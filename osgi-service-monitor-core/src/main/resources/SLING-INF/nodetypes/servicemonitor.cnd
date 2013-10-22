@@ -1,0 +1,8 @@
+<citytech = 'http://www.citytechinc.com'>
+
+[citytech:MonitorRecord] > nt:unstructured, sling:Resource
+  - monitoredService (string)
+  - startTime (string)
+  - endTime (string)
+  - responseType (string)
+  - stackTrace (string)
