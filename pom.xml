@@ -73,6 +73,7 @@
         <gpars.version>1.1.0</gpars.version>
         <guava.version>15.0</guava.version>
         <jackson.version>1.9.2</jackson.version>
+        <jsr166y.version>1.7.0</jsr166y.version>
 
     </properties>
 
@@ -116,6 +117,11 @@
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jsr166-mirror</groupId>
+                <artifactId>jsr166y</artifactId>
+                <version>${jsr166y.version}</version>
             </dependency>
 
             <!-- provided -->
