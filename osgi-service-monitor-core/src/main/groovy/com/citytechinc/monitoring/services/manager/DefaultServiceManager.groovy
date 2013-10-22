@@ -34,16 +34,16 @@ import org.osgi.framework.Constants as OsgiConstants
 class DefaultServiceManager implements ServiceManager {
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = ServiceStateMonitor, bind = "bindStateMonitors", unbind = "unbindStateMonitors")
-    private Map<ServiceStateMonitor, ServiceMonitorRecordHolder> stateMonitors = Maps.newConcurrentMap();
+    private Map<ServiceStateMonitor, ServiceMonitorRecordHolder> stateMonitors = Maps.newConcurrentMap()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = MonitoredService, bind = "bindMonitors", unbind = "unbindMonitors")
-    private Map<MonitoredService, ServiceMonitorRecordHolder> monitors = Maps.newConcurrentMap();
+    private Map<MonitoredService, ServiceMonitorRecordHolder> monitors = Maps.newConcurrentMap()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = NotificationAgent, bind = "bindNotificationAgents", unbind = "unbindNotificationAgents")
-    private Map<NotificationAgent, ServiceMonitorRecordHolder> notificationAgents = Maps.newConcurrentMap();
+    private Map<NotificationAgent, ServiceMonitorRecordHolder> notificationAgents = Maps.newConcurrentMap()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = RecordPersistenceService, bind = "bindPersistenceServices", unbind = "unbindPersistenceServices")
-    private Map<RecordPersistenceService, ServiceMonitorRecordHolder> persistenceServices = Maps.newConcurrentMap();
+    private Map<RecordPersistenceService, ServiceMonitorRecordHolder> persistenceServices = Maps.newConcurrentMap()
 
     protected void bindStateMonitors(final ServiceStateMonitor serviceStateMonitor) {
         stateMonitors.put(serviceStateMonitor)

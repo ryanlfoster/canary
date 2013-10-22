@@ -36,6 +36,13 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>citytech-public</id>
+            <url>http://nexus.citytech.ctmsp.com/content/groups/public</url>
+        </repository>
+    </repositories>
+
     <properties>
 
         <core.name>osgi-service-monitor-core</core.name>

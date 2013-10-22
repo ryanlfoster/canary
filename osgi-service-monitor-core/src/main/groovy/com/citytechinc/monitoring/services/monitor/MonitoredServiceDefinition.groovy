@@ -17,13 +17,13 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    int pollFrequency() default 1
+    int pollFrequency()
 
     /**
      *
      * @return
      */
-    TimeUnit pollFrequencyUnit() default TimeUnit.MINUTES
+    TimeUnit pollFrequencyUnit()
 
     /**
      *
@@ -71,7 +71,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    NotificationStrategy notificationStrategy() default NotificationStrategy.ALL
+    NotificationStrategy notificationStrategy() default NotificationStrategy.all
 
     /**
      *

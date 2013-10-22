@@ -11,35 +11,35 @@ import org.apache.commons.lang.exception.ExceptionUtils
  */
 class PollResponse {
 
-    private final PollResponseType pollResponseType;
-    private final String exceptionStackTrace;
+    private final PollResponseType pollResponseType
+    private final String exceptionStackTrace
 
-    protected ServiceMonitorResponse(final PollResponseType pollResponseType, final String exceptionStackTrace) {
-        this.pollResponseType = pollResponseType;
-        this.exceptionStackTrace = exceptionStackTrace;
+    protected PollResponse(final PollResponseType pollResponseType, final String exceptionStackTrace) {
+        this.pollResponseType = pollResponseType
+        this.exceptionStackTrace = exceptionStackTrace
     }
 
     public static PollResponse SUCCESS() {
-        return new PollResponse(PollResponseType.success, '');
+        return new PollResponse(PollResponseType.success, '')
     }
 
     public static PollResponse SERVICE_UNAVAILABLE() {
-        return new PollResponse(PollResponseType.service_unavailable, '');
+        return new PollResponse(PollResponseType.service_unavailable, '')
     }
 
     public static PollResponse UNEXPECTED_SERVICE_RESPONSE() {
-        return new PollResponse(PollResponseType.unexpected_service_response, '');
+        return new PollResponse(PollResponseType.unexpected_service_response, '')
     }
 
     public static PollResponse EXCEPTION(final Exception exception) {
-        return new PollResponse(PollResponseType.exception, ExceptionUtils.getStackTrace(exception));
+        return new PollResponse(PollResponseType.exception, ExceptionUtils.getStackTrace(exception))
     }
 
     public PollResponseType getPollResponseType() {
-        return pollResponseType;
+        return pollResponseType
     }
 
     public String getExceptionStackTrace() {
-        return exceptionStackTrace;
+        return exceptionStackTrace
     }
 }
