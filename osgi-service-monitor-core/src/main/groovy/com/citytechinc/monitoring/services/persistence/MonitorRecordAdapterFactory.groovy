@@ -10,15 +10,17 @@ import org.osgi.framework.Constants as OsgiConstants
 
 /**
  *
- * @author CITYTECH, INC. 2013
+ * @author Josh Durbin, CITYTECH, Inc. 2013
+ *
+ * Copyright 2013 CITYTECH, Inc.
  *
  */
 @Component(immediate = true)
 @Service(AdapterFactory)
 @SCRProperties([
-@Property(name = OsgiConstants.SERVICE_DESCRIPTION, value = "MyMove Address Express Domain Adapter"),
-@Property(name = "adapters", value = ['com.imagitas.mymove.addressexpress.domain.jcr.Category', 'com.imagitas.mymove.addressexpress.domain.jcr.Company']),
-@Property(name = "adaptables", value = ['org.apache.sling.api.resource.Resource'])])
+    @Property(name = OsgiConstants.SERVICE_DESCRIPTION, value = "Monitor Record Adapter Factory"),
+    @Property(name = "adapters", value = ['com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord']),
+    @Property(name = "adaptables", value = ['org.apache.sling.api.resource.Resource'])])
 @Slf4j
 class MonitorRecordAdapterFactory {
 }

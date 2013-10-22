@@ -2,13 +2,16 @@ package com.citytechinc.monitoring.services.notification
 
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord
+import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
+import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
+import org.apache.sling.commons.osgi.OsgiUtil
 import org.osgi.framework.Constants as OsgiConstants
 
 /**
@@ -24,13 +27,10 @@ import org.osgi.framework.Constants as OsgiConstants
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
 @NotificationAgentDefinition()
-class EmailNotification implements NotificationAgent{
+class EmailNotification implements NotificationAgent {
 
     @Reference
     MailService mailService
-
-    @Reference
-    SlingSettingsService slingSettingsService
 
     @Property(label = 'From email', value = [''], description = 'The from e-mail address when sending an alarm notification')
     private static final String FROM_EMAIL_PROPERTY = 'fromEmail'
@@ -44,12 +44,13 @@ class EmailNotification implements NotificationAgent{
     @Modified
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        fromEmail = OsgiUtil.toString(properties.get(FROM_EMAIL_PROPERTY), StringUtils.EMPTY)
+        fromEmail = OsgiUtil.toString(properties.get(FROM_EMAIL_PROPERTY), '')
         toEmailAddresses = Arrays.asList(OsgiUtil.toStringArray(properties.get(TO_EMAIL_ADDRESSES_PROPERTY)))
     }
     
     @Override
     void notify(ServiceMonitorRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
+        log.info("Received notification for record: ${record}")
     }
 }

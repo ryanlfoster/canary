@@ -1,6 +1,7 @@
 package com.citytechinc.monitoring.services.notification
 
 import com.citytechinc.monitoring.constants.Constants
+import com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.Properties
@@ -21,5 +22,11 @@ import org.osgi.framework.Constants as OsgiConstants
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
 @NotificationAgentDefinition(aggregateAlarms = false)
-class SMSNotification {
+class SMSNotification implements NotificationAgent {
+
+    @Override
+    void notify(ServiceMonitorRecord record) {
+
+        log.info("Received notification for record: ${record}")
+    }
 }

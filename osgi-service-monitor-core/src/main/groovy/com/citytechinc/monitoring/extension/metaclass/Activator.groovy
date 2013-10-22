@@ -1,6 +1,5 @@
 package com.citytechinc.monitoring.extension.metaclass
 
-
 import org.osgi.framework.BundleActivator
 import org.osgi.framework.BundleContext
 

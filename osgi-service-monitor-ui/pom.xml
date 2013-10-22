@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>com.imagitas.mymove</groupId>
-        <artifactId>mymove-address-express</artifactId>
-        <version>1.4.0-SNAPSHOT</version>
+        <groupId>com.citytechinc.monitoring</groupId>
+        <artifactId>osgi-service-monitor</artifactId>
+        <version>1.0.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>mymove-address-express-ui</artifactId>
+    <artifactId>osgi-service-monitor-ui</artifactId>
     <packaging>jar</packaging>
-    <name>MyMove.com Address Express UI</name>
+    <name>CITYTECH, Inc. OSGi Service Monitor UI</name>
 
     <properties>
         <maven.test.skip>true</maven.test.skip>
@@ -69,31 +69,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Component Plugin -->
-            <plugin>
-                <groupId>com.citytechinc.cq.cq-component-plugin</groupId>
-                <artifactId>cq-component-maven-plugin</artifactId>
-                <version>${cqcomponent.plugin.version}</version>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>component</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <componentPathBase>jcr_root/apps/mymove-address-express/components</componentPathBase>
-                    <defaultComponentGroup>MyMove Address Express</defaultComponentGroup>
-                    <transformerName>lower-case</transformerName>
-                    <excludeDependencies>
-                        <dependency>
-                            <groupId>com.imagitas.mymove</groupId>
-                            <artifactId>mymove-core</artifactId>
-                        </dependency>
-                    </excludeDependencies>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -118,22 +93,6 @@
                                 <argument>-F</argument>
                                 <argument>install=true</argument>
                             </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>clear-dispatcher-cache</id>
-                        <phase>install</phase>
-
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>curl</executable>
-                            <arguments>
-                                <argument>-v</argument>
-                                <argument>http://${dispatcher.host}/cgi-bin/clearPublish</argument>
-                            </arguments>
-                            <skip>${dispatcher.clear.skip}</skip>
                         </configuration>
                     </execution>
                 </executions>
@@ -179,13 +138,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>com.citytechinc.cqlibrary</groupId>
-            <artifactId>cq5-library-ui</artifactId>
-            <version>${cqlibrary.version}</version>
-            <scope>provided</scope>
-            <type>zip</type>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>${core.name}</artifactId>

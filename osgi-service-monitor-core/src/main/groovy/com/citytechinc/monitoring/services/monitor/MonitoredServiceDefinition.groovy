@@ -77,7 +77,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    String[] notificationSpecifics() default []
+    String[] notificationStrategySpecifics() default []
 
     /**
      *

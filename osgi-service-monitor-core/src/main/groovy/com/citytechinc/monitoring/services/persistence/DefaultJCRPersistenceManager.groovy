@@ -3,7 +3,6 @@ package com.citytechinc.monitoring.services.persistence
 import com.citytechinc.monitoring.constants.ServiceConstants
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import com.day.cq.commons.jcr.JcrUtil
-import com.google.common.base.Preconditions
 import groovy.util.logging.Slf4j
 import groovyx.gpars.GParsExecutorsPool
 import org.apache.felix.scr.annotations.Activate
