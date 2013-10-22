@@ -11,4 +11,6 @@ public interface ServiceManager {
 
     void forcePoll()
 
+    List<String> listMonitors()
+
 }

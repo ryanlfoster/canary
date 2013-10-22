@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
+          jcr:primaryType="cq:Template"
+          jcr:title="CITYTECH OSGi Service Monitor Dashboard Template"
+          jcr:description=""
+          allowedPaths="[/etc(/.*)?]"
+          ranking="{Long}10">
+    <jcr:content
+            jcr:primaryType="cq:PageContent"
+            sling:resourceType="osgi-service-monitor/components/page/servicemonitordashboard"
+            cq:designPath="/etc/designs/osgi-service-monitor"/>
+</jcr:root>
