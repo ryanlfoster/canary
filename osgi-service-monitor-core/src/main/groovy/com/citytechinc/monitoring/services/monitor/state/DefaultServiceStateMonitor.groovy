@@ -19,7 +19,7 @@ import org.osgi.framework.Constants as OsgiConstants
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(configurationFactory = true, policy = ConfigurationPolicy.REQUIRE, label = 'CITYTECH Service Monitor Service State Monitor Definition', description = '', immediate = true)
+@Component(configurationFactory = true, policy = ConfigurationPolicy.REQUIRE, label = 'Service State Monitor Definition', description = '', immediate = true, metatype = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])

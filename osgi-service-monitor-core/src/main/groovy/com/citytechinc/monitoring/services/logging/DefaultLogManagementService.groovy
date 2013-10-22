@@ -16,7 +16,7 @@ import org.osgi.framework.Constants as OsgiConstants
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(label = 'CITYTECH Service Monitor Log Management Service', description = 'Is responsible for handling escalation of logs for alarms, reading log output, and removing alarms.', immediate = true)
+@Component(immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])

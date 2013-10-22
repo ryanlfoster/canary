@@ -50,7 +50,6 @@
         <!-- plugins -->
         <compiler.version>1.6</compiler.version>
         <compiler.plugin.version>2.3.2</compiler.plugin.version>
-        <exec.plugin.version>1.2</exec.plugin.version>
         <scr.plugin.version>1.13.0</scr.plugin.version>
         <gmaven.version>1.4</gmaven.version>
         <gmaven.provider.version>1.8</gmaven.provider.version>
@@ -65,13 +64,128 @@
         <failsafe.plugin.version>2.11</failsafe.plugin.version>
         <m2e.plugin.version>1.0.0</m2e.plugin.version>
         <assembly.plugin.version>2.2.1</assembly.plugin.version>
-        <sling.plugin.version>2.1.0</sling.plugin.version>
         <release.plugin.version>2.2.2</release.plugin.version>
-        <deploy.plugin.version>2.4</deploy.plugin.version>
-        <jaxws.plugin.version>2.1</jaxws.plugin.version>
-        <cqcomponent.plugin.version>1.1.5</cqcomponent.plugin.version>
 
+        <!-- dependencies -->
+        <felix.scr.annotations>1.9.4</felix.scr.annotations>
         <groovy.version>2.1.7</groovy.version>
+        <slf4j.nop.version>1.6.4</slf4j.nop.version>
+        <gpars.version>1.1.0</gpars.version>
+        <guava.version>15.0</guava.version>
+        <jackson.version>1.9.2</jackson.version>
+
     </properties>
+
+    <dependencyManagement>
+
+        <dependencies>
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr.annotations</artifactId>
+                <version>${felix.scr.annotations}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${slf4j.nop.version}</version>
+            </dependency>
+
+            <!-- 3rd party -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.gpars</groupId>
+                <artifactId>gpars</artifactId>
+                <version>${gpars.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- provided -->
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.jcr.api</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.jcr</groupId>
+                <artifactId>jcr</artifactId>
+                <version>2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.6.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>1.2.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.api</artifactId>
+                <version>2.2.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.commons.osgi</artifactId>
+                <version>2.0.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.commons.scheduler</artifactId>
+                <version>2.3.4</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.adobe.granite</groupId>
+                <artifactId>com.adobe.granite.jmx</artifactId>
+                <version>0.2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>com.day.cq</groupId>
+                <artifactId>cq-mailer</artifactId>
+                <version>5.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.day.cq</groupId>
+                <artifactId>cq-commons</artifactId>
+                <version>5.5.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

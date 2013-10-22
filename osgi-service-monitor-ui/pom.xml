@@ -70,34 +70,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>install-package</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>curl</executable>
-                            <arguments>
-                                <argument>-f</argument>
-                                <argument>-v</argument>
-                                <argument>-u</argument>
-                                <argument>${sling.user}:${sling.password}</argument>
-                                <argument>-F</argument>
-                                <argument>file=@./target/${project.artifactId}-${project.parent.version}.zip</argument>
-                                <argument>http://${sling.host}:${sling.port}/crx/packmgr/service.jsp?name=${project.artifactId}-${project.parent.version}</argument>
-                                <argument>-F</argument>
-                                <argument>install=true</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${release.plugin.version}</version>

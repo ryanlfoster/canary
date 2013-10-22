@@ -22,7 +22,7 @@ import org.osgi.framework.Constants as OsgiConstants
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(label = 'OSGi Service Monitor Default JCR Persistence Manager', description = 'Responsible for persisting monitor data to the JCR.', immediate = true)
+@Component(immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = ServiceConstants.VENDOR_NAME) ])
