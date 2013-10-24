@@ -2,7 +2,6 @@ package com.citytechinc.monitoring.services.notification
 
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord
 import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
