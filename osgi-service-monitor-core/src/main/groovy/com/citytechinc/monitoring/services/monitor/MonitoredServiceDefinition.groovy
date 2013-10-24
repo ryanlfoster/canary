@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    TimeUnit autoResumePollingUnit() default TimeUnit.MINUTES
+    TimeUnit autoResumePollingUnit()
 
     /**
      *
