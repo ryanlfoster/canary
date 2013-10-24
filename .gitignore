@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+*.iml
+*.iws
+.project
+.metadata
+.classpath
+.settings/
+osgi-service-monitor-core/target
+osgi-service-monitor-ui/target
