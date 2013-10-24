@@ -13,4 +13,6 @@ public interface ServiceManager {
 
     List<String> listMonitors()
 
+    void informOfShutdown(String service)
+
 }

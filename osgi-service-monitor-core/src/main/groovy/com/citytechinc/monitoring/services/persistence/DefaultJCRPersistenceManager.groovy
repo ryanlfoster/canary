@@ -3,8 +3,9 @@ package com.citytechinc.monitoring.services.persistence
 import com.citytechinc.monitoring.constants.ServiceConstants
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import com.day.cq.commons.jcr.JcrUtil
+import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
-import groovyx.gpars.GParsExecutorsPool
+import groovyx.gpars.GParsPool
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.Modified
@@ -51,7 +52,7 @@ class DefaultJCRPersistenceManager implements RecordPersistenceService {
     @Override
     void persistRecords(List<ServiceMonitorRecordHolder> records) {
 
-        GParsExecutorsPool.withPool {
+        GParsPool.withPool {
 
             records.eachParallel { recordHolder ->
 
@@ -61,9 +62,10 @@ class DefaultJCRPersistenceManager implements RecordPersistenceService {
 
                     session = slingRepository.loginAdministrative(null)
 
-                    recordHolder.getRecordsAsList().each { record ->
+                    recordHolder.getRecords().each { record ->
 
-                        def recordNode = JcrUtil.createPath(record.monitoredService, 'nt:unstructured', ServiceConstants.MONITOR_RECORD_NODE_TYPE, session, false)
+                        //def recordNode = JcrUtil.createPath(record.monitoredService, 'nt:unstructured', ServiceConstants.MONITOR_RECORD_NODE_TYPE, session, false)
+                        def recordNode = JcrUtil.createPath(record.monitoredService, 'nt:unstructured', 'nt:unstructured', session, false)
 
                         recordNode.set('monitoredService', record.monitoredService)
                         recordNode.set('startTime', record.startTime)
@@ -83,6 +85,17 @@ class DefaultJCRPersistenceManager implements RecordPersistenceService {
 
     @Override
     List<ServiceMonitorRecordHolder> loadRecords() {
-        return null  //To change body of implemented methods use File | Settings | File Templates.
+
+        def session = slingRepository.loginAdministrative(null)
+        def rootNode = session.getNode(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE)
+
+        def collectedRecords = Lists.newCopyOnWriteArrayList()
+
+        GParsPool.withPool {
+
+            rootNode.recurse
+        }
+
+        session.logout()
     }
 }

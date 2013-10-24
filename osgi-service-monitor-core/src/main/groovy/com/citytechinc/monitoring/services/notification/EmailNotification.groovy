@@ -1,6 +1,7 @@
 package com.citytechinc.monitoring.services.notification
 
 import com.citytechinc.monitoring.constants.Constants
+import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord
 import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
@@ -47,10 +48,9 @@ class EmailNotification implements NotificationAgent {
         fromEmail = OsgiUtil.toString(properties.get(FROM_EMAIL_PROPERTY), '')
         toEmailAddresses = Arrays.asList(OsgiUtil.toStringArray(properties.get(TO_EMAIL_ADDRESSES_PROPERTY)))
     }
-    
-    @Override
-    void notify(ServiceMonitorRecord record) {
 
-        log.info("Received notification for record: ${record}")
+    @Override
+    void notify(List<ServiceMonitorRecordHolder> recordHolders) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

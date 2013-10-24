@@ -5,10 +5,12 @@
       <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="osgi-service-monitor-core-1.0.0.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="com.citytechinc.monitoring.extension.metaclass.Activator" bundleSymbolicName="com.citytechinc.monitoring.osgi-service-monitor-core" bundleVersion="1.0.0" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
           <property key="Bundle-Description" value="Bundle containing a set of OSGi services useful for basic monitoring of (other) OSGi services." />
+          <property key="Bundle-Vendor" value="CITYTECH, Inc." />
+          <property key="Bundle-DocURL" value="http://www.citytechinc.com" />
           <property key="Export-Package" value="com.citytechinc.monitoring.*" />
           <property key="DynamicImport-Package" value="*" />
           <property key="Bundle-Category" value="citytech" />
-          <property key="Sling-Nodetypes" value="SLING-INF/nodetypes/addressexpress.cnd" />
+          <property key="Sling-Nodetypes" value="SLING-INF/nodetypes/servicemonitor.cnd" />
           <property key="Bundle-Name" value="CITYTECH, Inc. OSGi Service Monitor Core" />
           <property key="Include-Resource" value="SLING-INF/nodetypes/servicemonitor.cnd=$MODULE_DIR$/src/main/resources/SLING-INF/nodetypes/servicemonitor.cnd" />
         </additionalProperties>
@@ -38,6 +40,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.guava:guava:15.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.felix:org.apache.felix.scr:1.6.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.jcr.api:2.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.jcr:jcr:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.4" level="project" />

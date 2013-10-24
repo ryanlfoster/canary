@@ -2,12 +2,12 @@ package com.citytechinc.monitoring.services.manager
 
 import com.citytechinc.monitoring.services.monitor.MonitoredService
 import com.citytechinc.monitoring.services.monitor.MonitoredServiceDefinition
-import com.citytechinc.monitoring.services.monitor.state.ServiceStateMonitor
 import com.citytechinc.monitoring.services.notification.NotificationAgent
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.notification.NotificationAgentDefinition
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceServiceDefinition
+import com.google.common.collect.Lists
 import com.google.common.collect.Maps
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component
@@ -33,9 +33,6 @@ import org.osgi.framework.Constants as OsgiConstants
 @Slf4j
 class DefaultServiceManager implements ServiceManager {
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = ServiceStateMonitor, bind = "bindStateMonitors", unbind = "unbindStateMonitors")
-    private Map<ServiceStateMonitor, ServiceMonitorRecordHolder> stateMonitors = Maps.newConcurrentMap()
-
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = MonitoredService, bind = "bindMonitors", unbind = "unbindMonitors")
     private Map<MonitoredService, ServiceMonitorRecordHolder> monitors = Maps.newConcurrentMap()
 
@@ -43,19 +40,11 @@ class DefaultServiceManager implements ServiceManager {
     private Map<NotificationAgent, ServiceMonitorRecordHolder> notificationAgents = Maps.newConcurrentMap()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = RecordPersistenceService, bind = "bindPersistenceServices", unbind = "unbindPersistenceServices")
-    private Map<RecordPersistenceService, ServiceMonitorRecordHolder> persistenceServices = Maps.newConcurrentMap()
-
-    protected void bindStateMonitors(final ServiceStateMonitor serviceStateMonitor) {
-        stateMonitors.put(serviceStateMonitor)
-    }
-
-    protected void unbindStateMonitors(final ServiceStateMonitor serviceStateMonitor) {
-        stateMonitors.remove(serviceStateMonitor)
-    }
+    private List<RecordPersistenceService> persistenceServices = Lists.newCopyOnWriteArrayList()
 
     protected void bindMonitors(final MonitoredService monitoredService) {
         def definition = monitoredService.class.getAnnotation(MonitoredServiceDefinition)
-        monitors.put(monitoredService, null)
+        monitors.put(monitoredService, new ServiceMonitorRecordHolder(definition.pollHistoryLength()))
     }
 
     protected void unbindMonitors(final MonitoredService monitoredService) {
@@ -73,7 +62,7 @@ class DefaultServiceManager implements ServiceManager {
 
     protected void bindPersistenceServices(final RecordPersistenceService recordPersistenceService) {
         def definition = recordPersistenceService.class.getAnnotation(RecordPersistenceServiceDefinition)
-        persistenceServices.put(recordPersistenceService, null)
+        persistenceServices.add(recordPersistenceService)
     }
 
     protected void unbindPersistenceServices(final RecordPersistenceService recordPersistenceService) {
@@ -88,5 +77,10 @@ class DefaultServiceManager implements ServiceManager {
     @Override
     List<String> listMonitors() {
         []
+    }
+
+    @Override
+    void informOfShutdown(String service) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

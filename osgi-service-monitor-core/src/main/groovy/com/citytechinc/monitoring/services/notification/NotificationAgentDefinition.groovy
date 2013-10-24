@@ -1,5 +1,4 @@
 package com.citytechinc.monitoring.services.notification
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -26,4 +25,18 @@ public @interface NotificationAgentDefinition {
      * @return
      */
     boolean summarizeNotifications() default true
+
+    /**
+     *
+     * Notification strategy for this service.
+     *
+     * @return
+     */
+    SubscriptionStrategy subscriptionStrategy() default SubscriptionStrategy.all
+
+    /**
+     *
+     * @return
+     */
+    String[] subscriptionStrategySpecifics() default []
 }

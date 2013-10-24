@@ -3,6 +3,7 @@ package com.citytechinc.monitoring.services.manager
 import com.citytechinc.monitoring.services.monitor.PollResponseType
 import com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord
 import com.google.common.base.Optional
+import com.google.common.collect.Queues
 import groovy.transform.ToString
 
 /**
@@ -15,39 +16,52 @@ import groovy.transform.ToString
 @ToString(includeNames=true)
 class ServiceMonitorRecordHolder {
 
-    Queue<ServiceMonitorRecord> records
+    private Queue<ServiceMonitorRecord> records
+    private String monitoredService
 
-    List<ServiceMonitorRecord> getRecordsAsList() {
+    public ServiceMonitorRecordHolder() {
+        this(10)
+    }
+
+    public ServiceMonitorRecordHolder(Integer numberOfRecords) {
+        records = Queues.newArrayBlockingQueue(numberOfRecords)
+    }
+
+    void addRecord(ServiceMonitorRecord record) {
+        records.offer(record)
+    }
+
+    List<ServiceMonitorRecord> getRecords() {
         records as List
     }
 
     Optional<ServiceMonitorRecord> getFirstSuccessfulPoll() {
 
-        def firstRecord = getRecordsAsList().collect { it.responseType == PollResponseType.success }.sort { it.startTime }.first()
+        def firstRecord = getRecords().findAll() { it.responseType == PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
     }
 
     Optional<ServiceMonitorRecord> getMostRecentSuccessfulPoll() {
 
-        def firstRecord = getRecordsAsList().collect { it.responseType == PollResponseType.success }.sort { it.startTime }.first()
+        def firstRecord = getRecords().findAll { it.responseType == PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
     }
 
     Optional<ServiceMonitorRecord> getFirstFailedPoll() {
 
-        def firstRecord = getRecordsAsList().collect { it.responseType != PollResponseType.success }.sort { it.startTime }.first()
+        def firstRecord = getRecords().findAll { it.responseType != PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
     }
 
     Optional<ServiceMonitorRecord> getMostRecentFailedPoll() {
 
-        def firstRecord = getRecordsAsList().collect { it.responseType != PollResponseType.success }.sort { it.startTime }.first()
+        def firstRecord = getRecords().findAll { it.responseType != PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
     }
 
     Integer getTotalNumberOfFailures() {
 
-        getRecordsAsList().count { it.responseType != PollResponseType.success }
+        getRecords().count { it.responseType != PollResponseType.success }
     }
 
     Integer getTotalNumberOfSuccessiveFailures() {

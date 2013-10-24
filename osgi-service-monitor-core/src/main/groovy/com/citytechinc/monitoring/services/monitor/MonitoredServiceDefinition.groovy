@@ -47,7 +47,13 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    int autoResumePollingPeriod()
+    int autoResumePollingPeriod() default 0
+
+    /**
+     *
+     * @return
+     */
+    TimeUnit autoResumePollingUnit() default TimeUnit.MINUTES
 
     /**
      *
@@ -64,20 +70,6 @@ import java.util.concurrent.TimeUnit
      * @return
      */
     int pollHistoryLength() default 50
-
-    /**
-     *
-     * Notification strategy for this service.
-     *
-     * @return
-     */
-    NotificationStrategy notificationStrategy() default NotificationStrategy.all
-
-    /**
-     *
-     * @return
-     */
-    String[] notificationStrategySpecifics() default []
 
     /**
      *

@@ -11,7 +11,6 @@ import com.citytechinc.monitoring.services.monitor.PollResponseType
  */
 class ServiceMonitorRecord {
 
-    String monitoredService
     Date startTime
     Date endTime
     PollResponseType responseType
