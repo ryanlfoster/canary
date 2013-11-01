@@ -1,5 +1,6 @@
 package com.citytechinc.monitoring.services.manager
 
+import com.citytechinc.monitoring.constants.ServiceConstants
 import com.citytechinc.monitoring.services.monitor.MonitoredService
 import com.citytechinc.monitoring.services.monitor.MonitoredServiceDefinition
 import com.citytechinc.monitoring.services.notification.NotificationAgent
@@ -7,10 +8,13 @@ import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.notification.NotificationAgentDefinition
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceServiceDefinition
+import com.day.cq.commons.jcr.JcrConstants
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
 import groovy.util.logging.Slf4j
+import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
+import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Reference
@@ -67,6 +71,14 @@ class DefaultServiceManager implements ServiceManager {
 
     protected void unbindPersistenceServices(final RecordPersistenceService recordPersistenceService) {
         persistenceServices.remove(recordPersistenceService)
+    }
+
+    @Activate
+    protected void activate(final Map<String, Object> properties) throws Exception {
+
+        log.info('Waiting 30 seconds for persistence managers to bind...')
+        sleep 30000
+        log.info('Manager now active.')
     }
 
     @Override

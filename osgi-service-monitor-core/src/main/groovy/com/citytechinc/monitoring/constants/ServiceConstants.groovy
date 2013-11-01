@@ -9,8 +9,10 @@ package com.citytechinc.monitoring.constants
  */
 class ServiceConstants {
 
-    static final String JCR_PERSISTENCE_STORAGE_ROOT_NODE = '/etc/service_monitoring'
+    static final String JCR_PERSISTENCE_STORAGE_ROOT_NODE = 'service_monitoring'
+    static final String JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH = '/etc/' + JCR_PERSISTENCE_STORAGE_ROOT_NODE
     static final String VENDOR_NAME = 'CITYTECH, Inc.'
+    static final String MONITOR_RECORD_HOLDER_NODE_TYPE = 'MonitorRecordHolder'
     static final String MONITOR_RECORD_NODE_TYPE = 'citytech:MonitorRecord'
 
     public static final String ABSTRACT_JSON_RESPONSE_SERVLET_CONTENT_TYPE = 'application/json'

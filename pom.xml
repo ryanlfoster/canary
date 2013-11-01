@@ -123,6 +123,7 @@
         <guava.version>15.0</guava.version>
         <jackson.version>1.9.2</jackson.version>
         <jsr166y.version>1.7.0</jsr166y.version>
+        <spock.version>0.7-groovy-2.0</spock.version>
 
     </properties>
 
@@ -171,6 +172,12 @@
                 <groupId>org.codehaus.jsr166-mirror</groupId>
                 <artifactId>jsr166y</artifactId>
                 <version>${jsr166y.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>${spock.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- provided -->

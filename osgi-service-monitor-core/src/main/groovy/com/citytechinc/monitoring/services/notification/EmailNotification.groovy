@@ -6,6 +6,7 @@ import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
+import org.apache.felix.scr.annotations.ConfigurationPolicy
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
@@ -21,7 +22,7 @@ import org.osgi.framework.Constants as OsgiConstants
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(label = 'CITYTECH Service Monitor EMail Notification', description = '', immediate = true, metatype = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, label = 'CITYTECH Service Monitor EMail Notification', description = '', immediate = true, metatype = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])

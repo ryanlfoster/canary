@@ -1,7 +1,9 @@
 <citytech = 'http://www.citytechinc.com'>
 
-[citytech:MonitorRecord] > nt:unstructured, sling:Resource
+[citytech:MonitorRecordHolder] > nt:unstructured, sling:Resource
   - monitoredService (string)
+
+[citytech:MonitorRecord] > nt:unstructured, sling:Resource
   - startTime (string)
   - endTime (string)
   - responseType (string)

@@ -1,5 +1,7 @@
 package com.citytechinc.monitoring.services.monitor
 
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
 import java.util.concurrent.TimeUnit
 
 /**
@@ -9,7 +11,24 @@ import java.util.concurrent.TimeUnit
  * Copyright 2013 CITYTECH, Inc.
  *
  */
+@Retention(RetentionPolicy.RUNTIME)
 @interface MonitoredServiceDefinition {
+
+    /**
+     *
+     * A sensible name for the monitor. If none is defined, the classname is used.
+     *
+     * @return
+     */
+    String name()
+
+    /**
+     *
+     * A description of what is polled.
+     *
+     * @return
+     */
+    String description()
 
     /**
      *
@@ -32,28 +51,6 @@ import java.util.concurrent.TimeUnit
      * @return
      */
     int sequentialFailedPollsToTriggerAlarm() default 3
-
-    /**
-     *
-     * Service should auto-resume polling after an alarm is triggered and not reset.
-     *
-     * @return
-     */
-    boolean autoResumePolling() default false
-
-    /**
-     *
-     * Service should auto-remove polling after n minutes when an alarm is triggered and not reset.
-     *
-     * @return
-     */
-    int autoResumePollingPeriod() default 0
-
-    /**
-     *
-     * @return
-     */
-    TimeUnit autoResumePollingUnit()
 
     /**
      *

@@ -2,12 +2,13 @@ package com.citytechinc.monitoring.services.persistence
 
 import com.citytechinc.monitoring.constants.ServiceConstants
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import com.day.cq.commons.jcr.JcrUtil
+import com.day.cq.commons.jcr.JcrConstants
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
 import groovyx.gpars.GParsPool
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
+import org.apache.felix.scr.annotations.ConfigurationPolicy
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Properties
@@ -23,7 +24,7 @@ import org.osgi.framework.Constants as OsgiConstants
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(immediate = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = ServiceConstants.VENDOR_NAME) ])
@@ -40,9 +41,10 @@ class DefaultJCRPersistenceManager implements RecordPersistenceService {
 
         def session = slingRepository.loginAdministrative(null)
 
-        if (!session.nodeExists(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE)) {
+        if (!session.nodeExists(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH)) {
 
-            JcrUtil.createPath(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE, 'nt:unstructured', 'nt:unstructured', session, false)
+            def node = session.getNode('/etc')
+            node.addNode(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE, JcrConstants.NT_FOLDER)
 
             session.save()
             session.logout()
@@ -62,17 +64,27 @@ class DefaultJCRPersistenceManager implements RecordPersistenceService {
 
                     session = slingRepository.loginAdministrative(null)
 
+                    if (session.nodeExists(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + recordHolder.monitoredService)) {
+
+                        def nodeToRemove = session.getNode(session.nodeExists(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + recordHolder.monitoredService))
+                        nodeToRemove.remove()
+                        session.save()
+                    }
+
+                    def rootNode = session.getNode(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH)
+                    def recordHolderNode = rootNode.addNode(recordHolder.monitoredService, ServiceConstants.MONITOR_RECORD_HOLDER_NODE_TYPE)
+
                     recordHolder.getRecords().each { record ->
 
-                        //def recordNode = JcrUtil.createPath(record.monitoredService, 'nt:unstructured', ServiceConstants.MONITOR_RECORD_NODE_TYPE, session, false)
-                        def recordNode = JcrUtil.createPath(record.monitoredService, 'nt:unstructured', 'nt:unstructured', session, false)
+                        def recordNode = recordHolderNode.addNode(record.startTime, ServiceConstants.MONITOR_RECORD_NODE_TYPE)
 
-                        recordNode.set('monitoredService', record.monitoredService)
                         recordNode.set('startTime', record.startTime)
                         recordNode.set('endTime', record.endTime)
                         recordNode.set('responseType', record.responseType)
                         recordNode.set('stackTrace', record.stackTrace)
                     }
+
+                    session.save()
 
                 } catch (all) {
                     log.error(all)
