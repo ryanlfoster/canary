@@ -1,27 +1,27 @@
 package com.citytechinc.monitoring.services.manager
 
-import com.citytechinc.monitoring.constants.ServiceConstants
+import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.monitor.MonitoredService
 import com.citytechinc.monitoring.services.monitor.MonitoredServiceDefinition
 import com.citytechinc.monitoring.services.notification.NotificationAgent
-import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.notification.NotificationAgentDefinition
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceServiceDefinition
-import com.day.cq.commons.jcr.JcrConstants
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
-import org.apache.felix.scr.annotations.Modified
-import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Properties
+import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.ReferenceCardinality
 import org.apache.felix.scr.annotations.ReferencePolicy
 import org.apache.felix.scr.annotations.Service
+import org.apache.sling.commons.scheduler.Scheduler
 import org.osgi.framework.Constants as OsgiConstants
+
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -37,6 +37,9 @@ import org.osgi.framework.Constants as OsgiConstants
 @Slf4j
 class DefaultServiceManager implements ServiceManager {
 
+    @Reference
+    Scheduler scheduler
+
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = MonitoredService, bind = "bindMonitors", unbind = "unbindMonitors")
     private Map<MonitoredService, ServiceMonitorRecordHolder> monitors = Maps.newConcurrentMap()
 
@@ -49,6 +52,13 @@ class DefaultServiceManager implements ServiceManager {
     protected void bindMonitors(final MonitoredService monitoredService) {
         def definition = monitoredService.class.getAnnotation(MonitoredServiceDefinition)
         monitors.put(monitoredService, new ServiceMonitorRecordHolder(definition.pollHistoryLength()))
+
+        scheduler.addPeriodicJob('key', new Runnable() {
+            @Override
+            void run() {
+
+            }
+        }, [:], TimeUnit.SECONDS.convert(definition.pollFrequency(), definition.pollFrequencyUnit()), false)
     }
 
     protected void unbindMonitors(final MonitoredService monitoredService) {

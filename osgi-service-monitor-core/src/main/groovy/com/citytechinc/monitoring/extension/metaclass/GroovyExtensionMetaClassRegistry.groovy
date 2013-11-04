@@ -1,6 +1,5 @@
 package com.citytechinc.monitoring.extension.metaclass
 
-
 import org.codehaus.groovy.runtime.InvokerHelper
 
 import javax.jcr.Node

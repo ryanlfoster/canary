@@ -13,13 +13,16 @@ public @interface AutoResumingPoller {
 
     /**
      *
-     * Service should auto-remove polling after n minutes when an alarm is triggered and not reset.
+     * Service should auto-resume polling after this defined time period. If a subsequent alarm is triggered,
+     *   the framework will wait for this defined period before polling again.
      *
      * @return
      */
     int autoResumePollingPeriod() default 0
 
     /**
+     *
+     * Unit relating to polling period.
      *
      * @return
      */

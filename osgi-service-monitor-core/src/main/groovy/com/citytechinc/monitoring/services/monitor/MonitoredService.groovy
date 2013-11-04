@@ -9,5 +9,11 @@ package com.citytechinc.monitoring.services.monitor
  */
 public interface MonitoredService {
 
+    /**
+     *
+     * Instructs a specific Monitor to execute its poll method.
+     *
+     * @return The poll response and any supporting data (exceptions).
+     */
     public PollResponse poll()
 }
