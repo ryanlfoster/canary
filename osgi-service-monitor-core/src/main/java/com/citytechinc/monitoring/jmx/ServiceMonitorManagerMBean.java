@@ -13,7 +13,7 @@ public interface ServiceMonitorManagerMBean {
     /**
      *
      */
-    @Description("Instruct the ServiceMonitorManager to poll all monitors")
-    public void forcePoll();
+//    @Description("Instruct the ServiceMonitorManager to poll all monitors")
+//    public void forcePoll();
 
 }

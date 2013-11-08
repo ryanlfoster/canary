@@ -43,5 +43,5 @@ public @interface NotificationAgentDefinition {
      *
      * @return
      */
-    String[] subscriptionStrategySpecifics() default []
+    Class[] subscriptionStrategySpecifics() default []
 }

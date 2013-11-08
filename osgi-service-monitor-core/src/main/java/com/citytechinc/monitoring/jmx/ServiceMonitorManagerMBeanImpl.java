@@ -30,9 +30,4 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
         super(ServiceMonitorManagerMBean.class);
     }
 
-    @Override
-    public void forcePoll() {
-        serviceManager.forcePoll();
-    }
-
 }

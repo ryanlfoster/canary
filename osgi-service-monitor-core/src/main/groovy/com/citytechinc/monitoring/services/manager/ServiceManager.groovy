@@ -9,10 +9,4 @@ package com.citytechinc.monitoring.services.manager
  */
 public interface ServiceManager {
 
-    void forcePoll()
-
-    List<String> listMonitors()
-
-    void informOfShutdown(String service)
-
 }

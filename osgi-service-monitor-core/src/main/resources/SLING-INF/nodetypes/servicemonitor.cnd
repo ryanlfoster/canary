@@ -2,6 +2,9 @@
 
 [citytech:MonitorRecordHolder] > nt:unstructured, sling:Resource
   - monitoredService (string)
+  - totalPolls (long)
+  - totalSuccessfulPolls (long)
+  - totalUnsuccessfulPolls (long)
 
 [citytech:MonitorRecord] > nt:unstructured, sling:Resource
   - startTime (string)
