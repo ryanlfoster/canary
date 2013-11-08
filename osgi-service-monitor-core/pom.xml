@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.citytechinc.monitoring</groupId>
         <artifactId>osgi-service-monitor</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -174,11 +174,7 @@
         </dependency>
 
         <!-- provided -->
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.jcr.api</artifactId>

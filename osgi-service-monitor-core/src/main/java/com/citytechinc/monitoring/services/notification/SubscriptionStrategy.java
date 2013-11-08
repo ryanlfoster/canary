@@ -1,4 +1,4 @@
-package com.citytechinc.monitoring.services.notification
+package com.citytechinc.monitoring.services.notification;
 
 /**
  *
@@ -9,6 +9,5 @@ package com.citytechinc.monitoring.services.notification
  */
 public enum SubscriptionStrategy {
 
-    all, all_excluding, none_excluding
-
+    ALL, ALL_EXCLUDING, NONE_EXCLUDING;
 }

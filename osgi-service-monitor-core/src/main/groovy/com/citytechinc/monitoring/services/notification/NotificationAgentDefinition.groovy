@@ -37,7 +37,7 @@ public @interface NotificationAgentDefinition {
      *
      * @return
      */
-    SubscriptionStrategy subscriptionStrategy() default SubscriptionStrategy.all
+    SubscriptionStrategy subscriptionStrategy() default SubscriptionStrategy.ALL
 
     /**
      *

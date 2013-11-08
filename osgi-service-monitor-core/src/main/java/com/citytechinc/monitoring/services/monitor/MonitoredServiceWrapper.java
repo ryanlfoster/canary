@@ -1,7 +1,5 @@
 package com.citytechinc.monitoring.services.monitor;
 
-import com.citytechinc.monitoring.constants.Constants;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,15 +14,13 @@ public final class MonitoredServiceWrapper {
     private final MonitoredService monitor;
     private final MonitoredServiceDefinition definition;
     private final AutoResumingPoller pollerDefinition;
-    private final Long pollIntervalInSeconds;
-    private final String schedulerKey;
+    private final Long pollIntervalInMilliseconds;
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
         this.monitor = monitor;
         definition = monitor.getClass().getAnnotation(MonitoredServiceDefinition.class);
         pollerDefinition = monitor.getClass().getAnnotation(AutoResumingPoller.class);
-        pollIntervalInSeconds = TimeUnit.SECONDS.convert(definition.pollFrequency(), definition.pollFrequencyUnit());
-        schedulerKey = Constants.FAST_HASH.hashUnencodedChars(monitor.getClass().getCanonicalName()).toString();
+        pollIntervalInMilliseconds = TimeUnit.MILLISECONDS.convert(definition.pollFrequency(), definition.pollFrequencyUnit());
     }
 
     public MonitoredServiceDefinition getDefinition() {
@@ -39,11 +35,7 @@ public final class MonitoredServiceWrapper {
         return pollerDefinition;
     }
 
-    public Long getPollIntervalInSeconds() {
-        return pollIntervalInSeconds;
-    }
-
-    public String getSchedulerKey() {
-        return schedulerKey;
+    public Long getPollIntervalInMilliseconds() {
+        return pollIntervalInMilliseconds;
     }
 }

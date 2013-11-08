@@ -13,7 +13,9 @@ import javax.management.NotCompliantMBeanException;
 
 /**
  *
- * @author CITYTECH, INC. 2013
+ * @author Josh Durbin, CITYTECH, Inc. 2013
+ *
+ * Copyright 2013 CITYTECH, Inc.
  *
  */
 @Component(immediate = true)

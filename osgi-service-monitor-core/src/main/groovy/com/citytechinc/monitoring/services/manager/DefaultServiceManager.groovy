@@ -23,8 +23,6 @@ import org.apache.felix.scr.annotations.ReferencePolicy
 import org.apache.felix.scr.annotations.Service
 import org.osgi.framework.Constants as OsgiConstants
 
-import java.util.concurrent.ConcurrentSkipListSet
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -49,7 +47,7 @@ class DefaultServiceManager implements ServiceManager {
     private List<PollResponseHandlerWrapper> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = RecordPersistenceService, bind = "bindPersistenceService", unbind = "unbindPersistenceService")
-    private List<RecordPersistenceServiceWrapper> registeredPersistenceServices = new ConcurrentSkipListSet(Constants.RECORD_PERSISTENCE_SERVICE_WRAPPER_COMPARATOR)
+    private List<RecordPersistenceServiceWrapper> registeredPersistenceServices = Lists.newCopyOnWriteArrayList()
 
     protected void bindMonitor(final MonitoredService monitoredService) {
         registeredMonitors.add(new MonitoredServiceWrapper(monitoredService))
@@ -67,6 +65,9 @@ class DefaultServiceManager implements ServiceManager {
 
     protected void bindPersistenceService(final RecordPersistenceService recordPersistenceService) {
         registeredPersistenceServices.add(new RecordPersistenceServiceWrapper(recordPersistenceService), Constants.RECORD_PERSISTENCE_SERVICE_WRAPPER_COMPARATOR)
+
+
+        registeredPersistenceServices.sort { it.definition.ranking() }.first().service
     }
 
     protected void unbindPersistenceService(final RecordPersistenceService recordPersistenceService) {

@@ -1,5 +1,7 @@
 package com.citytechinc.monitoring.services.monitor
 
+import com.citytechinc.monitoring.services.manager.MissionControlActor
+import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import groovyx.gpars.actor.DefaultActor
 
 /**
@@ -10,4 +12,21 @@ import groovyx.gpars.actor.DefaultActor
  *
  */
 final class MonitoredServiceActor extends DefaultActor {
+
+    MonitoredServiceWrapper wrapper
+    ServiceMonitorRecordHolder recordHolder
+    MissionControlActor missionControl
+
+    void act() {
+
+        loop {
+
+
+
+            sleep(wrapper.pollIntervalInMilliseconds)
+
+            wrapper.monitor.poll()
+            record
+        }
+    }
 }

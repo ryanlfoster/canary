@@ -47,8 +47,9 @@ class DefaultJCRPersistenceManager implements RecordPersistenceService {
             node.addNode(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE, JcrConstants.NT_FOLDER)
 
             session.save()
-            session.logout()
         }
+
+        session.logout()
     }
 
     @Override
