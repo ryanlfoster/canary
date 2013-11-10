@@ -4,7 +4,6 @@ import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.monitor.MonitoredService
 import com.citytechinc.monitoring.services.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.services.notification.NotificationAgent
-import com.citytechinc.monitoring.services.notification.NotificationAgentActor
 import com.citytechinc.monitoring.services.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceServiceWrapper
@@ -41,7 +40,7 @@ class DefaultServiceManager implements ServiceManager {
     private List<MonitoredServiceWrapper> registeredMonitors = Lists.newCopyOnWriteArrayList()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = NotificationAgent, bind = "bindNotificationAgent", unbind = "unbindNotificationAgent")
-    private List<NotificationAgentActor> registeredNotificationAgents = Lists.newCopyOnWriteArrayList()
+    private List<NotificationAgentWrapper> registeredNotificationAgents = Lists.newCopyOnWriteArrayList()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = PollResponseHandler, bind = "bindPollResponseHandler", unbind = "unbindPollResponseHandler")
     private List<PollResponseHandlerWrapper> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
@@ -64,10 +63,7 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     protected void bindPersistenceService(final RecordPersistenceService recordPersistenceService) {
-        registeredPersistenceServices.add(new RecordPersistenceServiceWrapper(recordPersistenceService), Constants.RECORD_PERSISTENCE_SERVICE_WRAPPER_COMPARATOR)
-
-
-        registeredPersistenceServices.sort { it.definition.ranking() }.first().service
+        registeredPersistenceServices.add(new RecordPersistenceServiceWrapper(recordPersistenceService))
     }
 
     protected void unbindPersistenceService(final RecordPersistenceService recordPersistenceService) {

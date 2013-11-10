@@ -1,5 +1,6 @@
 package com.citytechinc.monitoring.services.manager
 
+import com.citytechinc.monitoring.services.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.services.monitor.PollResponseType
 import com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord
 import com.google.common.base.Optional
@@ -13,18 +14,28 @@ import groovy.transform.ToString
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@ToString(includeNames=true)
+@ToString(includeFields=true)
 class ServiceMonitorRecordHolder {
 
     private Queue<ServiceMonitorRecord> records
     private String monitoredService
 
-    public ServiceMonitorRecordHolder() {
-        this(10)
+    private ServiceMonitorRecordHolder(String monitoredService, Integer numberOfRecords) {
+        this.monitoredService = monitoredService
+        records = Queues.newArrayBlockingQueue(numberOfRecords)
     }
 
-    public ServiceMonitorRecordHolder(Integer numberOfRecords) {
-        records = Queues.newArrayBlockingQueue(numberOfRecords)
+    public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
+
+        return new ServiceMonitorRecordHolder(wrapper.monitorServiceClassName, wrapper.definition.pollHistoryLength())
+    }
+
+    public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<ServiceMonitorRecord> records) {
+
+        ServiceMonitorRecordHolder holder = new ServiceMonitorRecordHolder(wrapper.monitorServiceClassName, wrapper.definition.pollHistoryLength())
+        records.each { holder.addRecord(it) }
+
+        holder
     }
 
     void addRecord(ServiceMonitorRecord record) {

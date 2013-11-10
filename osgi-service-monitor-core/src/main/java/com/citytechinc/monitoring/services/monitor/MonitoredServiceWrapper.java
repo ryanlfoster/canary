@@ -12,12 +12,14 @@ import java.util.concurrent.TimeUnit;
 public final class MonitoredServiceWrapper {
 
     private final MonitoredService monitor;
+    private final String monitorServiceClassName;
     private final MonitoredServiceDefinition definition;
     private final AutoResumingPoller pollerDefinition;
     private final Long pollIntervalInMilliseconds;
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
         this.monitor = monitor;
+        monitorServiceClassName = monitor.getClass().getCanonicalName();
         definition = monitor.getClass().getAnnotation(MonitoredServiceDefinition.class);
         pollerDefinition = monitor.getClass().getAnnotation(AutoResumingPoller.class);
         pollIntervalInMilliseconds = TimeUnit.MILLISECONDS.convert(definition.pollFrequency(), definition.pollFrequencyUnit());
@@ -25,6 +27,10 @@ public final class MonitoredServiceWrapper {
 
     public MonitoredServiceDefinition getDefinition() {
         return definition;
+    }
+
+    public String getMonitorServiceClassName() {
+        return monitorServiceClassName;
     }
 
     public MonitoredService getMonitor() {
