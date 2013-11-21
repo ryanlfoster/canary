@@ -8,7 +8,6 @@ import com.citytechinc.monitoring.services.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.services.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.monitoring.services.responsehandler.PollResponseHandler
-import com.citytechinc.monitoring.services.responsehandler.PollResponseHandlerWrapper
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -43,7 +42,7 @@ class DefaultServiceManager implements ServiceManager {
     private List<NotificationAgentWrapper> registeredNotificationAgents = Lists.newCopyOnWriteArrayList()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = PollResponseHandler, bind = "bindPollResponseHandler", unbind = "unbindPollResponseHandler")
-    private List<PollResponseHandlerWrapper> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
+    private List<PollResponseHandler> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = RecordPersistenceService, bind = "bindPersistenceService", unbind = "unbindPersistenceService")
     private List<RecordPersistenceServiceWrapper> registeredPersistenceServices = Lists.newCopyOnWriteArrayList()
@@ -70,7 +69,7 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     protected void bindPollResponseHandler(final PollResponseHandler pollResponseHandler) {
-        registeredPollResponseHandlers.add(new PollResponseHandlerWrapper(pollResponseHandler))
+        registeredPollResponseHandlers.add(pollResponseHandler)
     }
 
     protected void unbindPollResponseHandler(final PollResponseHandler pollResponseHandler) {

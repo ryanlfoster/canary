@@ -2,9 +2,8 @@ package com.citytechinc.monitoring.samples.responsehandler
 
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.monitor.PollResponse
-import com.citytechinc.monitoring.services.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.services.responsehandler.PollResponseHandler
-import com.citytechinc.monitoring.services.responsehandler.PollResponseHandlerDefinition
+
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.Properties
@@ -24,7 +23,6 @@ import org.osgi.framework.Constants as OsgiConstants
 @Properties(value = [
 @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
-@PollResponseHandlerDefinition(subscriptionStrategy = SubscriptionStrategy.all)
 class ResponseLogger implements PollResponseHandler {
 
     @Override

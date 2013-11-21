@@ -8,6 +8,9 @@ import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
  *
  * Copyright 2013 CITYTECH, Inc.
  *
+ * A notification agent is passed the entire data set for a monitor when a condition is met. The service framework
+ *   garauntees that
+ *
  */
 public interface NotificationAgent {
 
