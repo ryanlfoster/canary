@@ -117,7 +117,7 @@
 
         <!-- dependencies -->
         <felix.scr.annotations>1.9.4</felix.scr.annotations>
-        <groovy.version>2.1.7</groovy.version>
+        <groovy.version>2.2.0</groovy.version>
         <slf4j.nop.version>1.6.4</slf4j.nop.version>
         <gpars.version>1.1.0</gpars.version>
         <guava.version>15.0</guava.version>

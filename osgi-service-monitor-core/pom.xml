@@ -136,6 +136,14 @@
 
     <dependencies>
 
+        <!-- test -->
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>${spock.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- compile -->
         <dependency>
             <groupId>org.apache.felix</groupId>
