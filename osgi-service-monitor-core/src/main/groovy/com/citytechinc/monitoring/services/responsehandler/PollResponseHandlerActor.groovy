@@ -1,5 +1,6 @@
 package com.citytechinc.monitoring.services.responsehandler
 
+import com.citytechinc.monitoring.services.monitor.PollResponse
 import groovyx.gpars.actor.DefaultActor
 
 /**
@@ -10,4 +11,17 @@ import groovyx.gpars.actor.DefaultActor
  *
  */
 final class PollResponseHandlerActor extends DefaultActor {
+
+    PollResponseHandler handler
+
+    void act() {
+
+        loop {
+
+            react { String monitorName, PollResponse response ->
+
+                handler.handleResponse(monitorName, response)
+            }
+        }
+    }
 }
