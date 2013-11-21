@@ -53,6 +53,7 @@
                 <include>com.google.guava</include>
                 <include>org.codehaus.jsr166-mirror</include>
                 <include>org.codehaus.gpars</include>
+                <include>org.codehaus.groovy</include>
             </includes>
             <useStrictFiltering>true</useStrictFiltering>
         </dependencySet>
