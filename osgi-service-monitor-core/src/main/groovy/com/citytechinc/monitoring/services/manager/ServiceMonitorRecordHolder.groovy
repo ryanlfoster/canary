@@ -1,8 +1,8 @@
 package com.citytechinc.monitoring.services.manager
 
-import com.citytechinc.monitoring.services.monitor.MonitoredServiceWrapper
-import com.citytechinc.monitoring.services.monitor.PollResponseType
-import com.citytechinc.monitoring.services.persistence.ServiceMonitorRecord
+import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
+import com.citytechinc.monitoring.api.monitor.PollResponseType
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecord
 import com.google.common.base.Optional
 import com.google.common.collect.Queues
 import groovy.transform.ToString
@@ -68,6 +68,10 @@ class ServiceMonitorRecordHolder {
 
         def firstRecord = getRecords().findAll { it.responseType != PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
+    }
+
+    String getMonitoredService() {
+        return monitoredService
     }
 
     Integer getTotalNumberOfFailures() {

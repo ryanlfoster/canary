@@ -1,5 +1,7 @@
 package com.citytechinc.monitoring.services.notification
 
+import com.citytechinc.monitoring.api.notification.NotificationAgent
+import com.citytechinc.monitoring.api.notification.NotificationAgentDefinition
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import com.day.cq.mailer.MailService

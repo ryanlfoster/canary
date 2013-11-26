@@ -1,8 +1,8 @@
 package com.citytechinc.monitoring.samples.responsehandler
 
 import com.citytechinc.monitoring.constants.Constants
-import com.citytechinc.monitoring.services.monitor.PollResponse
-import com.citytechinc.monitoring.services.responsehandler.PollResponseHandler
+import com.citytechinc.monitoring.api.monitor.PollResponse
+import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component

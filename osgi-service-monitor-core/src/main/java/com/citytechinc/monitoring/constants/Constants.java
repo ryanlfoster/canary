@@ -1,9 +1,5 @@
 package com.citytechinc.monitoring.constants;
 
-import com.citytechinc.monitoring.services.persistence.RecordPersistenceServiceWrapper;
-
-import java.util.Comparator;
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013

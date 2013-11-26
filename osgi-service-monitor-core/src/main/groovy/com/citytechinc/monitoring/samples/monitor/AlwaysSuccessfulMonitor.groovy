@@ -2,9 +2,9 @@ package com.citytechinc.monitoring.samples.monitor
 
 import com.citytechinc.monitoring.constants.Constants
 
-import com.citytechinc.monitoring.services.monitor.MonitoredService
-import com.citytechinc.monitoring.services.monitor.MonitoredServiceDefinition
-import com.citytechinc.monitoring.services.monitor.PollResponse
+import com.citytechinc.monitoring.api.monitor.MonitoredService
+import com.citytechinc.monitoring.api.monitor.MonitoredServiceDefinition
+import com.citytechinc.monitoring.api.monitor.PollResponse
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.Property
