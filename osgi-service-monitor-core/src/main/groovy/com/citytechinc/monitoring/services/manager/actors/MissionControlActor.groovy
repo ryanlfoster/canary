@@ -1,30 +1,46 @@
 package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.monitor.MonitoredService
-import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import com.citytechinc.monitoring.services.manager.actors.MonitoredServiceActor
-import com.citytechinc.monitoring.services.monitor.MonitoredServiceWrapper
+import com.citytechinc.monitoring.api.persistence.RecordPersistenceService
+import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
+import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.monitor.PollResponse
 import com.citytechinc.monitoring.api.notification.NotificationAgent
-import com.citytechinc.monitoring.services.manager.actors.NotificationAgentActor
-import com.citytechinc.monitoring.services.notification.NotificationAgentWrapper
+import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
-import com.citytechinc.monitoring.services.manager.actors.PollResponseHandlerActor
+import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 
 @Slf4j
 class MissionControlActor extends DynamicDispatchActor {
 
-    final Map<String, ServiceMonitorRecordHolder> monitorHistory
-
     Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors
     Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents
     Map<PollResponseHandler, PollResponseHandlerActor> pollResponseHandlers
+    List<RecordPersistenceServiceWrapper> recordPersistenceServices
 
-    MissionControlActor(monitorHistory) {
+    def getHighestOrderPersistenceService = { def relevantRecord ->
 
-        this.monitorHistory = monitorHistory
+        // singular load record
+        def highestOrderService = recordPersistenceServices.sort { it.definition.ranking() }.first().service
+        highestOrderService.getRecordHolder(relevantRecord)
+    }
+
+    void onMessage(RecordPersistenceService recordPersistenceService) {
+
+        def wrapper = new RecordPersistenceServiceWrapper(service: recordPersistenceService)
+
+        if (recordPersistenceServices.contains(wrapper)) {
+
+            log.info("Registering persistence service ${wrapper.service.class.name}")
+            recordPersistenceServices.add(wrapper)
+
+        } else {
+
+            log.info("Unregistering persistence service ${wrapper.service.class.name}")
+            recordPersistenceServices.remove(wrapper)
+        }
     }
 
     void onMessage(MonitoredService monitoredService) {
@@ -38,7 +54,7 @@ class MissionControlActor extends DynamicDispatchActor {
 
         } else {
 
-            def actor = new MonitoredServiceActor(wrapper: wrapper)
+            def actor = new MonitoredServiceActor(wrapper: wrapper, missionControl: this, recordHolder: null)
             actor.start()
 
             log.info("Starting actor for monitor ${wrapper.monitor.class.name}")

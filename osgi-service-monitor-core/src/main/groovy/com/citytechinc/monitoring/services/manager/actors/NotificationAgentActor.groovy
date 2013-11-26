@@ -1,7 +1,7 @@
 package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.monitor.PollResponse
-import com.citytechinc.monitoring.services.notification.NotificationAgentWrapper
+import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import groovyx.gpars.actor.DefaultActor
 
 /**
