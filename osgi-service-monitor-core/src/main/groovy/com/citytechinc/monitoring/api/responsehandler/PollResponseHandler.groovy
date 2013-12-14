@@ -1,6 +1,6 @@
 package com.citytechinc.monitoring.api.responsehandler
 
-import com.citytechinc.monitoring.api.monitor.PollResponse
+import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 
 /**
  *
@@ -13,8 +13,7 @@ public interface PollResponseHandler {
 
     /**
      *
-     * @param monitorName
-     * @param response
+     * @param serviceMonitorRecord
      */
-    void handleResponse(String monitorName, PollResponse response)
+    void handleResponse(DetailedPollResponse serviceMonitorRecord)
 }

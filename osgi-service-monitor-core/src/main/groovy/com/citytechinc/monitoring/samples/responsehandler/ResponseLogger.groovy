@@ -1,9 +1,8 @@
 package com.citytechinc.monitoring.samples.responsehandler
 
 import com.citytechinc.monitoring.constants.Constants
-import com.citytechinc.monitoring.api.monitor.PollResponse
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
-
+import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.Properties
@@ -26,8 +25,8 @@ import org.osgi.framework.Constants as OsgiConstants
 class ResponseLogger implements PollResponseHandler {
 
     @Override
-    void handleResponse(String monitorName, PollResponse response) {
+    void handleResponse(DetailedPollResponse serviceMonitorRecord) {
 
-        log.info("Processing ALL responses, this for monitor ${monitorName} and response ${response}")
+        log.info("Processing response ... ${serviceMonitorRecord}")
     }
 }

@@ -2,7 +2,7 @@ package com.citytechinc.monitoring.services.manager
 
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.monitor.PollResponseType
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecord
+import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.google.common.base.Optional
 import com.google.common.collect.Queues
 import groovy.transform.ToString
@@ -17,7 +17,7 @@ import groovy.transform.ToString
 @ToString(includeFields=true)
 class ServiceMonitorRecordHolder {
 
-    private Queue<ServiceMonitorRecord> records
+    private Queue<DetailedPollResponse> records
     private String monitoredService
 
     private ServiceMonitorRecordHolder(String monitoredService, Integer numberOfRecords) {
@@ -30,7 +30,7 @@ class ServiceMonitorRecordHolder {
         return new ServiceMonitorRecordHolder(wrapper.monitorServiceClassName, wrapper.definition.pollHistoryLength())
     }
 
-    public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<ServiceMonitorRecord> records) {
+    public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<DetailedPollResponse> records) {
 
         ServiceMonitorRecordHolder holder = new ServiceMonitorRecordHolder(wrapper.monitorServiceClassName, wrapper.definition.pollHistoryLength())
         records.each { holder.addRecord(it) }
@@ -38,33 +38,33 @@ class ServiceMonitorRecordHolder {
         holder
     }
 
-    void addRecord(ServiceMonitorRecord record) {
+    void addRecord(DetailedPollResponse record) {
         records.offer(record)
     }
 
-    List<ServiceMonitorRecord> getRecords() {
+    List<DetailedPollResponse> getRecords() {
         records as List
     }
 
-    Optional<ServiceMonitorRecord> getFirstSuccessfulPoll() {
+    Optional<DetailedPollResponse> getFirstSuccessfulPoll() {
 
         def firstRecord = getRecords().findAll() { it.responseType == PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
     }
 
-    Optional<ServiceMonitorRecord> getMostRecentSuccessfulPoll() {
+    Optional<DetailedPollResponse> getMostRecentSuccessfulPoll() {
 
         def firstRecord = getRecords().findAll { it.responseType == PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
     }
 
-    Optional<ServiceMonitorRecord> getFirstFailedPoll() {
+    Optional<DetailedPollResponse> getFirstFailedPoll() {
 
         def firstRecord = getRecords().findAll { it.responseType != PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
     }
 
-    Optional<ServiceMonitorRecord> getMostRecentFailedPoll() {
+    Optional<DetailedPollResponse> getMostRecentFailedPoll() {
 
         def firstRecord = getRecords().findAll { it.responseType != PollResponseType.success }.sort { it.startTime }.first()
         firstRecord ? Optional.of(firstRecord) : Optional.absent()
@@ -82,7 +82,7 @@ class ServiceMonitorRecordHolder {
     Integer getTotalNumberOfSuccessiveFailures() {
     }
 
-    Optional<List<ServiceMonitorRecord>> getFailures() {
+    Optional<List<DetailedPollResponse>> getFailures() {
 
     }
 }

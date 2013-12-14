@@ -9,6 +9,6 @@ package com.citytechinc.monitoring.api.monitor
  */
 public enum PollResponseType {
 
-    success, service_unavailable, unexpected_service_response, exception, interrupted
+    success, service_unavailable, unexpected_service_response, exception, interrupted, clear
 
 }

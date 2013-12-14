@@ -33,7 +33,7 @@ import org.osgi.framework.Constants as OsgiConstants
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = ServiceConstants.VENDOR_NAME) ])
 @Slf4j
 @RecordPersistenceServiceDefinition(ranking = 10)
-class DefaultJCRPersistenceManager implements RecordPersistenceService {
+class JCRPersistenceManager implements RecordPersistenceService {
 
     @Reference
     SlingRepository slingRepository

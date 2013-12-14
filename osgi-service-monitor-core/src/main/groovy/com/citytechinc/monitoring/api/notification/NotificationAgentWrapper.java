@@ -1,8 +1,5 @@
 package com.citytechinc.monitoring.api.notification;
 
-import com.citytechinc.monitoring.api.notification.NotificationAgent;
-import com.citytechinc.monitoring.api.notification.NotificationAgentDefinition;
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013

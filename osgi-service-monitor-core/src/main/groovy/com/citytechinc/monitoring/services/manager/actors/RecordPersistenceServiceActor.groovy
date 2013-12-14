@@ -1,11 +1,16 @@
 package com.citytechinc.monitoring.services.manager.actors
 
+import groovyx.gpars.actor.DynamicDispatchActor
+
 /**
- * Created with IntelliJ IDEA.
- * User: jdurbin
- * Date: 11/23/13
- * Time: 8:56 AM
- * To change this template use File | Settings | File Templates.
+ *
+ * @author Josh Durbin, CITYTECH, Inc. 2013
+ *
+ * Copyright 2013 CITYTECH, Inc.
+ *
  */
-class RecordPersistenceServiceActor {
+class RecordPersistenceServiceActor extends DynamicDispatchActor {
+
+    static class GetRecords {}
+    static class ResumePolling {}
 }

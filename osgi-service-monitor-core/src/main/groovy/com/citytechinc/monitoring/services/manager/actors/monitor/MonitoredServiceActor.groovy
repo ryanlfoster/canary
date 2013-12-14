@@ -1,10 +1,11 @@
 package com.citytechinc.monitoring.services.manager.actors.monitor
 
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecord
+import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
-import groovyx.gpars.actor.DefaultActor
+import com.citytechinc.monitoring.services.manager.actors.missioncontrol.MissionControlActor
+import groovy.util.logging.Slf4j
+import groovyx.gpars.actor.DynamicDispatchActor
 
 /**
  *
@@ -18,7 +19,11 @@ import groovyx.gpars.actor.DefaultActor
  *   2. A timed actor that is used when an alarm is thrown and a timeout is requested
  *
  */
-final class MonitoredServiceActor extends DefaultActor {
+@Slf4j
+final class MonitoredServiceActor extends DynamicDispatchActor {
+
+    static class GetRecords {}
+    static class ResumePolling {}
 
     MonitoredServiceWrapper wrapper
     ServiceMonitorRecordHolder recordHolder
@@ -27,43 +32,39 @@ final class MonitoredServiceActor extends DefaultActor {
     TimedMonitorServiceActor timedMonitorServiceActor
     TimedMonitorSuspensionActor timedMonitorSuspensionActor
 
-    void act() {
+    def startTimedMonitorServiceActor() {
 
         timedMonitorServiceActor = new TimedMonitorServiceActor(sleepTime: wrapper.pollIntervalInMilliseconds, monitoredService: wrapper.monitor, monitoredServiceActor: this)
         timedMonitorServiceActor.start()
-
-        loop {
-
-            react { message ->
-
-                switch (message) {
-
-                    case "getRecords":
-
-                        missionControl << recordHolder
-                        break
-                    case "resume":
-
-                        timedMonitorServiceActor = new TimedMonitorServiceActor(sleepTime: wrapper.pollIntervalInMilliseconds, monitoredService: wrapper.monitor, monitoredServiceActor: this)
-                        timedMonitorServiceActor.start()
-
-                        break
-                    case ServiceMonitorRecord:
-
-                        recordHolder.addRecord(message)
-
-                        if (alarmed) {
-
-                            timedMonitorServiceActor.stop()
-
-                            timedMonitorSuspensionActor = new TimedMonitorSuspensionActor(sleepTime: 1000, monitoredServiceActor: this)
-                            timedMonitorSuspensionActor.start()
-                        }
-
-                        break
-                }
-            }
-        }
     }
 
+    def startTimedMonitorSuspensionActor() {
+
+        timedMonitorSuspensionActor = new TimedMonitorSuspensionActor(sleepTime: 1000, monitoredServiceActor: this)
+        timedMonitorSuspensionActor.start()
+    }
+
+    void afterStart() {
+        startTimedMonitorServiceActor()
+    }
+
+    void onMessage(GetRecords message) {
+        missionControl << recordHolder
+    }
+
+    void onMessage(ResumePolling message) {
+        startTimedMonitorServiceActor()
+    }
+
+    void onMessage(DetailedPollResponse detailedPollResponse) {
+
+        recordHolder.addRecord(detailedPollResponse)
+        missionControl << detailedPollResponse
+
+//        if (alarmed) {
+//
+//            timedMonitorServiceActor.stop()
+//            startTimedMonitorSuspensionActor()
+//        }
+    }
 }

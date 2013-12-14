@@ -1,7 +1,8 @@
 package com.citytechinc.monitoring.services.manager.actors.monitor
 
 import com.citytechinc.monitoring.api.monitor.MonitoredService
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecord
+import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
+import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DefaultActor
 
 /**
@@ -15,6 +16,7 @@ import groovyx.gpars.actor.DefaultActor
  *   a timeout, exception, or general valid response are pushed back to the {@link MonitoredServiceActor}.
  *
  */
+@Slf4j
 class TimedMonitorServiceActor extends DefaultActor {
 
     Long sleepTime
@@ -29,7 +31,11 @@ class TimedMonitorServiceActor extends DefaultActor {
 
             def startTime = new Date()
             def pollResponse = monitoredService.poll()
-            monitoredServiceActor << new ServiceMonitorRecord(startTime: startTime, endTime: new Date(), responseType: pollResponse.pollResponseType, stackTrace: pollResponse.exceptionStackTrace)
+            monitoredServiceActor << new DetailedPollResponse(startTime: startTime,
+                    endTime: new Date(),
+                    responseType: pollResponse.pollResponseType,
+                    stackTrace: pollResponse.exceptionStackTrace,
+                    monitoredServiceClassname: monitoredService.class.name)
         }
     }
 }

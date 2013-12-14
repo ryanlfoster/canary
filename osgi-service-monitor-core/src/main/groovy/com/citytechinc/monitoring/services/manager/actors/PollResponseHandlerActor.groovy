@@ -1,8 +1,8 @@
 package com.citytechinc.monitoring.services.manager.actors
 
-import com.citytechinc.monitoring.api.monitor.PollResponse
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
-import groovyx.gpars.actor.DefaultActor
+import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
+import groovyx.gpars.actor.DynamicDispatchActor
 
 /**
  *
@@ -11,18 +11,12 @@ import groovyx.gpars.actor.DefaultActor
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-final class PollResponseHandlerActor extends DefaultActor {
+final class PollResponseHandlerActor extends DynamicDispatchActor {
 
     PollResponseHandler handler
 
-    void act() {
+    void onMessage(DetailedPollResponse serviceMonitorRecord) {
 
-        loop {
-
-            react { String monitorName, PollResponse response ->
-
-                handler.handleResponse(monitorName, response)
-            }
-        }
+        handler.handleResponse(serviceMonitorRecord)
     }
 }

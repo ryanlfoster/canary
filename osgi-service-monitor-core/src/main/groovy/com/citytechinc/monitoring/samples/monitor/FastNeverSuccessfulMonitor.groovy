@@ -1,14 +1,13 @@
 package com.citytechinc.monitoring.samples.monitor
 
-import com.citytechinc.monitoring.constants.Constants
-
 import com.citytechinc.monitoring.api.monitor.MonitoredService
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.monitoring.api.monitor.PollResponse
+import com.citytechinc.monitoring.constants.Constants
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component
-import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Properties
+import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Service
 import org.osgi.framework.Constants as OsgiConstants
 
@@ -26,8 +25,8 @@ import java.util.concurrent.TimeUnit
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
-@MonitoredServiceDefinition(name = 'Never Successful', description = 'Should always return failure', pollFrequency = 10, pollFrequencyUnit = TimeUnit.SECONDS)
-class NeverSuccessfulMonitor implements MonitoredService {
+@MonitoredServiceDefinition(name = 'Fast Never Successful', description = 'Should always return failure', pollFrequency = 1, pollFrequencyUnit = TimeUnit.SECONDS)
+class FastNeverSuccessfulMonitor implements MonitoredService {
 
     @Override
     PollResponse poll() {

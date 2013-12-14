@@ -5,7 +5,12 @@ import com.citytechinc.monitoring.api.notification.NotificationAgent
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.constants.Constants
-import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
+import com.citytechinc.monitoring.services.manager.actors.missioncontrol.MissionControlActor
+import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.MonitoredServiceServiceRegistration
+import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.NotificationAgentServiceRegistration
+import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.PollResponseServiceRegistration
+import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.RecordPersistenceServiceRegistration
+import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.RegistrationType
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.*
@@ -42,75 +47,90 @@ class DefaultServiceManager implements ServiceManager {
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = PollResponseHandler, bind = 'bindPollResponseHandler', unbind = 'unbindPollResponseHandler')
     private List<PollResponseHandler> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
 
-    protected void bindMonitor(final MonitoredService monitoredService) {
+    protected void bindMonitor(final MonitoredService service) {
+        registeredMonitors.add(service)
 
-        registeredMonitors.add(monitoredService)
-
-        if (ready) {
-            missionControl << monitoredService
+        if (ready.get()) {
+            missionControl << new MonitoredServiceServiceRegistration(
+                    service: service,
+                    type: RegistrationType.register)
         }
     }
 
-    protected void unbindMonitor(final MonitoredService monitoredService) {
+    protected void unbindMonitor(final MonitoredService service) {
 
-        registeredMonitors.remove(monitoredService)
+        registeredMonitors.remove(service)
 
-        if (ready) {
-            missionControl << monitoredService
+        if (ready.get()) {
+            missionControl << new MonitoredServiceServiceRegistration(
+                    service: service,
+                    type: RegistrationType.unregister)
         }
     }
 
-    protected void bindNotificationAgent(final NotificationAgent notificationAgent) {
+    protected void bindNotificationAgent(final NotificationAgent service) {
 
-        registeredNotificationAgents.add(notificationAgent)
+        registeredNotificationAgents.add(service)
 
-        if (ready) {
-            missionControl << notificationAgent
+        if (ready.get()) {
+            missionControl << new NotificationAgentServiceRegistration(
+                    service: service,
+                    type: RegistrationType.register)
         }
     }
 
-    protected void unbindNotificationAgent(final NotificationAgent notificationAgent) {
+    protected void unbindNotificationAgent(final NotificationAgent service) {
 
-        registeredNotificationAgents.remove(notificationAgent)
+        registeredNotificationAgents.remove(service)
 
-        if (ready) {
-            missionControl << notificationAgent
+        if (ready.get()) {
+            missionControl << new NotificationAgentServiceRegistration(
+                    service: service,
+                    type: RegistrationType.unregister)
         }
     }
 
-    protected void bindPersistenceService(final RecordPersistenceService recordPersistenceService) {
+    protected void bindPersistenceService(final RecordPersistenceService service) {
 
-        registeredPersistenceServices.add(recordPersistenceService)
+        registeredPersistenceServices.add(service)
 
-        if (ready) {
-            missionControl << recordPersistenceService
+        if (ready.get()) {
+            missionControl << new RecordPersistenceServiceRegistration(
+                    service: service,
+                    type: RegistrationType.register)
         }
     }
 
-    protected void unbindPersistenceService(final RecordPersistenceService recordPersistenceService) {
+    protected void unbindPersistenceService(final RecordPersistenceService service) {
 
-        registeredPersistenceServices.remove(recordPersistenceService)
+        registeredPersistenceServices.remove(service)
 
-        if (ready) {
-            missionControl << recordPersistenceService
+        if (ready.get()) {
+            missionControl << new RecordPersistenceServiceRegistration(
+                    service: service,
+                    type: RegistrationType.unregister)
         }
     }
 
-    protected void bindPollResponseHandler(final PollResponseHandler pollResponseHandler) {
+    protected void bindPollResponseHandler(final PollResponseHandler service) {
 
-        registeredPollResponseHandlers.add(pollResponseHandler)
+        registeredPollResponseHandlers.add(service)
 
-        if (ready) {
-            missionControl << pollResponseHandler
+        if (ready.get()) {
+            missionControl << new PollResponseServiceRegistration(
+                    service: service,
+                    type: RegistrationType.register)
         }
     }
 
-    protected void unbindPollResponseHandler(final PollResponseHandler pollResponseHandler) {
+    protected void unbindPollResponseHandler(final PollResponseHandler service) {
 
-        registeredPollResponseHandlers.remove(pollResponseHandler)
+        registeredPollResponseHandlers.remove(service)
 
-        if (ready) {
-            missionControl << pollResponseHandler
+        if (ready.get()) {
+            missionControl << new PollResponseServiceRegistration(
+                    service: service,
+                    type: RegistrationType.unregister)
         }
     }
 
@@ -118,13 +138,24 @@ class DefaultServiceManager implements ServiceManager {
     protected void activate(final Map<String, Object> properties) throws Exception {
 
         missionControl = new MissionControlActor()
-
-        registeredMonitors.each { missionControl << it }
-        registeredNotificationAgents.each { missionControl << it }
-        registeredPersistenceServices.each { missionControl << it }
-        registeredPollResponseHandlers.each { missionControl << it }
-
         missionControl.start()
+
+        registeredMonitors.each { missionControl << new MonitoredServiceServiceRegistration(
+                service: it,
+                type: RegistrationType.register)}
+
+        registeredNotificationAgents.each { missionControl << new NotificationAgentServiceRegistration(
+                service: it,
+                type: RegistrationType.register)}
+
+        registeredPersistenceServices.each { missionControl << new RecordPersistenceServiceRegistration(
+                service: it,
+                type: RegistrationType.register)}
+
+        registeredPollResponseHandlers.each { missionControl << new PollResponseServiceRegistration(
+                service: it,
+                type: RegistrationType.register)}
+
         ready.set(true)
     }
 
@@ -133,8 +164,8 @@ class DefaultServiceManager implements ServiceManager {
 
         if (ready) {
 
-            missionControl.terminate()
             ready.set(false)
+            missionControl.stop()
         }
     }
 }
