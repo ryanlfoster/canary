@@ -2,6 +2,7 @@ package com.citytechinc.monitoring.api.notification
 
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -11,19 +12,20 @@ import java.lang.annotation.RetentionPolicy
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NotificationAgentDefinition {
+public @interface AggregateAlarms {
 
     /**
      *
-     * Notification strategy for this service.
+     * The poll frequency for the service.
      *
      * @return
      */
-    SubscriptionStrategy subscriptionStrategy() default SubscriptionStrategy.all
+    int aggregationWindow()
 
     /**
      *
      * @return
      */
-    Class[] subscriptionStrategySpecifics() default []
+    TimeUnit aggregationWindowTimeUnit()
+
 }

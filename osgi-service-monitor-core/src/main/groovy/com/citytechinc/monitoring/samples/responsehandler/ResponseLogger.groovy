@@ -27,6 +27,5 @@ class ResponseLogger implements PollResponseHandler {
     @Override
     void handleResponse(DetailedPollResponse serviceMonitorRecord) {
 
-        log.info("Processing response ... ${serviceMonitorRecord}")
     }
 }

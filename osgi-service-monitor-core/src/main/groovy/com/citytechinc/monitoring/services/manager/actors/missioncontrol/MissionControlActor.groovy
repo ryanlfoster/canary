@@ -6,7 +6,7 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrappe
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import com.citytechinc.monitoring.services.manager.actors.NotificationAgentActor
+import com.citytechinc.monitoring.services.manager.actors.notificationagent.NotificationAgentActor
 import com.citytechinc.monitoring.services.manager.actors.PollResponseHandlerActor
 import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.MonitoredServiceServiceRegistration
 import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.NotificationAgentServiceRegistration
@@ -83,13 +83,13 @@ class MissionControlActor extends DynamicDispatchActor {
             def actor = new NotificationAgentActor(wrapper: wrapper)
             actor.start()
 
-            log.info("Starting actor for notification agent ${wrapper.monitor.class.name}")
+            log.info("Starting actor for notification agent ${wrapper.agent.class.name}")
 
             notificationAgents.put(wrapper, actor)
 
         } else {
 
-            log.info("Termating actor for notification agent ${wrapper.monitor.class.name}")
+            log.info("Termating actor for notification agent ${wrapper.agent.class.name}")
             notificationAgents.get(wrapper).terminate()
         }
     }

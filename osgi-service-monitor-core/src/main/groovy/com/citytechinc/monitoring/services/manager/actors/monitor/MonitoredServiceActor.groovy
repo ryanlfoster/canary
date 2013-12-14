@@ -32,6 +32,8 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     TimedMonitorServiceActor timedMonitorServiceActor
     TimedMonitorSuspensionActor timedMonitorSuspensionActor
 
+    def random = new Random()
+
     def startTimedMonitorServiceActor() {
 
         timedMonitorServiceActor = new TimedMonitorServiceActor(sleepTime: wrapper.pollIntervalInMilliseconds, monitoredService: wrapper.monitor, monitoredServiceActor: this)
@@ -60,6 +62,10 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
         recordHolder.addRecord(detailedPollResponse)
         missionControl << detailedPollResponse
+
+        if (random.nextBoolean()) {
+            missionControl << recordHolder
+        }
 
 //        if (alarmed) {
 //
