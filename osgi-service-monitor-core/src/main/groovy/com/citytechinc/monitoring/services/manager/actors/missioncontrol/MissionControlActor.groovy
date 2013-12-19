@@ -14,10 +14,11 @@ import com.citytechinc.monitoring.services.manager.actors.missioncontrol.message
 import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.RecordPersistenceServiceRegistration
 import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.RegistrationType
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
+import groovy.transform.Immutable
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 
-@Slf4j
+
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -25,7 +26,20 @@ import groovyx.gpars.actor.DynamicDispatchActor
  * Copyright 2013 CITYTECH, Inc.
  *
  */
+@Slf4j
 class MissionControlActor extends DynamicDispatchActor {
+
+    // MESSAGES
+
+    @Immutable
+    static class GetRecordHolder {
+        String identifier
+    }
+
+    @Immutable
+    static class ClearAlarm {
+        String identifer
+    }
 
     Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
     Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
@@ -45,11 +59,12 @@ class MissionControlActor extends DynamicDispatchActor {
 
         if (message.type == RegistrationType.register && !recordPersistenceServices.contains(wrapper)) {
 
-            log.info("Registering persistence service ${wrapper.service.class.name}")
+            log.debug("Registering persistence service ${wrapper.service.class.name}")
             recordPersistenceServices.add(wrapper)
-        } else {
 
-            log.info("Unregistering persistence service ${wrapper.service.class.name}")
+        } else if (message.type == RegistrationType.unregister) {
+
+            log.debug("Unregistering persistence service ${wrapper.service.class.name}")
             recordPersistenceServices.remove(wrapper)
         }
     }
@@ -64,12 +79,13 @@ class MissionControlActor extends DynamicDispatchActor {
             def actor = new MonitoredServiceActor(wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
             actor.start()
 
-            log.info("Starting actor for monitor ${wrapper.monitor.class.name}")
+            log.debug("Starting actor for monitor ${wrapper.monitor.class.name}")
 
             monitors.put(wrapper, actor)
-        } else {
 
-            log.info("Termating actor for monitor ${wrapper.monitor.class.name}")
+        } else if (message.type == RegistrationType.unregister) {
+
+            log.debug("Termating actor for monitor ${wrapper.monitor.class.name}")
             monitors.get(wrapper).terminate()
         }
     }
@@ -83,13 +99,13 @@ class MissionControlActor extends DynamicDispatchActor {
             def actor = new NotificationAgentActor(wrapper: wrapper)
             actor.start()
 
-            log.info("Starting actor for notification agent ${wrapper.agent.class.name}")
+            log.debug("Starting actor for notification agent ${wrapper.agent.class.name}")
 
             notificationAgents.put(wrapper, actor)
 
-        } else {
+        } else if (message.type == RegistrationType.unregister) {
 
-            log.info("Termating actor for notification agent ${wrapper.agent.class.name}")
+            log.debug("Termating actor for notification agent ${wrapper.agent.class.name}")
             notificationAgents.get(wrapper).terminate()
         }
     }
@@ -101,14 +117,20 @@ class MissionControlActor extends DynamicDispatchActor {
             def actor = new PollResponseHandlerActor(handler: message.service)
             actor.start()
 
-            log.info("Starting actor for poll response handler ${message.service.class.name}")
+            log.debug("Starting actor for poll response handler ${message.service.class.name}")
             pollResponseHandlers.put(message.service, actor)
 
-        } else {
+        } else if (message.type == RegistrationType.unregister) {
 
-            log.info("Termating actor for poll response handler ${message.service.class.name}")
+            log.debug("Termating actor for poll response handler ${message.service.class.name}")
             pollResponseHandlers.get(message.service).terminate()
         }
+    }
+
+    void onMessage(GetRecordHolder message) {
+
+        def monitorActor = monitors.get(monitors.keySet().findAll { it.monitor.class == message.identifier})
+        reply monitorActor << new MonitoredServiceActor.GetRecords()
     }
 
     /**

@@ -13,10 +13,16 @@ import com.citytechinc.monitoring.services.manager.actors.missioncontrol.message
 import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.RegistrationType
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
-import org.apache.felix.scr.annotations.*
+import org.apache.felix.scr.annotations.Activate
+import org.apache.felix.scr.annotations.Component
+import org.apache.felix.scr.annotations.Deactivate
+import org.apache.felix.scr.annotations.Property
+import org.apache.felix.scr.annotations.Properties
+import org.apache.felix.scr.annotations.Reference
+import org.apache.felix.scr.annotations.ReferenceCardinality
+import org.apache.felix.scr.annotations.ReferencePolicy
+import org.apache.felix.scr.annotations.Service
 import org.osgi.framework.Constants as OsgiConstants
-
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  *
@@ -32,25 +38,40 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Slf4j
 class DefaultServiceManager implements ServiceManager {
 
-    def missionControl
-    def ready = new AtomicBoolean(false)
+    def missionControl = new MissionControlActor()
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = MonitoredService, bind = 'bindMonitor', unbind = 'unbindMonitor')
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            referenceInterface = MonitoredService,
+            bind = 'bindMonitor',
+            unbind = 'unbindMonitor')
     private List<MonitoredService> registeredMonitors = Lists.newCopyOnWriteArrayList()
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = NotificationAgent, bind = 'bindNotificationAgent', unbind = 'unbindNotificationAgent')
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            referenceInterface = NotificationAgent,
+            bind = 'bindNotificationAgent',
+            unbind = 'unbindNotificationAgent')
     private List<NotificationAgent> registeredNotificationAgents = Lists.newCopyOnWriteArrayList()
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = RecordPersistenceService, bind = 'bindPersistenceService', unbind = 'unbindPersistenceService')
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            referenceInterface = RecordPersistenceService,
+            bind = 'bindPersistenceService',
+            unbind = 'unbindPersistenceService')
     private List<RecordPersistenceService> registeredPersistenceServices = Lists.newCopyOnWriteArrayList()
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC, referenceInterface = PollResponseHandler, bind = 'bindPollResponseHandler', unbind = 'unbindPollResponseHandler')
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            referenceInterface = PollResponseHandler,
+            bind = 'bindPollResponseHandler',
+            unbind = 'unbindPollResponseHandler')
     private List<PollResponseHandler> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
 
     protected void bindMonitor(final MonitoredService service) {
         registeredMonitors.add(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new MonitoredServiceServiceRegistration(
                     service: service,
                     type: RegistrationType.register)
@@ -61,7 +82,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredMonitors.remove(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new MonitoredServiceServiceRegistration(
                     service: service,
                     type: RegistrationType.unregister)
@@ -72,7 +93,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredNotificationAgents.add(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new NotificationAgentServiceRegistration(
                     service: service,
                     type: RegistrationType.register)
@@ -83,7 +104,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredNotificationAgents.remove(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new NotificationAgentServiceRegistration(
                     service: service,
                     type: RegistrationType.unregister)
@@ -94,7 +115,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredPersistenceServices.add(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new RecordPersistenceServiceRegistration(
                     service: service,
                     type: RegistrationType.register)
@@ -105,7 +126,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredPersistenceServices.remove(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new RecordPersistenceServiceRegistration(
                     service: service,
                     type: RegistrationType.unregister)
@@ -116,7 +137,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredPollResponseHandlers.add(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new PollResponseServiceRegistration(
                     service: service,
                     type: RegistrationType.register)
@@ -127,7 +148,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredPollResponseHandlers.remove(service)
 
-        if (ready.get()) {
+        if (missionControl.isActive()) {
             missionControl << new PollResponseServiceRegistration(
                     service: service,
                     type: RegistrationType.unregister)
@@ -137,7 +158,6 @@ class DefaultServiceManager implements ServiceManager {
     @Activate
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        missionControl = new MissionControlActor()
         missionControl.start()
 
         registeredMonitors.each { missionControl << new MonitoredServiceServiceRegistration(
@@ -155,16 +175,13 @@ class DefaultServiceManager implements ServiceManager {
         registeredPollResponseHandlers.each { missionControl << new PollResponseServiceRegistration(
                 service: it,
                 type: RegistrationType.register)}
-
-        ready.set(true)
     }
 
     @Deactivate
     protected void deactivate(final Map<String, Object> properties) throws Exception {
 
-        if (ready) {
+        if (missionControl.isActive()) {
 
-            ready.set(false)
             missionControl.stop()
         }
     }

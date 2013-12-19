@@ -1,5 +1,6 @@
 package com.citytechinc.monitoring.samples.monitor
 
+import com.citytechinc.monitoring.api.monitor.AutoResumingPoller
 import com.citytechinc.monitoring.constants.Constants
 
 import com.citytechinc.monitoring.api.monitor.MonitoredService
@@ -27,10 +28,11 @@ import java.util.concurrent.TimeUnit
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
 @MonitoredServiceDefinition(name = 'Always Successful', description = 'Should always return success', pollFrequency = 10, pollFrequencyUnit = TimeUnit.SECONDS)
+@AutoResumingPoller(autoResumePollingPeriod = 10, autoResumePollingUnit = TimeUnit.SECONDS)
 class AlwaysSuccessfulMonitor implements MonitoredService {
 
     @Override
     PollResponse poll() {
-        PollResponse.SUCCESS()
+        PollResponse.UNEXPECTED_SERVICE_RESPONSE()
     }
 }

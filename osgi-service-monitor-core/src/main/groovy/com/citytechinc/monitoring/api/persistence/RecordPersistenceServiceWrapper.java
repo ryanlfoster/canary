@@ -1,8 +1,5 @@
 package com.citytechinc.monitoring.api.persistence;
 
-import com.citytechinc.monitoring.api.persistence.RecordPersistenceService;
-import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceDefinition;
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013

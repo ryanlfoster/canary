@@ -14,15 +14,22 @@ public final class MonitoredServiceWrapper {
     private final MonitoredService monitor;
     private final String monitorServiceClassName;
     private final MonitoredServiceDefinition definition;
-    private final AutoResumingPoller pollerDefinition;
+    private final Long autoResumePollIntevalInMilliseconds;
     private final Long pollIntervalInMilliseconds;
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
         this.monitor = monitor;
         monitorServiceClassName = monitor.getClass().getCanonicalName();
         definition = monitor.getClass().getAnnotation(MonitoredServiceDefinition.class);
-        pollerDefinition = monitor.getClass().getAnnotation(AutoResumingPoller.class);
         pollIntervalInMilliseconds = TimeUnit.MILLISECONDS.convert(definition.pollFrequency(), definition.pollFrequencyUnit());
+
+        final AutoResumingPoller autoResumingPollerDefinition = monitor.getClass().getAnnotation(AutoResumingPoller.class);
+
+        if (autoResumingPollerDefinition != null) {
+            autoResumePollIntevalInMilliseconds = TimeUnit.MILLISECONDS.convert(autoResumingPollerDefinition.autoResumePollingPeriod(), autoResumingPollerDefinition.autoResumePollingUnit());
+        } else {
+            autoResumePollIntevalInMilliseconds = 0L;
+        }
     }
 
     public MonitoredServiceDefinition getDefinition() {
@@ -37,11 +44,11 @@ public final class MonitoredServiceWrapper {
         return monitor;
     }
 
-    public AutoResumingPoller getPollerDefinition() {
-        return pollerDefinition;
-    }
-
     public Long getPollIntervalInMilliseconds() {
         return pollIntervalInMilliseconds;
+    }
+
+    public Long getAutoResumePollIntevalInMilliseconds() {
+        return autoResumePollIntevalInMilliseconds;
     }
 }

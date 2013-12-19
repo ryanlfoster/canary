@@ -32,8 +32,6 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     TimedMonitorServiceActor timedMonitorServiceActor
     TimedMonitorSuspensionActor timedMonitorSuspensionActor
 
-    def random = new Random()
-
     def startTimedMonitorServiceActor() {
 
         timedMonitorServiceActor = new TimedMonitorServiceActor(sleepTime: wrapper.pollIntervalInMilliseconds, monitoredService: wrapper.monitor, monitoredServiceActor: this)
@@ -42,7 +40,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def startTimedMonitorSuspensionActor() {
 
-        timedMonitorSuspensionActor = new TimedMonitorSuspensionActor(sleepTime: 1000, monitoredServiceActor: this)
+        timedMonitorSuspensionActor = new TimedMonitorSuspensionActor(sleepTime: wrapper.autoResumePollIntevalInMilliseconds, monitoredServiceActor: this)
         timedMonitorSuspensionActor.start()
     }
 
@@ -63,14 +61,16 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         recordHolder.addRecord(detailedPollResponse)
         missionControl << detailedPollResponse
 
-        if (random.nextBoolean()) {
+        if (recordHolder.isAlarmed()) {
+
+            timedMonitorServiceActor.terminate()
+
+            if (wrapper.autoResumePollIntevalInMilliseconds > 0L) {
+
+                startTimedMonitorSuspensionActor()
+            }
+
             missionControl << recordHolder
         }
-
-//        if (alarmed) {
-//
-//            timedMonitorServiceActor.stop()
-//            startTimedMonitorSuspensionActor()
-//        }
     }
 }

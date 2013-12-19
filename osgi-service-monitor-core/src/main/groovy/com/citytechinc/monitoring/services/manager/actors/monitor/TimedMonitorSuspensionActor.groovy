@@ -22,7 +22,7 @@ class TimedMonitorSuspensionActor extends DefaultActor {
         loop {
 
             sleep (sleepTime)
-            monitoredServiceActor << "resume"
+            monitoredServiceActor << new MonitoredServiceActor.ResumePolling()
             terminate()
         }
     }
