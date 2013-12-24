@@ -8,6 +8,8 @@ The OSGi Service Monitor provides granular support for monitoring service health
 
 [![Build Status](https://travis-ci.org/Citytechinc/osgi-service-monitor.png?branch=develop)](https://travis-ci.org/Citytechinc/osgi-service-monitor)
 
+[![Stories in Ready](https://badge.waffle.io/citytechinc/osgi-service-monitor.png?label=ready)](http://waffle.io/citytechinc/osgi-service-monitor)
+
 See the [Maven site](http://code.citytechinc.com/osgi-service-monitor) for full documentation.
 
 ## Versioning
