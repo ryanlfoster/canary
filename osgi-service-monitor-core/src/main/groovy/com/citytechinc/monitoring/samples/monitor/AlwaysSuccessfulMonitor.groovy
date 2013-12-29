@@ -27,12 +27,34 @@ import java.util.concurrent.TimeUnit
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
-@MonitoredServiceDefinition(name = 'Always Successful', description = 'Should always return success', pollFrequency = 10, pollFrequencyUnit = TimeUnit.SECONDS)
+@MonitoredServiceDefinition(name = 'Always Successful', description = 'Should always return success', pollFrequency = 1, pollFrequencyUnit = TimeUnit.SECONDS, sequentialFailedPollsToTriggerAlarm = 5)
 @AutoResumingPoller(autoResumePollingPeriod = 10, autoResumePollingUnit = TimeUnit.SECONDS)
 class AlwaysSuccessfulMonitor implements MonitoredService {
 
+    def random = new Random()
+
     @Override
     PollResponse poll() {
-        PollResponse.UNEXPECTED_SERVICE_RESPONSE()
+
+        def response
+
+        switch(random.nextInt(3)) {
+
+            case 0:
+                response = PollResponse.SUCCESS()
+                break
+            case 1:
+                response = PollResponse.SERVICE_UNAVAILABLE()
+                break
+            case 2:
+                response = PollResponse.UNEXPECTED_SERVICE_RESPONSE()
+                break
+            case 3:
+                response = PollResponse.EXCEPTION(new Exception('oops'))
+                break
+        }
+
+        //response
+        PollResponse.SUCCESS()
     }
 }

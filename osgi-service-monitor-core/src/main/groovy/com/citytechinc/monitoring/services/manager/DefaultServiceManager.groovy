@@ -185,4 +185,15 @@ class DefaultServiceManager implements ServiceManager {
             missionControl.stop()
         }
     }
+
+    @Override
+    ServiceMonitorRecordHolder getRecordHolder(String identifer) {
+
+        def id = new MissionControlActor.GetRecordHolder(identifier: identifer)
+        def cameBack = missionControl.sendAndWait(id)
+
+        log.info("id: ${id}, cameBack: ${cameBack}")
+
+        cameBack
+    }
 }

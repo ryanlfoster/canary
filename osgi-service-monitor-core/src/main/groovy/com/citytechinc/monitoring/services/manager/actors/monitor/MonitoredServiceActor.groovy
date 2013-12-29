@@ -49,7 +49,8 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     }
 
     void onMessage(GetRecords message) {
-        missionControl << recordHolder
+        //missionControl << recordHolder
+        sender.send(recordHolder)
     }
 
     void onMessage(ResumePolling message) {
@@ -61,16 +62,26 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         recordHolder.addRecord(detailedPollResponse)
         missionControl << detailedPollResponse
 
+        log.debug("Handling response ${detailedPollResponse}")
+
         if (recordHolder.isAlarmed()) {
+
+            log.debug('Monitor is alarmed, terminating timed service actor')
 
             timedMonitorServiceActor.terminate()
 
+            log.debug("Monitor auto resume poller interval ${wrapper.autoResumePollIntevalInMilliseconds}")
+
             if (wrapper.autoResumePollIntevalInMilliseconds > 0L) {
+
+                log.debug('Starting auto resume actor...')
 
                 startTimedMonitorSuspensionActor()
             }
 
             missionControl << recordHolder
         }
+
+        reply('test')
     }
 }

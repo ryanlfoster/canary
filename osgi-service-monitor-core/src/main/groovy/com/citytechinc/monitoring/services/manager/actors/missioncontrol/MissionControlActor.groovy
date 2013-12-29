@@ -18,6 +18,8 @@ import groovy.transform.Immutable
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 
+import java.util.concurrent.TimeUnit
+
 
 /**
  *
@@ -129,8 +131,12 @@ class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(GetRecordHolder message) {
 
-        def monitorActor = monitors.get(monitors.keySet().findAll { it.monitor.class == message.identifier})
-        reply monitorActor << new MonitoredServiceActor.GetRecords()
+        log.info("Got a record request for ${message.identifier}")
+
+        def actor = monitors.values().first()
+        def records = actor.sendAndWait(new MonitoredServiceActor.GetRecords(), 1L, TimeUnit.SECONDS)
+
+        sender.send(records)
     }
 
     /**

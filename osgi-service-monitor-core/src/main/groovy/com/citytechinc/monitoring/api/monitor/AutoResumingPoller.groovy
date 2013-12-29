@@ -1,5 +1,7 @@
 package com.citytechinc.monitoring.api.monitor
 
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
 import java.util.concurrent.TimeUnit
 
 /**
@@ -9,6 +11,7 @@ import java.util.concurrent.TimeUnit
  * Copyright 2013 CITYTECH, Inc.
  *
  */
+@Retention(RetentionPolicy.RUNTIME)
 public @interface AutoResumingPoller {
 
     /**

@@ -9,4 +9,10 @@ package com.citytechinc.monitoring.services.manager
  */
 public interface ServiceManager {
 
+    /**
+     *
+     * @param identifer
+     * @return
+     */
+    ServiceMonitorRecordHolder getRecordHolder(String identifer)
 }
