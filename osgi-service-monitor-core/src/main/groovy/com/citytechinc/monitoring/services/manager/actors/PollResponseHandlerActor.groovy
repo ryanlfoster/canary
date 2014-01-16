@@ -18,18 +18,18 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
 
     void onMessage(DetailedPollResponse message) {
 
-        switch (wrapper.definition.subscriptionStrategy()) {
+        switch (wrapper.definition.strategy()) {
 
             case SubscriptionStrategy.opt_into:
 
-                if (wrapper.definition.subscriptionStrategySpecifics().collect { it.name }.contains(message.monitoredServiceClassname))
+                if (wrapper.definition.specifics().collect { it.name }.contains(message.monitoredServiceClassname))
                     wrapper.handler.handleResponse(message)
 
                 break
 
             case SubscriptionStrategy.opt_out_of:
 
-                if (!wrapper.definition.subscriptionStrategySpecifics().collect { it.name }.contains(message.monitoredServiceClassname))
+                if (!wrapper.definition.specifics().collect { it.name }.contains(message.monitoredServiceClassname))
                     wrapper.handler.handleResponse(message)
 
                 break
