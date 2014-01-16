@@ -21,12 +21,12 @@ public final class MonitoredServiceWrapper {
         this.monitor = monitor;
         monitorServiceClassName = monitor.getClass().getCanonicalName();
         definition = monitor.getClass().getAnnotation(MonitoredServiceDefinition.class);
-        pollIntervalInMilliseconds = TimeUnit.MILLISECONDS.convert(definition.pollFrequency(), definition.pollFrequencyUnit());
+        pollIntervalInMilliseconds = TimeUnit.MILLISECONDS.convert(definition.pollInterval(), definition.pollIntervalUnit());
 
         final AutoResumingPoller autoResumingPollerDefinition = monitor.getClass().getAnnotation(AutoResumingPoller.class);
 
         if (autoResumingPollerDefinition != null) {
-            autoResumePollIntevalInMilliseconds = TimeUnit.MILLISECONDS.convert(autoResumingPollerDefinition.autoResumePollingPeriod(), autoResumingPollerDefinition.autoResumePollingUnit());
+            autoResumePollIntevalInMilliseconds = TimeUnit.MILLISECONDS.convert(autoResumingPollerDefinition.interval(), autoResumingPollerDefinition.unit());
         } else {
             autoResumePollIntevalInMilliseconds = 0L;
         }

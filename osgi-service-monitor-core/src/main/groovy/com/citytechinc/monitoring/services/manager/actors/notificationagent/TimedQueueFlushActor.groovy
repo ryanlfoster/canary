@@ -11,6 +11,8 @@ import groovyx.gpars.actor.DefaultActor
  */
 class TimedQueueFlushActor extends DefaultActor {
 
+    static class FlushQueue {}
+
     Long sleepTime
     NotificationAgentActor notificationAgentActor
 
@@ -19,7 +21,7 @@ class TimedQueueFlushActor extends DefaultActor {
         loop {
 
             sleep (sleepTime)
-            notificationAgentActor << new NotificationAgentActor.FlushQueue()
+            notificationAgentActor << new FlushQueue()
             terminate()
         }
     }

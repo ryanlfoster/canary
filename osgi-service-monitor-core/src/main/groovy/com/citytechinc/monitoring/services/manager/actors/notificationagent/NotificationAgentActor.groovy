@@ -16,8 +16,6 @@ import groovyx.gpars.actor.DynamicDispatchActor
 @Slf4j
 final class NotificationAgentActor extends DynamicDispatchActor {
 
-    static class FlushQueue {}
-
     NotificationAgentWrapper wrapper
     TimedQueueFlushActor timedQueueFlushActor
 
@@ -25,18 +23,18 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     void onMessage(ServiceMonitorRecordHolder message) {
 
-        switch (wrapper.definition.subscriptionStrategy()) {
+        switch (wrapper.definition.strategy()) {
 
             case SubscriptionStrategy.opt_into:
 
-                if (wrapper.definition.subscriptionStrategySpecifics().collect { it.name }.contains(message.monitoredService))
+                if (wrapper.definition.specifics().collect { it.name }.contains(message.monitoredService))
                     handleMessage(message)
 
                 break
 
             case SubscriptionStrategy.opt_out_of:
 
-                if (!wrapper.definition.subscriptionStrategySpecifics().collect { it.name }.contains(message.monitoredService))
+                if (!wrapper.definition.specifics().collect { it.name }.contains(message.monitoredService))
                     handleMessage(message)
 
                 break
@@ -48,7 +46,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
         }
     }
 
-    void onMessage(FlushQueue message) {
+    void onMessage(TimedQueueFlushActor.FlushQueue message) {
 
         log.debug("Flushing queue of size ${queuedMessages.size()}")
         wrapper.agent.notify(queuedMessages)

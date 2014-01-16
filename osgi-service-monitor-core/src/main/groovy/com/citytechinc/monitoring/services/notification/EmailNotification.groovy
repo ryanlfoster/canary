@@ -2,6 +2,7 @@ package com.citytechinc.monitoring.services.notification
 
 import com.citytechinc.monitoring.api.notification.NotificationAgent
 import com.citytechinc.monitoring.api.notification.NotificationAgentDefinition
+import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import com.day.cq.mailer.MailService
@@ -29,7 +30,7 @@ import org.osgi.framework.Constants as OsgiConstants
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
-@NotificationAgentDefinition()
+@NotificationAgentDefinition(strategy = SubscriptionStrategy.all)
 class EmailNotification implements NotificationAgent {
 
     @Reference

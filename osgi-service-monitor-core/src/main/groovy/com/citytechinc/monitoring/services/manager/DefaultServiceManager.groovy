@@ -187,6 +187,41 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
+    void requestAllMonitorsPoll() {
+
+    }
+
+    @Override
+    void requestAllMonitorsPersist() {
+
+    }
+
+    @Override
+    List<String> listMonitoredServices() {
+        []
+    }
+
+    @Override
+    List<String> listRecordPersistenceServices() {
+        []
+    }
+
+    @Override
+    List<String> listNotificationAgents() {
+        []
+    }
+
+    @Override
+    List<String> listPollResponseHandlers() {
+        []
+    }
+
+    @Override
+    List<String> listAlarmedMonitors() {
+        []
+    }
+
+    @Override
     ServiceMonitorRecordHolder getRecordHolder(String identifer) {
 
         def id = new MissionControlActor.GetRecordHolder(identifier: identifer)

@@ -1,6 +1,7 @@
 package com.citytechinc.monitoring.services.manager.actors
 
-import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
+import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
+import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import groovyx.gpars.actor.DynamicDispatchActor
 
@@ -13,10 +14,30 @@ import groovyx.gpars.actor.DynamicDispatchActor
  */
 final class PollResponseHandlerActor extends DynamicDispatchActor {
 
-    PollResponseHandler handler
+    PollResponseWrapper wrapper
 
-    void onMessage(DetailedPollResponse serviceMonitorRecord) {
+    void onMessage(DetailedPollResponse message) {
 
-        handler.handleResponse(serviceMonitorRecord)
+        switch (wrapper.definition.subscriptionStrategy()) {
+
+            case SubscriptionStrategy.opt_into:
+
+                if (wrapper.definition.subscriptionStrategySpecifics().collect { it.name }.contains(message.monitoredServiceClassname))
+                    wrapper.handler.handleResponse(message)
+
+                break
+
+            case SubscriptionStrategy.opt_out_of:
+
+                if (!wrapper.definition.subscriptionStrategySpecifics().collect { it.name }.contains(message.monitoredServiceClassname))
+                    wrapper.handler.handleResponse(message)
+
+                break
+
+            case SubscriptionStrategy.all:
+            default:
+
+                wrapper.handler.handleResponse(message)
+        }
     }
 }

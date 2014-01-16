@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
     /**
      *
-     * A sensible name for the monitor. If none is defined, the classname is used.
+     * A sensible name for the monitor. If none is defined, the class name is used.
      *
      * @return
      */
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    String description()
+    String description() default ''
 
     /**
      *
@@ -36,13 +36,13 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    int pollFrequency()
+    int pollInterval()
 
     /**
      *
      * @return
      */
-    TimeUnit pollFrequencyUnit()
+    TimeUnit pollIntervalUnit()
 
     /**
      *
@@ -70,8 +70,18 @@ import java.util.concurrent.TimeUnit
 
     /**
      *
+     *
+     *
      * @return
      */
     boolean createLoggerForAlarm() default true
+
+    /**
+     *
+     * This flag indicates that any monitor that goes into an 'alarmed' state will request persistence.
+     *
+     * @return
+     */
+    boolean persistRecordHolderWhenAlarmed() default false
 
 }

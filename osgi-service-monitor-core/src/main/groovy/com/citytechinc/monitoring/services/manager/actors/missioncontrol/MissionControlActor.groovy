@@ -3,9 +3,10 @@ package com.citytechinc.monitoring.services.manager.actors.missioncontrol
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
-import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
+import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.manager.actors.RecordPersistenceServiceActor
 import com.citytechinc.monitoring.services.manager.actors.notificationagent.NotificationAgentActor
 import com.citytechinc.monitoring.services.manager.actors.PollResponseHandlerActor
 import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.MonitoredServiceServiceRegistration
@@ -20,7 +21,6 @@ import groovyx.gpars.actor.DynamicDispatchActor
 
 import java.util.concurrent.TimeUnit
 
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -31,27 +31,24 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 class MissionControlActor extends DynamicDispatchActor {
 
-    // MESSAGES
+    @Immutable
+    static class GetRecordHolder { String identifier }
 
     @Immutable
-    static class GetRecordHolder {
-        String identifier
-    }
+    static class ClearAlarm { String identifer }
 
     @Immutable
-    static class ClearAlarm {
-        String identifer
-    }
+    static class ForcePoll { }
 
     Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
     Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
-    Map<PollResponseHandler, PollResponseHandlerActor> pollResponseHandlers = [:]
-    List<RecordPersistenceServiceWrapper> recordPersistenceServices = []
+    Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
+    Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
     def getHighestOrderPersistenceService = { def relevantRecord ->
 
         // singular load record
-        def highestOrderService = recordPersistenceServices.sort { it.definition.ranking() }.first().service
+        def highestOrderService = recordPersistenceServices.keySet().sort { it.definition.ranking() }.first().service
         highestOrderService.getRecordHolder(relevantRecord)
     }
 
@@ -59,14 +56,18 @@ class MissionControlActor extends DynamicDispatchActor {
 
         def wrapper = new RecordPersistenceServiceWrapper(message.service)
 
-        if (message.type == RegistrationType.register && !recordPersistenceServices.contains(wrapper)) {
+        if (message.type == RegistrationType.register && !recordPersistenceServices.containsKey(wrapper)) {
 
-            log.debug("Registering persistence service ${wrapper.service.class.name}")
+            def actor = new RecordPersistenceServiceActor(wrapper: wrapper)
+            actor.start()
+
+            log.debug("Starting actor for persistence service ${wrapper.service.class.name}")
             recordPersistenceServices.add(wrapper)
 
         } else if (message.type == RegistrationType.unregister) {
 
-            log.debug("Unregistering persistence service ${wrapper.service.class.name}")
+            log.debug("Terminating actor for persistence service ${wrapper.service.class.name}")
+            recordPersistenceServices.get(wrapper).terminate()
             recordPersistenceServices.remove(wrapper)
         }
     }
@@ -89,6 +90,7 @@ class MissionControlActor extends DynamicDispatchActor {
 
             log.debug("Termating actor for monitor ${wrapper.monitor.class.name}")
             monitors.get(wrapper).terminate()
+            monitors.remove(wrapper)
         }
     }
 
@@ -109,23 +111,27 @@ class MissionControlActor extends DynamicDispatchActor {
 
             log.debug("Termating actor for notification agent ${wrapper.agent.class.name}")
             notificationAgents.get(wrapper).terminate()
+            notificationAgents.remove(wrapper)
         }
     }
 
     void onMessage(PollResponseServiceRegistration message) {
 
-        if (message.type == RegistrationType.register && !pollResponseHandlers.containsKey(message.service)) {
+        def wrapper = new PollResponseWrapper(message.service)
 
-            def actor = new PollResponseHandlerActor(handler: message.service)
+        if (message.type == RegistrationType.register && !pollResponseHandlers.containsKey(wrapper)) {
+
+            def actor = new PollResponseHandlerActor(wrapper: wrapper)
             actor.start()
 
             log.debug("Starting actor for poll response handler ${message.service.class.name}")
-            pollResponseHandlers.put(message.service, actor)
+            pollResponseHandlers.put(wrapper, actor)
 
         } else if (message.type == RegistrationType.unregister) {
 
             log.debug("Termating actor for poll response handler ${message.service.class.name}")
-            pollResponseHandlers.get(message.service).terminate()
+            pollResponseHandlers.get(wrapper, terminate())
+            pollResponseHandlers.remove(wrapper)
         }
     }
 
@@ -164,4 +170,5 @@ class MissionControlActor extends DynamicDispatchActor {
 
         notificationAgents.values().each { it << message }
     }
+
 }

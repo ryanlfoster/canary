@@ -19,11 +19,11 @@ public @interface NotificationAgentDefinition {
      *
      * @return
      */
-    SubscriptionStrategy subscriptionStrategy() default SubscriptionStrategy.all
+    SubscriptionStrategy strategy()
 
     /**
      *
      * @return
      */
-    Class[] subscriptionStrategySpecifics() default []
+    Class[] specifics() default []
 }

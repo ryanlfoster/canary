@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.NotCompliantMBeanException;
+import java.util.List;
 
 /**
  *
@@ -32,4 +33,38 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
         super(ServiceMonitorManagerMBean.class);
     }
 
+    @Override
+    public void requestAllMonitorsPoll() {
+        serviceManager.requestAllMonitorsPoll();
+    }
+
+    @Override
+    public void requestAllMonitorsPersist() {
+        serviceManager.requestAllMonitorsPersist();
+    }
+
+    @Override
+    public List<String> listMonitoredServices() {
+        return serviceManager.listMonitoredServices();
+    }
+
+    @Override
+    public List<String> listRecordPersistenceServices() {
+        return serviceManager.listRecordPersistenceServices();
+    }
+
+    @Override
+    public List<String> listNotificationAgents() {
+        return serviceManager.listNotificationAgents();
+    }
+
+    @Override
+    public List<String> listPollResponseHandlers() {
+        return serviceManager.listPollResponseHandlers();
+    }
+
+    @Override
+    public List<String> listAlarmedMonitors() {
+        return serviceManager.listAlarmedMonitors();
+    }
 }

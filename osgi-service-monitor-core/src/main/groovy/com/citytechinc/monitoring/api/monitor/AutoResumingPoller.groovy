@@ -21,7 +21,7 @@ public @interface AutoResumingPoller {
      *
      * @return
      */
-    int autoResumePollingPeriod() default 0
+    int interval()
 
     /**
      *
@@ -29,5 +29,5 @@ public @interface AutoResumingPoller {
      *
      * @return
      */
-    TimeUnit autoResumePollingUnit()
+    TimeUnit unit()
 }
