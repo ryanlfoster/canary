@@ -21,11 +21,11 @@ public @interface PollResponseDefinition {
      *
      * @return
      */
-    SubscriptionStrategy subscriptionStrategy()
+    SubscriptionStrategy strategy()
 
     /**
      *
      * @return
      */
-    Class[] subscriptionStrategySpecifics() default []
+    Class[] specifics() default []
 }
