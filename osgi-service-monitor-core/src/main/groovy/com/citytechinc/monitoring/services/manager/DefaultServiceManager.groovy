@@ -167,6 +167,16 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl.isActive()) {
 
+            log.info("Unregistering ${registeredMonitors.size()} monitors, " +
+                    "${registeredNotificationAgents.size()} notification agents, " +
+                    "${registeredPersistenceServices.size()} persistence handlers, and " +
+                    "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
+
+            registeredMonitors.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
+            registeredNotificationAgents.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
+            registeredPersistenceServices.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
+            registeredPollResponseHandlers.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
+
             log.info("Shutting down mission control...")
             missionControl.stop()
         }
