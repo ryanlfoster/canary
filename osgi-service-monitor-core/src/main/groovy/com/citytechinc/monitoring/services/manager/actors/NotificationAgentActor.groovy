@@ -17,7 +17,7 @@ import org.apache.sling.commons.scheduler.Scheduler
 @Slf4j
 final class NotificationAgentActor extends DynamicDispatchActor {
 
-    static def jobprefix = 'scheduled-monitor-'
+    static def jobprefix = 'scheduled-notification-agent-flush-'
 
     // MESSAGES
     static class FlushQueue { }
@@ -25,6 +25,11 @@ final class NotificationAgentActor extends DynamicDispatchActor {
     NotificationAgentWrapper wrapper
     Scheduler scheduler
 
+    /**
+     * Internal message queue is used for batching messages. When a message is processed and an aggregation period
+     *   is defined, we place said messages in this list and start a timer. The timer is equal to the aggregation period
+     *   which, when expired, instructs this actor to flush its queue (this list).
+     */
     List<ServiceMonitorRecordHolder> queuedMessages = []
 
     void onMessage(ServiceMonitorRecordHolder message) {
@@ -67,7 +72,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
             if (queuedMessages.isEmpty()) {
 
                 def now = new Date()
-                scheduler.fireJobAt(jobprefix, {
+                scheduler.fireJobAt(jobprefix + wrapper.agent.class.name, {
 
                     this << new FlushQueue()
 

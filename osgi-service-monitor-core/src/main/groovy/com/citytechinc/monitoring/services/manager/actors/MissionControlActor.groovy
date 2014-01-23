@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 class MissionControlActor extends DynamicDispatchActor {
 
+    // MESSAGES
     static class RegisterService { def service }
     static class UnregisterService { def service }
     static class GetRecordHolder { String identifier }
@@ -34,10 +35,11 @@ class MissionControlActor extends DynamicDispatchActor {
 
     Scheduler scheduler
 
-    def monitors = [:]
-    def notificationAgents = [:]
-    def pollResponseHandlers = [:]
-    def recordPersistenceServices = [:]
+    // WRAPPERS AND ACTORS
+    Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
+    Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
+    Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
+    Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
     void onMessage(RegisterService message) {
 
@@ -81,7 +83,7 @@ class MissionControlActor extends DynamicDispatchActor {
                             actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
                         } else {
 
-                            log.fino("Record holder is absent, starting a clean actor...")
+                            log.info("Record holder is absent, starting a clean actor...")
                             actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
                         }
 
@@ -90,6 +92,9 @@ class MissionControlActor extends DynamicDispatchActor {
                 }
 
                 monitors.put(wrapper, actor)
+            } else {
+
+                log.warn("Monitored service ${message.service} already registered")
             }
 
         } else if (message.service instanceof NotificationAgent) {
@@ -102,6 +107,9 @@ class MissionControlActor extends DynamicDispatchActor {
                 actor.start()
 
                 notificationAgents.put(wrapper, actor)
+            } else {
+
+                log.warn("Notification agent ${message.service} already registered")
             }
 
         } else if (message.service instanceof RecordPersistenceService) {
@@ -114,6 +122,9 @@ class MissionControlActor extends DynamicDispatchActor {
                 actor.start()
 
                 recordPersistenceServices.put(wrapper, actor)
+            } else {
+
+                log.warn("Record persistence service ${message.service} already registered")
             }
 
         } else if (message.service instanceof PollResponseHandler) {
@@ -126,6 +137,9 @@ class MissionControlActor extends DynamicDispatchActor {
                 actor.start()
 
                 pollResponseHandlers.put(wrapper, actor)
+            } else {
+
+                log.warn("Poll response handler ${message.service} already registered")
             }
         }
     }
@@ -140,8 +154,13 @@ class MissionControlActor extends DynamicDispatchActor {
 
             if (monitors.containsKey(wrapper)) {
 
+                log.info("Terminating actor for monitored service ${message.service}")
+
                 monitors.get(wrapper).terminate()
                 monitors.remove(wrapper)
+            } else {
+
+                log.warn("Monitored service ${message.service} is not registered")
             }
 
         } else if (message.service instanceof NotificationAgent) {
@@ -150,8 +169,13 @@ class MissionControlActor extends DynamicDispatchActor {
 
             if (notificationAgents.containsKey(wrapper)) {
 
+                log.info("Terminating actor for notification agent ${message.service}")
+
                 notificationAgents.get(wrapper).terminate()
                 notificationAgents.remove(wrapper)
+            } else {
+
+                log.warn("Notification agent ${message.service} is not registered")
             }
 
         } else if (message.service instanceof RecordPersistenceService) {
@@ -160,8 +184,13 @@ class MissionControlActor extends DynamicDispatchActor {
 
             if (recordPersistenceServices.containsKey(wrapper)) {
 
+                log.info("Terminating actor for record persistence service ${message.service}")
+
                 recordPersistenceServices.get(wrapper).terminate()
                 recordPersistenceServices.remove(wrapper)
+            } else {
+
+                log.warn("Record persistence service ${message.service} is not registered")
             }
 
         } else if (message.service instanceof PollResponseHandler) {
@@ -170,8 +199,13 @@ class MissionControlActor extends DynamicDispatchActor {
 
             if (pollResponseHandlers.containsKey(wrapper)) {
 
+                log.info("Terminating actor for poll response handler ${message.service}")
+
                 pollResponseHandlers.get(wrapper).terminate()
                 pollResponseHandlers.remove(wrapper)
+            } else {
+
+                log.warn("Poll response handler ${message.service} is not registered")
             }
         }
     }
