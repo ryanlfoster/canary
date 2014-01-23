@@ -1,10 +1,11 @@
-package com.citytechinc.monitoring.services.manager.actors.notificationagent
+package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
+import org.apache.sling.commons.scheduler.Scheduler
 
 /**
  *
@@ -16,8 +17,13 @@ import groovyx.gpars.actor.DynamicDispatchActor
 @Slf4j
 final class NotificationAgentActor extends DynamicDispatchActor {
 
+    static def jobprefix = 'scheduled-monitor-'
+
+    // MESSAGES
+    static class FlushQueue { }
+
     NotificationAgentWrapper wrapper
-    TimedQueueFlushActor timedQueueFlushActor
+    Scheduler scheduler
 
     List<ServiceMonitorRecordHolder> queuedMessages = []
 
@@ -46,9 +52,10 @@ final class NotificationAgentActor extends DynamicDispatchActor {
         }
     }
 
-    void onMessage(TimedQueueFlushActor.FlushQueue message) {
+    void onMessage(FlushQueue message) {
 
-        log.debug("Flushing queue of size ${queuedMessages.size()}")
+        log.info("Flushing queue of size ${queuedMessages.size()}")
+
         wrapper.agent.notify(queuedMessages)
         queuedMessages.clear()
     }
@@ -59,17 +66,20 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             if (queuedMessages.isEmpty()) {
 
-                log.debug("Starting TimedQueueFlushActor with a sleep time of ${wrapper.aggregationWindowInMilliseconds}")
-                timedQueueFlushActor = new TimedQueueFlushActor(sleepTime: wrapper.aggregationWindowInMilliseconds, notificationAgentActor: this)
-                timedQueueFlushActor.start()
+                def now = new Date()
+                scheduler.fireJobAt(jobprefix, {
+
+                    this << new FlushQueue()
+
+                }, [:], new Date(now.time + wrapper.aggregationWindowInMilliseconds))
             }
 
-            log.debug("Adding message. Size of queue is ${queuedMessages.size()}")
+            log.info("Adding message to queue with size of ${queuedMessages.size()}")
             queuedMessages.add(message)
 
         } else {
 
-            log.debug("Sending message, queue not needed...")
+            log.info("Aggregation undefined, sending message without delay...")
             wrapper.agent.notify([message])
         }
     }

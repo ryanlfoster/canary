@@ -26,6 +26,10 @@ import org.osgi.framework.Constants as OsgiConstants
  *
  * Copyright 2013 CITYTECH, Inc.
  *
+ * The service manager acts as a conduit between the Felix OSGi container, its services (monitored services,
+ *   notification agents, poll response handlers, and persistence services), and the actor framework. Most of this
+ *   service is boiler plate code which it'd be nice to work around, but that's for a later date...
+ *
  */
 @Component(immediate = true)
 @Service
@@ -141,22 +145,21 @@ class DefaultServiceManager implements ServiceManager {
     @Activate
     protected void activate(final Map<String, Object> properties) throws Exception {
 
+        log.info("Starting mission control...")
         missionControl = new MissionControlActor(scheduler: scheduler)
         missionControl.start()
 
-        def servicesToRegister = []
+        log.info("Registering ${registeredMonitors.size()} monitors, " +
+                "${registeredNotificationAgents.size()} notification agents, " +
+                "${registeredPersistenceServices.size()} persistence handlers, and " +
+                "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
 
-        servicesToRegister.addAll(registeredMonitors)
-        servicesToRegister.addAll(registeredNotificationAgents)
-        servicesToRegister.addAll(registeredPersistenceServices)
-        servicesToRegister.addAll(registeredPollResponseHandlers)
+        registeredMonitors.each { missionControl << new MissionControlActor.RegisterService(service: it) }
+        registeredNotificationAgents.each { missionControl << new MissionControlActor.RegisterService(service: it) }
+        registeredPersistenceServices.each { missionControl << new MissionControlActor.RegisterService(service: it) }
+        registeredPollResponseHandlers.each { missionControl << new MissionControlActor.RegisterService(service: it) }
 
-        log.info("Preparing to register ${servicesToRegister.size()} services with mission control...")
-
-        servicesToRegister.each {
-
-            missionControl << new MissionControlActor.RegisterService(service: it)
-        }
+        log.info("Mission control started.")
     }
 
     @Deactivate

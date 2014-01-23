@@ -10,8 +10,6 @@ import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import com.citytechinc.monitoring.services.manager.actors.notificationagent.NotificationAgentActor
-import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
@@ -36,17 +34,10 @@ class MissionControlActor extends DynamicDispatchActor {
 
     Scheduler scheduler
 
-    Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
-    Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
-    Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
-    Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
-
-    def getHighestOrderPersistenceService = { def relevantRecord ->
-
-        // singular load record
-        def highestOrderService = recordPersistenceServices.keySet().sort { it.definition.ranking() }.first().service
-        highestOrderService.getRecordHolder(relevantRecord)
-    }
+    def monitors = [:]
+    def notificationAgents = [:]
+    def pollResponseHandlers = [:]
+    def recordPersistenceServices = [:]
 
     void onMessage(RegisterService message) {
 
@@ -60,6 +51,8 @@ class MissionControlActor extends DynamicDispatchActor {
 
                 if (recordPersistenceServices.isEmpty()) {
 
+                    log.info("No record persistence services to poll for data, starting a clean actor...")
+
                     // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
                     def actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
                     actor.start()
@@ -72,9 +65,26 @@ class MissionControlActor extends DynamicDispatchActor {
                      *   transmission is non-blocking. Its response will invoke the closure, providing the record holder from
                      *   the persistence service, and start the actor with history.
                      */
-                    recordPersistenceServices.get(recordPersistenceServices.keySet().sort { it.definition.ranking() }.first()).sendAndContinue(new RecordPersistenceServiceActor.GetRecord(wrapper.monitorServiceClassName), { recordHolder ->
+                    def persistenceWrapper = recordPersistenceServices.keySet().sort { it.definition.ranking() }.first()
 
-                        def actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder)
+                    log.info("Polling ${persistenceWrapper.service.class} for records...")
+
+                    recordPersistenceServices.get(persistenceWrapper).sendAndContinue(new RecordPersistenceServiceActor.GetRecord(wrapper.monitorServiceClassName), { recordHolder ->
+
+                        log.info("Received record ${recordHolder} from persistence service")
+
+                        def actor
+
+                        if (recordHolder.present()) {
+
+                            log.info("Record holder is present, setting record holder on actor, starting actor...")
+                            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
+                        } else {
+
+                            log.fino("Record holder is absent, starting a clean actor...")
+                            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
+                        }
+
                         actor.start()
                     })
                 }
@@ -184,6 +194,8 @@ class MissionControlActor extends DynamicDispatchActor {
      */
     void onMessage(DetailedPollResponse message) {
 
+        log.info("Sending ${message} to ${pollResponseHandlers.size()} poll response handlers")
+
         pollResponseHandlers.values().each { it << message }
     }
 
@@ -198,6 +210,8 @@ class MissionControlActor extends DynamicDispatchActor {
      * @param message
      */
     void onMessage(ServiceMonitorRecordHolder message) {
+
+        log.info("Sending ${message} to ${notificationAgents.size()} notification agents")
 
         notificationAgents.values().each { it << message }
     }
