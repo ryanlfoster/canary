@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
  *
  */
 @Slf4j
-class MissionControlActor extends DynamicDispatchActor {
+final class MissionControlActor extends DynamicDispatchActor {
 
     // MESSAGES
     static class RegisterService { def service }

@@ -12,18 +12,15 @@ import groovyx.gpars.actor.DynamicDispatchActor
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-class RecordPersistenceServiceActor extends DynamicDispatchActor {
+final class RecordPersistenceServiceActor extends DynamicDispatchActor {
 
-    @Immutable
+    // MESSAGES
     static class GetRecord { String monitor }
-
-    @Immutable
     static class PersistRecord { ServiceMonitorRecordHolder recordHolder }
 
     RecordPersistenceServiceWrapper wrapper
 
     void onMessage(GetRecord message) {
-
         sender.send(wrapper.service.getRecordHolder(message.monitor))
     }
 

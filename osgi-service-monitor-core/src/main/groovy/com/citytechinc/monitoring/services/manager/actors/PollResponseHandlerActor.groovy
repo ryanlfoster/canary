@@ -16,6 +16,15 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
 
     PollResponseWrapper wrapper
 
+    /**
+     *
+     * Performs filtering of DetailedPollResponse messages. If the wrapper definition
+     *   allows the message to pass, we will call the handler. This call is blocking.
+     *
+     *   If the wrapper definition does not allow the message to pass, the message is dropped.
+     *
+     * @param message
+     */
     void onMessage(DetailedPollResponse message) {
 
         switch (wrapper.definition.strategy()) {

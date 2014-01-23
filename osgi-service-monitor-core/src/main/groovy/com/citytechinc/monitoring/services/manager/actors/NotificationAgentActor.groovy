@@ -32,6 +32,14 @@ final class NotificationAgentActor extends DynamicDispatchActor {
      */
     List<ServiceMonitorRecordHolder> queuedMessages = []
 
+    /**
+     *
+     * Performs filtering of ServiceMonitorRecordHolder messages. If the wrapper definition
+     *   allows the message to pass, we will call the handler. If the wrapper definition does
+     *   not allow the message to pass, the message is dropped.
+     *
+     * @param message
+     */
     void onMessage(ServiceMonitorRecordHolder message) {
 
         switch (wrapper.definition.strategy()) {
