@@ -77,30 +77,27 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def schedulePolling = {
 
-        log.info("Scheduled polling running..")
-
         if (!recordHolder.isAlarmed()) {
 
-            log.info("Monitor is not alarmed....")
+            scheduler.addPeriodicJob(schedulerJobKey(), {
 
-
-
-
-            scheduler.addPeriodicJob(jobprefix + wrapper.monitorServiceClassName, {
-
-                log.info("Adding schedule job...")
+                log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! JOB RAN")
                 this << new Poll()
 
             }, [:], wrapper.pollIntervalInMilliseconds, false)
 
-            log.info("Job is scheduled.")
+            log.info("Adding schedule job defined under the key: ${schedulerJobKey()}")
         }
     }
 
     def unschedulePolling = {
 
-        log.info("Removing scheduled job...")
-        scheduler.removeJob(jobprefix + wrapper.monitorServiceClassName)
+        log.info("Removing schedule job for key ${schedulerJobKey()}")
+        scheduler.removeJob(schedulerJobKey())
+    }
+
+    def schedulerJobKey = {
+        jobprefix + wrapper.monitorServiceClassName
     }
 
     def oneTimeScheduleAutoResume = {
@@ -108,7 +105,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInMilliseconds > 0L) {
 
             def now = new Date()
-            scheduler.fireJobAt(jobprefix, {
+            scheduler.fireJobAt(schedulerJobKey(), {
 
                 this << new AutoResumePoll()
 

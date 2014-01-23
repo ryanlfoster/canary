@@ -38,7 +38,7 @@ import org.osgi.framework.Constants as OsgiConstants
 @Slf4j
 class DefaultServiceManager implements ServiceManager {
 
-    def missionControl
+    MissionControlActor missionControl
 
     @Reference
     Scheduler scheduler
@@ -83,6 +83,8 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredMonitors.remove(service)
 
+        sleep(100)
+
         if (missionControl?.isActive()) {
             missionControl << new MissionControlActor.UnregisterService(service: service)
         }
@@ -100,6 +102,8 @@ class DefaultServiceManager implements ServiceManager {
     void unbindNotificationAgent(final NotificationAgent service) {
 
         registeredNotificationAgents.remove(service)
+
+        sleep(100)
 
         if (missionControl?.isActive()) {
             missionControl << new MissionControlActor.UnregisterService(service: service)
@@ -119,6 +123,8 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredPersistenceServices.remove(service)
 
+        sleep(100)
+
         if (missionControl?.isActive()) {
             missionControl << new MissionControlActor.UnregisterService(service: service)
         }
@@ -136,6 +142,8 @@ class DefaultServiceManager implements ServiceManager {
     void unbindPollResponseHandler(final PollResponseHandler service) {
 
         registeredPollResponseHandlers.remove(service)
+
+        sleep(100)
 
         if (missionControl?.isActive()) {
             missionControl << new MissionControlActor.UnregisterService(service: service)
