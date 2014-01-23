@@ -5,12 +5,7 @@ import com.citytechinc.monitoring.api.notification.NotificationAgent
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.constants.Constants
-import com.citytechinc.monitoring.services.manager.actors.missioncontrol.MissionControlActor
-import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.MonitoredServiceServiceRegistration
-import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.NotificationAgentServiceRegistration
-import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.PollResponseServiceRegistration
-import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.RecordPersistenceServiceRegistration
-import com.citytechinc.monitoring.services.manager.actors.missioncontrol.messages.RegistrationType
+import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -22,6 +17,7 @@ import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.ReferenceCardinality
 import org.apache.felix.scr.annotations.ReferencePolicy
 import org.apache.felix.scr.annotations.Service
+import org.apache.sling.commons.scheduler.Scheduler
 import org.osgi.framework.Constants as OsgiConstants
 
 /**
@@ -38,7 +34,10 @@ import org.osgi.framework.Constants as OsgiConstants
 @Slf4j
 class DefaultServiceManager implements ServiceManager {
 
-    def missionControl = new MissionControlActor()
+    def missionControl
+
+    @Reference
+    Scheduler scheduler
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
             policy = ReferencePolicy.DYNAMIC,
@@ -68,113 +67,96 @@ class DefaultServiceManager implements ServiceManager {
             unbind = 'unbindPollResponseHandler')
     private List<PollResponseHandler> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
 
-    protected void bindMonitor(final MonitoredService service) {
+    void bindMonitor(final MonitoredService service) {
         registeredMonitors.add(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new MonitoredServiceServiceRegistration(
-                    service: service,
-                    type: RegistrationType.register)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.RegisterService(service: service)
         }
     }
 
-    protected void unbindMonitor(final MonitoredService service) {
+    void unbindMonitor(final MonitoredService service) {
 
         registeredMonitors.remove(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new MonitoredServiceServiceRegistration(
-                    service: service,
-                    type: RegistrationType.unregister)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.UnregisterService(service: service)
         }
     }
 
-    protected void bindNotificationAgent(final NotificationAgent service) {
+    void bindNotificationAgent(final NotificationAgent service) {
 
         registeredNotificationAgents.add(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new NotificationAgentServiceRegistration(
-                    service: service,
-                    type: RegistrationType.register)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.RegisterService(service: service)
         }
     }
 
-    protected void unbindNotificationAgent(final NotificationAgent service) {
+    void unbindNotificationAgent(final NotificationAgent service) {
 
         registeredNotificationAgents.remove(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new NotificationAgentServiceRegistration(
-                    service: service,
-                    type: RegistrationType.unregister)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.UnregisterService(service: service)
         }
     }
 
-    protected void bindPersistenceService(final RecordPersistenceService service) {
+    void bindPersistenceService(final RecordPersistenceService service) {
 
         registeredPersistenceServices.add(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new RecordPersistenceServiceRegistration(
-                    service: service,
-                    type: RegistrationType.register)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.RegisterService(service: service)
         }
     }
 
-    protected void unbindPersistenceService(final RecordPersistenceService service) {
+    void unbindPersistenceService(final RecordPersistenceService service) {
 
         registeredPersistenceServices.remove(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new RecordPersistenceServiceRegistration(
-                    service: service,
-                    type: RegistrationType.unregister)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.UnregisterService(service: service)
         }
     }
 
-    protected void bindPollResponseHandler(final PollResponseHandler service) {
+    void bindPollResponseHandler(final PollResponseHandler service) {
 
         registeredPollResponseHandlers.add(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new PollResponseServiceRegistration(
-                    service: service,
-                    type: RegistrationType.register)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.RegisterService(service: service)
         }
     }
 
-    protected void unbindPollResponseHandler(final PollResponseHandler service) {
+    void unbindPollResponseHandler(final PollResponseHandler service) {
 
         registeredPollResponseHandlers.remove(service)
 
-        if (missionControl.isActive()) {
-            missionControl << new PollResponseServiceRegistration(
-                    service: service,
-                    type: RegistrationType.unregister)
+        if (missionControl?.isActive()) {
+            missionControl << new MissionControlActor.UnregisterService(service: service)
         }
     }
 
     @Activate
     protected void activate(final Map<String, Object> properties) throws Exception {
 
+        missionControl = new MissionControlActor(scheduler: scheduler)
         missionControl.start()
 
-        registeredMonitors.each { missionControl << new MonitoredServiceServiceRegistration(
-                service: it,
-                type: RegistrationType.register)}
+        def servicesToRegister = []
 
-        registeredNotificationAgents.each { missionControl << new NotificationAgentServiceRegistration(
-                service: it,
-                type: RegistrationType.register)}
+        servicesToRegister.addAll(registeredMonitors)
+        servicesToRegister.addAll(registeredNotificationAgents)
+        servicesToRegister.addAll(registeredPersistenceServices)
+        servicesToRegister.addAll(registeredPollResponseHandlers)
 
-        registeredPersistenceServices.each { missionControl << new RecordPersistenceServiceRegistration(
-                service: it,
-                type: RegistrationType.register)}
+        log.info("Preparing to register ${servicesToRegister.size()} services with mission control...")
 
-        registeredPollResponseHandlers.each { missionControl << new PollResponseServiceRegistration(
-                service: it,
-                type: RegistrationType.register)}
+        servicesToRegister.each {
+
+            missionControl << new MissionControlActor.RegisterService(service: it)
+        }
     }
 
     @Deactivate
@@ -182,6 +164,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl.isActive()) {
 
+            log.info("Shutting down mission control...")
             missionControl.stop()
         }
     }

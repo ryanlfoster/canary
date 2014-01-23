@@ -3,9 +3,10 @@ package com.citytechinc.monitoring.services.manager.actors.monitor
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import com.citytechinc.monitoring.services.manager.actors.missioncontrol.MissionControlActor
+import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
+import org.apache.sling.commons.scheduler.Scheduler
 
 /**
  *
@@ -22,66 +23,97 @@ import groovyx.gpars.actor.DynamicDispatchActor
 @Slf4j
 final class MonitoredServiceActor extends DynamicDispatchActor {
 
+    static def jobprefix = 'scheduled-monitor-'
+
+    // MESSAGES
     static class GetRecords {}
-    static class ResumePolling {}
+    static class Poll {}
+    static class AutoResumePoll {}
 
     MonitoredServiceWrapper wrapper
     ServiceMonitorRecordHolder recordHolder
+    Scheduler scheduler
     MissionControlActor missionControl
 
-    TimedMonitorServiceActor timedMonitorServiceActor
-    TimedMonitorSuspensionActor timedMonitorSuspensionActor
-
-    def startTimedMonitorServiceActor() {
-
-        timedMonitorServiceActor = new TimedMonitorServiceActor(sleepTime: wrapper.pollIntervalInMilliseconds, monitoredService: wrapper.monitor, monitoredServiceActor: this)
-        timedMonitorServiceActor.start()
-    }
-
-    def startTimedMonitorSuspensionActor() {
-
-        timedMonitorSuspensionActor = new TimedMonitorSuspensionActor(sleepTime: wrapper.autoResumePollIntevalInMilliseconds, monitoredServiceActor: this)
-        timedMonitorSuspensionActor.start()
-    }
-
     void afterStart() {
-        startTimedMonitorServiceActor()
+        schedulePolling()
     }
 
-    void onMessage(GetRecords message) {
-        //missionControl << recordHolder
-        sender.send(recordHolder)
+    void afterStop() {
+        unschedulePolling()
     }
 
-    void onMessage(ResumePolling message) {
-        startTimedMonitorServiceActor()
+    void onMessage(AutoResumePoll message) {
+        schedulePolling()
     }
 
-    void onMessage(DetailedPollResponse detailedPollResponse) {
+    void onMessage(Poll message) {
 
+        def startTime = new Date()
+        def pollResponse = wrapper.monitor.poll()
+
+        def detailedPollResponse = new DetailedPollResponse(startTime: startTime,
+                endTime: new Date(),
+                responseType: pollResponse.pollResponseType,
+                stackTrace: pollResponse.exceptionStackTrace,
+                monitoredServiceClassname: wrapper.monitor.class.name)
+
+        // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
         recordHolder.addRecord(detailedPollResponse)
         missionControl << detailedPollResponse
 
-        log.debug("Handling response ${detailedPollResponse}")
-
         if (recordHolder.isAlarmed()) {
 
-            log.debug('Monitor is alarmed, terminating timed service actor')
-
-            timedMonitorServiceActor.terminate()
-
-            log.debug("Monitor auto resume poller interval ${wrapper.autoResumePollIntevalInMilliseconds}")
-
-            if (wrapper.autoResumePollIntevalInMilliseconds > 0L) {
-
-                log.debug('Starting auto resume actor...')
-
-                startTimedMonitorSuspensionActor()
-            }
-
+            // SEND RECORDS TO MISSION CONTROL FOR BROADCAST
             missionControl << recordHolder
+
+            // REMOVE JOB SCHEDULER
+            unschedulePolling()
+
+            // SCHEDULE AUTO RESUME POLLING
+            oneTimeScheduleAutoResume()
         }
 
-        reply('test')
+    }
+
+    def schedulePolling = {
+
+        log.info("Scheduled polling running..")
+
+        if (!recordHolder.isAlarmed()) {
+
+            log.info("Monitor is not alarmed....")
+
+
+
+
+            scheduler.addPeriodicJob(jobprefix + wrapper.monitorServiceClassName, {
+
+                log.info("Adding schedule job...")
+                this << new Poll()
+
+            }, [:], wrapper.pollIntervalInMilliseconds, false)
+
+            log.info("Job is scheduled.")
+        }
+    }
+
+    def unschedulePolling = {
+
+        log.info("Removing scheduled job...")
+        scheduler.removeJob(jobprefix + wrapper.monitorServiceClassName)
+    }
+
+    def oneTimeScheduleAutoResume = {
+
+        if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInMilliseconds > 0L) {
+
+            def now = new Date()
+            scheduler.fireJobAt(jobprefix, {
+
+                this << new AutoResumePoll()
+
+            }, [:], new Date(now.time + wrapper.autoResumePollIntevalInMilliseconds))
+        }
     }
 }

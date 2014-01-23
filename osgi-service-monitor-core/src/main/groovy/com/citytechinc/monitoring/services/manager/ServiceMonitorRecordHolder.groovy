@@ -54,7 +54,9 @@ class ServiceMonitorRecordHolder {
 
         def alarmed = false
 
-        def topPollResults = Lists.partition(getRecords().reverse(), sequentialFailedPollsToTriggerAlarm).first()
+        def zser = Lists.partition(getRecords().reverse(), sequentialFailedPollsToTriggerAlarm)
+
+        def topPollResults = zser.isEmpty() ? [] : zser.first()
 
         if (topPollResults.size() == sequentialFailedPollsToTriggerAlarm) {
 

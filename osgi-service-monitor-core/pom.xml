@@ -244,6 +244,11 @@
             <artifactId>cq-commons</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.commons.scheduler</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>
