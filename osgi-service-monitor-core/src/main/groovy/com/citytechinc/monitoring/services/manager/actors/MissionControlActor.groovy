@@ -59,6 +59,7 @@ class MissionControlActor extends DynamicDispatchActor {
                     def actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
                     actor.start()
 
+                    monitors.put(wrapper, actor)
                 } else {
 
                     /**
@@ -87,11 +88,12 @@ class MissionControlActor extends DynamicDispatchActor {
                             actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
                         }
 
+                        monitors.put(wrapper, actor)
+
                         actor.start()
                     })
                 }
 
-                monitors.put(wrapper, actor)
             } else {
 
                 log.warn("Monitored service ${message.service} already registered")
