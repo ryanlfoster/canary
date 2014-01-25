@@ -1,6 +1,8 @@
 package com.citytechinc.monitoring.jmx;
 
 import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
+import com.adobe.granite.jmx.annotation.Description;
+import com.adobe.granite.jmx.annotation.Name;
 import com.citytechinc.monitoring.services.manager.ServiceManager;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.NotCompliantMBeanException;
+import javax.management.openmbean.TabularDataSupport;
 import java.util.List;
 
 /**
@@ -20,7 +23,7 @@ import java.util.List;
  *
  */
 @Component(immediate = true)
-@Property(name = "jmx.objectname", value = "com.citytechinc.monitoring.services:type=CITYTECH OSGi Service Monitor Management")
+@Property(name = "jmx.objectname", value = "com.citytechinc.monitoring.jmx:type=CITYTECH OSGi Service Monitor Management")
 @Service
 public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean implements ServiceMonitorManagerMBean {
 
@@ -44,27 +47,38 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public List<String> listMonitoredServices() {
-        return serviceManager.listMonitoredServices();
+    public TabularDataSupport listMonitoredServices() {
+        return null;
     }
 
     @Override
-    public List<String> listRecordPersistenceServices() {
-        return serviceManager.listRecordPersistenceServices();
+    public TabularDataSupport listRecordPersistenceServices() {
+        return null;
     }
 
     @Override
-    public List<String> listNotificationAgents() {
-        return serviceManager.listNotificationAgents();
+    public TabularDataSupport listNotificationAgents() {
+        return null;
     }
 
     @Override
-    public List<String> listPollResponseHandlers() {
-        return serviceManager.listPollResponseHandlers();
+    public TabularDataSupport listPollResponseHandlers() {
+        return null;
     }
 
     @Override
     public List<String> listAlarmedMonitors() {
-        return serviceManager.listAlarmedMonitors();
+        return null;
     }
+
+    @Override
+    public void resetAllAlarms() {
+        serviceManager.resetAllAlarms();
+    }
+
+    @Override
+    public void resetAlarm(final String fullyQualifiedMonitorPath) {
+        serviceManager.resetAlarm(fullyQualifiedMonitorPath);
+    }
+
 }

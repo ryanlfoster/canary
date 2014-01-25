@@ -1,7 +1,9 @@
 package com.citytechinc.monitoring.jmx;
 
 import com.adobe.granite.jmx.annotation.Description;
+import com.adobe.granite.jmx.annotation.Name;
 
+import javax.management.openmbean.TabularDataSupport;
 import java.util.List;
 
 /**
@@ -14,25 +16,31 @@ import java.util.List;
 @Description("CITYTECH OSGi Service Monitor Management")
 public interface ServiceMonitorManagerMBean {
 
-    @Description("Force all monitors to poll 'now' -- monitors will continue polling on registered intervals")
+    @Description("Request that all monitors poll now. Monitors will continue polling at their scheduled intervals. Alarmed monitors will not poll.")
     public void requestAllMonitorsPoll();
 
-    @Description("Force a persistence action for all monitors to all record persistence services")
+    @Description("Request that all monitors persist their data")
     public void requestAllMonitorsPersist();
 
-    @Description("Lists the monitors")
-    public List<String> listMonitoredServices();
+    @Description("Lists the monitors and their definitions")
+    public TabularDataSupport listMonitoredServices();
 
-    @Description("Lists the persistence services")
-    public List<String> listRecordPersistenceServices();
+    @Description("Lists the persistence services and their definitions")
+    public TabularDataSupport listRecordPersistenceServices();
 
-    @Description("Lists the notification agents")
-    public List<String> listNotificationAgents();
+    @Description("Lists the notification agents and their definitions")
+    public TabularDataSupport listNotificationAgents();
 
-    @Description("Lists the poll response handlers")
-    public List<String> listPollResponseHandlers();
+    @Description("Lists the poll response handlers and their definitions")
+    public TabularDataSupport listPollResponseHandlers();
 
     @Description("Lists alarmed monitors")
     public List<String> listAlarmedMonitors();
+
+    @Description("Resets all alarmed monitors")
+    public void resetAllAlarms();
+
+    @Description("Reset a specific alarmed ServiceMonitor")
+    public void resetAlarm(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
 
 }

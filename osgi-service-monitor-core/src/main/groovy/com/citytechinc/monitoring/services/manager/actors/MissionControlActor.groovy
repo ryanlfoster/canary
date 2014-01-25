@@ -29,9 +29,8 @@ final class MissionControlActor extends DynamicDispatchActor {
     // MESSAGES
     static class RegisterService { def service }
     static class UnregisterService { def service }
-    static class GetRecordHolder { String identifier }
-    static class ClearAlarm { String identifer }
-    static class ForcePoll { }
+    static class GetMonitorRecordHolder { String fullyQualifiedMonitorPath }
+    static class ResetAlarm { String fullyQualifiedMonitorPath }
 
     Scheduler scheduler
 
@@ -105,7 +104,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             if (!notificationAgents.containsKey(wrapper)) {
 
-                def actor = new NotificationAgentActor(wrapper: wrapper)
+                def actor = new NotificationAgentActor(wrapper: wrapper, scheduler: scheduler)
                 actor.start()
 
                 notificationAgents.put(wrapper, actor)
@@ -212,14 +211,59 @@ final class MissionControlActor extends DynamicDispatchActor {
         }
     }
 
-    void onMessage(GetRecordHolder message) {
+    /**
+     *
+     * A poll request coming from the outside world. We'll push this poll request to all
+     *   the monitor actors.
+     *
+     * @param message
+     */
+    void onMessage(MonitoredServiceActor.Poll message) {
 
-        log.info("Got a record request for ${message.identifier}")
+        log.info("Sending poll requests to all ${monitors.size()} monitor actors...")
 
-        def actor = monitors.values().first()
-        def records = actor.sendAndWait(new MonitoredServiceActor.GetRecords(), 1L, TimeUnit.SECONDS)
+        monitors.values().each { it << message }
+    }
+
+    /**
+     *
+     * A record retrieval request from the outside world. We'll find the corresponding monitor actor
+     *   and request that it send us its records.
+     *
+     * This call is blocking with a max time of 1 second.
+     *
+     * @param message
+     */
+    void onMessage(GetMonitorRecordHolder message) {
+
+        log.info("Got a record request for ${message.fullyQualifiedMonitorPath}")
+
+        def key = monitors.keySet().find { it.monitorServiceClassName == message.fullyQualifiedMonitorPath }
+        def records = monitors.get(key).sendAndWait(new GetMonitorRecordHolder(), 1L, TimeUnit.SECONDS)
 
         sender.send(records)
+    }
+
+    /**
+     *
+     * A clear monitor alarm request from the outside world. We'll find the corresponding monitor actor
+     *   and request that it clear its alarm state.
+     *
+     * @param message
+     */
+    void onMessage(ResetAlarm message) {
+
+        log.info("Got a clear alarm request for ${message.fullyQualifiedMonitorPath}")
+
+        if (message.fullyQualifiedMonitorPath) {
+
+            def key = monitors.keySet().find { it.monitorServiceClassName == message.fullyQualifiedMonitorPath }
+            monitors.get(key) << new ResetAlarm()
+        } else {
+
+            monitors.values().each { it << new ResetAlarm() }
+        }
+
     }
 
     /**

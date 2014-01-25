@@ -25,7 +25,6 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     static def jobprefix = 'scheduled-monitor-'
 
     // MESSAGES
-    static class GetRecords {}
     static class Poll {}
     static class AutoResumePoll {}
 
@@ -46,9 +45,26 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         schedulePolling()
     }
 
+    void onMessage(MissionControlActor.GetMonitorRecordHolder message) {
+        sender.send(recordHolder)
+    }
+
+    void onMessage(MissionControlActor.ResetAlarm message) {
+
+        if (recordHolder.isAlarmed()) {
+
+            //todo reset alarm
+        } else {
+
+            log.warn("Reset alarm received but not in alarm state")
+        }
+    }
+
     void onMessage(Poll message) {
 
         def startTime = new Date()
+
+        //todo wrap this call in an actor with a timeout
         def pollResponse = wrapper.monitor.poll()
 
         def detailedPollResponse = new DetailedPollResponse(startTime: startTime,
@@ -63,7 +79,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
         if (recordHolder.isAlarmed()) {
 
-            // SEND RECORDS TO MISSION CONTROL FOR BROADCAST
+            // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
             missionControl << recordHolder
 
             // REMOVE JOB SCHEDULER

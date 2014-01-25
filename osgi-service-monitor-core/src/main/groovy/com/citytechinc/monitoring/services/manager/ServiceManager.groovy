@@ -1,5 +1,10 @@
 package com.citytechinc.monitoring.services.manager
 
+import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
+import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
+import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
+import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
+
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -23,25 +28,25 @@ public interface ServiceManager {
      *
      * @return
      */
-    public List<String> listMonitoredServices()
+    public List<MonitoredServiceWrapper> listMonitoredServices()
 
     /**
      *
      * @return
      */
-    public List<String> listRecordPersistenceServices()
+    public List<RecordPersistenceServiceWrapper> listRecordPersistenceServices()
 
     /**
      *
      * @return
      */
-    public List<String> listNotificationAgents()
+    public List<NotificationAgentWrapper> listNotificationAgents()
 
     /**
      *
      * @return
      */
-    public List<String> listPollResponseHandlers()
+    public List<PollResponseWrapper> listPollResponseHandlers()
 
     /**
      *
@@ -51,9 +56,20 @@ public interface ServiceManager {
 
     /**
      *
-     * @param identifer
+     * @param fullyQualifiedMonitorPath
      * @return
      */
-    ServiceMonitorRecordHolder getRecordHolder(String identifer)
+    public ServiceMonitorRecordHolder getRecordHolder(String fullyQualifiedMonitorPath)
+
+    /**
+     *
+     * @param fullyQualifiedMonitorPath
+     */
+    public void resetAlarm(String fullyQualifiedMonitorPath)
+
+    /**
+     *
+     */
+    public void resetAllAlarms()
 
 }

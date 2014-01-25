@@ -1,11 +1,16 @@
 package com.citytechinc.monitoring.services.manager
 
 import com.citytechinc.monitoring.api.monitor.MonitoredService
+import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.notification.NotificationAgent
+import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceService
+import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
+import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
+import com.citytechinc.monitoring.services.manager.actors.MonitoredServiceActor
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -193,46 +198,91 @@ class DefaultServiceManager implements ServiceManager {
     @Override
     void requestAllMonitorsPoll() {
 
+        if (missionControl?.isActive()) {
+
+            missionControl << new MonitoredServiceActor.Poll()
+        }
     }
 
     @Override
     void requestAllMonitorsPersist() {
 
+        if (missionControl?.isActive()) {
+
+            missionControl << new MissionControlActor.GetMonitorRecordHolder()
+        }
     }
 
     @Override
-    List<String> listMonitoredServices() {
-        []
+    List<MonitoredServiceWrapper> listMonitoredServices() {
+        registeredMonitors.collect { new MonitoredServiceWrapper(it) }
     }
 
     @Override
-    List<String> listRecordPersistenceServices() {
-        []
+    List<RecordPersistenceServiceWrapper> listRecordPersistenceServices() {
+        registeredPersistenceServices.collect { new RecordPersistenceServiceWrapper(it) }
     }
 
     @Override
-    List<String> listNotificationAgents() {
-        []
+    List<NotificationAgentWrapper> listNotificationAgents() {
+        registeredNotificationAgents.collect { new NotificationAgentWrapper(it) }
     }
 
     @Override
-    List<String> listPollResponseHandlers() {
-        []
+    List<PollResponseWrapper> listPollResponseHandlers() {
+        registeredPollResponseHandlers.collect { new PollResponseWrapper(it) }
     }
 
     @Override
     List<String> listAlarmedMonitors() {
-        []
+
+        def alarmedMonitors = []
+
+        if (missionControl?.isActive()) {
+
+            alarmedMonitors = registeredMonitors.each {
+
+                def message = new MissionControlActor.GetMonitorRecordHolder(fullyQualifiedMonitorPath: it.class.name)
+                def response = missionControl.sendAndWait(message) as ServiceMonitorRecordHolder
+
+                if (response.isAlarmed()) {
+                    alarmedMonitors.add(it.class.name)
+                }
+            }
+        }
+
+        alarmedMonitors
     }
 
     @Override
-    ServiceMonitorRecordHolder getRecordHolder(String identifer) {
+    ServiceMonitorRecordHolder getRecordHolder(String fullyQualifiedMonitorPath) {
 
-        def id = new MissionControlActor.GetRecordHolder(identifier: identifer)
-        def cameBack = missionControl.sendAndWait(id)
+        def recordHolder
 
-        log.info("id: ${id}, cameBack: ${cameBack}")
+        if (missionControl?.isActive()) {
 
-        cameBack
+            def message = new MissionControlActor.GetMonitorRecordHolder(fullyQualifiedMonitorPath: identifer)
+            recordHolder = missionControl.sendAndWait(message) as ServiceMonitorRecordHolder
+        }
+
+        recordHolder
+    }
+
+    @Override
+    void resetAlarm(String fullyQualifiedMonitorPath) {
+
+        if (missionControl?.isActive()) {
+
+            missionControl << new MissionControlActor.ResetAlarm(fullyQualifiedMonitorPath: fullyQualifiedMonitorPath)
+        }
+    }
+
+    @Override
+    void resetAllAlarms() {
+
+        if (missionControl?.isActive()) {
+
+            missionControl << new MissionControlActor.ResetAlarm()
+        }
     }
 }
