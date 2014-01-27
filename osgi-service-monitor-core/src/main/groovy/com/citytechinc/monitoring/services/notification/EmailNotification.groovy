@@ -4,7 +4,7 @@ import com.citytechinc.monitoring.api.notification.NotificationAgent
 import com.citytechinc.monitoring.api.notification.NotificationAgentDefinition
 import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.constants.Constants
-import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
 import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate

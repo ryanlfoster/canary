@@ -4,6 +4,7 @@ import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
 
 /**
  *

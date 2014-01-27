@@ -1,8 +1,7 @@
-package com.citytechinc.monitoring.services.manager
+package com.citytechinc.monitoring.services.jcrpersistence
 
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.monitor.PollResponseType
-import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.google.common.collect.Lists
 import com.google.common.collect.Queues
 import groovy.transform.ToString
@@ -54,13 +53,14 @@ class ServiceMonitorRecordHolder {
 
         def alarmed = false
 
-        def zser = Lists.partition(getRecords().reverse(), sequentialFailedPollsToTriggerAlarm)
+        if (getRecords().size() <= sequentialFailedPollsToTriggerAlarm) {
 
-        def topPollResults = zser.isEmpty() ? [] : zser.first()
+            alarmed = getRecords().reverse().findAll { it.responseType != PollResponseType.success }.findAll { it.responseType != PollResponseType.clear }.size() > 0
+        } else {
 
-        if (topPollResults.size() == sequentialFailedPollsToTriggerAlarm) {
-
-            alarmed = topPollResults.findAll { it.responseType != PollResponseType.success }.findAll { it.responseType != PollResponseType.clear }.size() > 0
+            // GET ONLY RELEVANT RECORDS
+            def mostRelevantRecords = Lists.partition(getRecords().reverse(), sequentialFailedPollsToTriggerAlarm).first()
+            alarmed = mostRelevantRecords.findAll { it.responseType != PollResponseType.success }.findAll { it.responseType != PollResponseType.clear }.size() > 0
         }
 
         alarmed

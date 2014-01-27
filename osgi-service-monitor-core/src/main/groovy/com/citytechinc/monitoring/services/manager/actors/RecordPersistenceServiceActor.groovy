@@ -1,8 +1,7 @@
 package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
-import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
-import groovy.transform.Immutable
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
 import groovyx.gpars.actor.DynamicDispatchActor
 
 /**

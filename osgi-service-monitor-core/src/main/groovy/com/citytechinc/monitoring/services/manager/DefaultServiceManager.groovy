@@ -9,6 +9,7 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrappe
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.constants.Constants
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
 import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
 import com.citytechinc.monitoring.services.manager.actors.MonitoredServiceActor
 import com.google.common.collect.Lists

@@ -1,6 +1,6 @@
 package com.citytechinc.monitoring.api.notification
 
-import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
 
 /**
  *

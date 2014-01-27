@@ -18,5 +18,6 @@ class DetailedPollResponse {
     PollResponseType responseType
     String stackTrace
     String monitoredServiceClassname
+    Boolean cleared
 
 }

@@ -9,7 +9,7 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrappe
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
-import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
@@ -253,13 +253,15 @@ final class MissionControlActor extends DynamicDispatchActor {
      */
     void onMessage(ResetAlarm message) {
 
-        log.info("Got a clear alarm request for ${message.fullyQualifiedMonitorPath}")
-
         if (message.fullyQualifiedMonitorPath) {
+
+            log.info("Got a clear alarm request for ${message.fullyQualifiedMonitorPath}...")
 
             def key = monitors.keySet().find { it.monitorServiceClassName == message.fullyQualifiedMonitorPath }
             monitors.get(key) << new ResetAlarm()
         } else {
+
+            log.info("Got a clear alarm request for all monitors...")
 
             monitors.values().each { it << new ResetAlarm() }
         }

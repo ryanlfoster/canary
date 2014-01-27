@@ -3,12 +3,9 @@ package com.citytechinc.monitoring.services.jcrpersistence
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceDefinition
 import com.citytechinc.monitoring.constants.ServiceConstants
-import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
 import com.day.cq.commons.jcr.JcrConstants
 import com.google.common.base.Optional
-import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
-import groovyx.gpars.GParsPool
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy

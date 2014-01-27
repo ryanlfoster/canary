@@ -2,7 +2,7 @@ package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
-import com.citytechinc.monitoring.services.manager.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
@@ -12,11 +12,6 @@ import org.apache.sling.commons.scheduler.Scheduler
  * @author Josh Durbin, CITYTECH, Inc. 2013
  *
  * Copyright 2013 CITYTECH, Inc.
- *
- * This stateful actor contains historical information regarding poll data. It also manages two actors:
- *
- *   1. A timed actor that executes calls to the monitored service
- *   2. A timed actor that is used when an alarm is thrown and a timeout is requested
  *
  */
 @Slf4j
@@ -102,13 +97,13 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
             }, [:], wrapper.pollIntervalInMilliseconds, false)
 
-            log.info("Adding schedule job defined under the key: ${schedulerJobKey()}")
+            log.info("Adding scheduled job defined under the key: ${schedulerJobKey()}")
         }
     }
 
     def unschedulePolling = {
 
-        log.info("Removing schedule job for key ${schedulerJobKey()}")
+        log.info("Removing scheduled job for key ${schedulerJobKey()}")
         scheduler.removeJob(schedulerJobKey())
     }
 
