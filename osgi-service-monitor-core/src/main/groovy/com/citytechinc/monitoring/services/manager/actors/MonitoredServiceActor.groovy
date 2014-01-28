@@ -73,34 +73,39 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     void onMessage(Poll message) {
 
+        final Date startTime = new Date()
+
+        PollResponse pollResponse
+
         try {
 
-            final Date startTime = new Date()
-            final PollResponse pollResponse = wrapper.monitor.poll()
-
-            DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
-                    endTime: new Date(),
-                    responseType: pollResponse.pollResponseType,
-                    stackTrace: pollResponse.exceptionStackTrace)
-
-            // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
-            recordHolder.addRecord(detailedPollResponse)
-            missionControl << new BroadcastPollResponse(pollResponse: detailedPollResponse, canonicalMonitorName: recordHolder.canonicalMonitorName)
-
-            if (recordHolder.isAlarmed()) {
-
-                // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
-                missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistRecordHolderWhenAlarmed())
-
-                // REMOVE JOB SCHEDULER
-                unschedulePolling()
-
-                // SCHEDULE AUTO RESUME POLLING
-                oneTimeScheduleAutoResume()
-            }
+            pollResponse = wrapper.monitor.poll()
 
         } catch (Exception e) {
+
             log.error("An exception occurred while calling the monitored service: ${wrapper.canonicalMonitorName}", e)
+            pollResponse = PollResponse.EXCEPTION(e)
+        }
+
+        DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
+                endTime: new Date(),
+                responseType: pollResponse.pollResponseType,
+                stackTrace: pollResponse.exceptionStackTrace)
+
+        // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
+        recordHolder.addRecord(detailedPollResponse)
+        missionControl << new BroadcastPollResponse(pollResponse: detailedPollResponse, canonicalMonitorName: recordHolder.canonicalMonitorName)
+
+        if (recordHolder.isAlarmed()) {
+
+            // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
+            missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistRecordHolderWhenAlarmed())
+
+            // REMOVE JOB SCHEDULER
+            unschedulePolling()
+
+            // SCHEDULE AUTO RESUME POLLING
+            oneTimeScheduleAutoResume()
         }
     }
 
