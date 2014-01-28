@@ -9,6 +9,7 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrappe
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
+import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor

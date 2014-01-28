@@ -3,6 +3,7 @@ package com.citytechinc.monitoring.services.manager.actors
 import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
+import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler

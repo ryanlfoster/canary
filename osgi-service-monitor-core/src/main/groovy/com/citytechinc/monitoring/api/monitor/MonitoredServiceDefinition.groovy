@@ -50,15 +50,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    int sequentialFailedPollsToTriggerAlarm() default 3
-
-    /**
-     *
-     * Monitor service for unintended shutdowns due to dependency failures, inactive bundles, etc...
-     *
-     * @return
-     */
-    boolean monitorForUnintendedShutdowns() default true
+    int alarmThreshold() default 3
 
     /**
      *
@@ -66,15 +58,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    int pollHistoryLength() default 50
-
-    /**
-     *
-     *
-     *
-     * @return
-     */
-    boolean createLoggerForAlarm() default true
+    int maxPollHistoryEntries() default 50
 
     /**
      *
@@ -82,6 +66,8 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    boolean persistRecordHolderWhenAlarmed() default false
+    boolean persistWhenAlarmed() default false
+
+    int pollMaxExecutionTimeInSeconds() default 3
 
 }

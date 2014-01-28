@@ -1,12 +1,15 @@
-package com.citytechinc.monitoring.services.manager.actors
+package com.citytechinc.monitoring.services.manager.actors.monitor
 
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.monitor.PollResponse
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
+import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
+
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -39,14 +42,21 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     RecordHolder recordHolder
     Scheduler scheduler
     MissionControlActor missionControl
+    PollingActor pollingActor
 
     void afterStart() {
         schedulePolling()
+
+        pollingActor = new PollingActor(service: wrapper.monitor)
+        pollingActor.start()
     }
 
     void afterStop() {
         unschedulePolling()
+
+        pollingActor.terminate()
     }
+
 
     void onMessage(AutoResumePolling message) {
 
@@ -74,18 +84,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     void onMessage(Poll message) {
 
         final Date startTime = new Date()
-
-        PollResponse pollResponse
-
-        try {
-
-            pollResponse = wrapper.monitor.poll()
-
-        } catch (Exception e) {
-
-            log.error("An exception occurred while calling the monitored service: ${wrapper.canonicalMonitorName}", e)
-            pollResponse = PollResponse.EXCEPTION(e)
-        }
+        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.pollMaxExecutionTimeInMillseconds, TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
 
         DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
@@ -99,7 +98,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         if (recordHolder.isAlarmed()) {
 
             // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
-            missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistRecordHolderWhenAlarmed())
+            missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistWhenAlarmed())
 
             // REMOVE JOB SCHEDULER
             unschedulePolling()

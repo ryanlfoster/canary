@@ -2,6 +2,7 @@ package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
+import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 

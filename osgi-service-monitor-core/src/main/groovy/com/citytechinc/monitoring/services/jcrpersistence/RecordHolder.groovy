@@ -30,12 +30,12 @@ class RecordHolder {
 
     public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
 
-        return new RecordHolder(wrapper.canonicalMonitorName, wrapper.definition.pollHistoryLength(), wrapper.definition.sequentialFailedPollsToTriggerAlarm())
+        return new RecordHolder(wrapper.canonicalMonitorName, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
     }
 
     public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<DetailedPollResponse> records) {
 
-        RecordHolder holder = new RecordHolder(wrapper.canonicalMonitorName, wrapper.definition.pollHistoryLength(), wrapper.definition.sequentialFailedPollsToTriggerAlarm())
+        RecordHolder holder = new RecordHolder(wrapper.canonicalMonitorName, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
         records.each { holder.addRecord(it) }
 
         holder
