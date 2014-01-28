@@ -17,7 +17,7 @@ public final class MonitoredServiceWrapper {
     final MonitoredService monitor
     final String canonicalMonitorName
     final MonitoredServiceDefinition definition
-    final Long autoResumePollIntevalInSeconds
+    final Long autoResumePollIntevalInMilliseconds
     final Long pollIntervalInSeconds
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
@@ -29,9 +29,9 @@ public final class MonitoredServiceWrapper {
         final AutoResumingPoller autoResumingPollerDefinition = monitor.class.getAnnotation(AutoResumingPoller)
 
         if (autoResumingPollerDefinition != null) {
-            autoResumePollIntevalInSeconds = TimeUnit.SECONDS.convert(autoResumingPollerDefinition.interval(), autoResumingPollerDefinition.unit())
+            autoResumePollIntevalInMilliseconds = TimeUnit.MILLISECONDS.convert(autoResumingPollerDefinition.interval(), autoResumingPollerDefinition.unit())
         } else {
-            autoResumePollIntevalInSeconds = 0L
+            autoResumePollIntevalInMilliseconds = 0L
         }
     }
 }

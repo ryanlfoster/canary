@@ -122,7 +122,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def oneTimeScheduleAutoResume = {
 
-        if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInSeconds > 0L) {
+        if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInMilliseconds > 0L) {
 
             log.info("Adding scheduled auto resume job defined under the key: ${schedulerJobKey()}")
 
@@ -131,7 +131,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
                 this << new AutoResumePolling()
 
-            }, [:], new Date(now.time + wrapper.autoResumePollIntevalInSeconds))
+            }, [:], new Date(now.time + wrapper.autoResumePollIntevalInMilliseconds))
         }
     }
 }

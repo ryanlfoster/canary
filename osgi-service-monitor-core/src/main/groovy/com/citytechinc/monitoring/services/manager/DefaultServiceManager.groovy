@@ -256,13 +256,13 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
-    RecordHolder getRecordHolder(String fullyQualifiedMonitorPath) {
+    RecordHolder getRecordHolder(String canonicalMonitorName) {
 
         def recordHolder
 
         if (missionControl?.isActive()) {
 
-            def message = new MissionControlActor.GetRecords(canonicalMonitorName: fullyQualifiedMonitorPath)
+            def message = new MissionControlActor.GetRecords(canonicalMonitorName: canonicalMonitorName)
             recordHolder = missionControl.sendAndWait(message) as RecordHolder
         }
 
@@ -270,11 +270,11 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
-    void resetAlarm(String fullyQualifiedMonitorPath) {
+    void resetAlarm(String canonicalMonitorName) {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MissionControlActor.ResetAlarm(canonicalMonitorName: fullyQualifiedMonitorPath)
+            missionControl << new MissionControlActor.ResetAlarm(canonicalMonitorName: canonicalMonitorName)
         }
     }
 

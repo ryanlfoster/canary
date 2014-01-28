@@ -57,16 +57,16 @@ public interface ServiceManager {
 
     /**
      *
-     * @param fullyQualifiedMonitorPath
+     * @param canonicalMonitorName
      * @return
      */
-    public RecordHolder getRecordHolder(String fullyQualifiedMonitorPath)
+    public RecordHolder getRecordHolder(String canonicalMonitorName)
 
     /**
      *
-     * @param fullyQualifiedMonitorPath
+     * @param canonicalMonitorName
      */
-    public void resetAlarm(String fullyQualifiedMonitorPath)
+    public void resetAlarm(String canonicalMonitorName)
 
     /**
      *
