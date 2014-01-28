@@ -1,6 +1,7 @@
 package com.citytechinc.monitoring.services.jcrpersistence
 
 import com.citytechinc.monitoring.api.monitor.PollResponseType
+import groovy.transform.AutoClone
 import groovy.transform.ToString
 
 /**
@@ -11,13 +12,12 @@ import groovy.transform.ToString
  *
  */
 @ToString
+@AutoClone
 class DetailedPollResponse {
 
     Date startTime
     Date endTime
     PollResponseType responseType
     String stackTrace
-    String monitoredServiceClassname
-    Boolean cleared
-
+    Boolean cleared = false
 }

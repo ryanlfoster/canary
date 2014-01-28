@@ -4,7 +4,7 @@ import com.citytechinc.monitoring.api.notification.NotificationAgent
 import com.citytechinc.monitoring.api.notification.NotificationAgentDefinition
 import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.constants.Constants
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -53,7 +53,7 @@ class EmailNotification implements NotificationAgent {
     }
 
     @Override
-    void notify(List<ServiceMonitorRecordHolder> recordHolders) {
+    void notify(List<RecordHolder> recordHolders) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

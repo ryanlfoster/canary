@@ -15,5 +15,5 @@ public interface PollResponseHandler {
      *
      * @param serviceMonitorRecord
      */
-    void handleResponse(DetailedPollResponse serviceMonitorRecord)
+    void handleResponse(String canonicalMonitorName, DetailedPollResponse serviceMonitorRecord)
 }

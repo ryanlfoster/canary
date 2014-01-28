@@ -53,7 +53,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
     }
 
     @Override
-    void persistRecordHolder(ServiceMonitorRecordHolder recordHolder) {
+    void persistRecordHolder(RecordHolder recordHolder) {
 
         def session
 
@@ -92,7 +92,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
     }
 
     @Override
-    Optional<ServiceMonitorRecordHolder> getRecordHolder(String monitorClass) {
+    Optional<RecordHolder> getRecordHolder(String monitorClass) {
 
         def session = slingRepository.loginAdministrative(null)
         def rootNode = session.getNode(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE)

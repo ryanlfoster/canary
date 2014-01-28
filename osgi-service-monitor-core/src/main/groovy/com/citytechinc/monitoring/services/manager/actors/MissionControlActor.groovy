@@ -8,8 +8,7 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
-import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
@@ -29,16 +28,16 @@ final class MissionControlActor extends DynamicDispatchActor {
     // MESSAGES
     static class RegisterService { def service }
     static class UnregisterService { def service }
-    static class GetMonitorRecordHolder { String fullyQualifiedMonitorPath }
-    static class ResetAlarm { String fullyQualifiedMonitorPath }
+    static class GetRecords { String canonicalMonitorName }
+    static class ResetAlarm { String canonicalMonitorName }
 
     Scheduler scheduler
 
     // WRAPPERS AND ACTORS
-    Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
-    Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
-    Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
-    Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
+    final Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
+    final Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
+    final Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
+    final Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
     void onMessage(RegisterService message) {
 
@@ -55,7 +54,7 @@ final class MissionControlActor extends DynamicDispatchActor {
                     log.info("No record persistence services to poll for data, starting a clean actor...")
 
                     // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
-                    def actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
+                    def actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
                     actor.start()
 
                     monitors.put(wrapper, actor)
@@ -71,7 +70,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
                     log.info("Polling ${persistenceWrapper.service.class} for records...")
 
-                    recordPersistenceServices.get(persistenceWrapper).sendAndContinue(new RecordPersistenceServiceActor.GetRecord(wrapper.monitorServiceClassName), { recordHolder ->
+                    recordPersistenceServices.get(persistenceWrapper).sendAndContinue(new RecordPersistenceServiceActor.GetRecord(wrapper.canonicalMonitorName), { recordHolder ->
 
                         log.info("Received record ${recordHolder} from persistence service")
 
@@ -84,7 +83,7 @@ final class MissionControlActor extends DynamicDispatchActor {
                         } else {
 
                             log.info("Record holder is absent, starting a clean actor...")
-                            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: ServiceMonitorRecordHolder.CREATE_NEW(wrapper))
+                            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
                         }
 
                         monitors.put(wrapper, actor)
@@ -234,68 +233,80 @@ final class MissionControlActor extends DynamicDispatchActor {
      *
      * @param message
      */
-    void onMessage(GetMonitorRecordHolder message) {
+    void onMessage(GetRecords message) {
 
-        log.info("Got a record request for ${message.fullyQualifiedMonitorPath}")
+        log.info("Got a record request for ${message.canonicalMonitorName}")
 
-        def key = monitors.keySet().find { it.monitorServiceClassName == message.fullyQualifiedMonitorPath }
-        def records = monitors.get(key).sendAndWait(new GetMonitorRecordHolder(), 1L, TimeUnit.SECONDS)
+        def key = monitors.keySet().find { it.canonicalMonitorName == message.canonicalMonitorName }
+        def records = monitors.get(key).sendAndWait(new MonitoredServiceActor.GetRecords(), 1L, TimeUnit.SECONDS)
 
         sender.send(records)
     }
 
     /**
      *
-     * A clear monitor alarm request from the outside world. We'll find the corresponding monitor actor
-     *   and request that it clear its alarm state.
+     * The ResetAlarm message that takes an argument is specific to the Mission Control Actor. These messages
+     *   should only come from the Service Manager on behalf of external OSGi services/calls.
+     *
+     * The actor will then turn around and send a ResetAlarm message specific to the Monitored Service Actor. If no
+     *   explicit monitor is defined, all monitors will receive the message. They may choose, however, to disregard the
+     *   message.
      *
      * @param message
      */
     void onMessage(ResetAlarm message) {
 
-        if (message.fullyQualifiedMonitorPath) {
+        if (message.canonicalMonitorName) {
 
-            log.info("Got a clear alarm request for ${message.fullyQualifiedMonitorPath}...")
+            log.info("Got a clear alarm request for ${message.canonicalMonitorName}...")
 
-            def key = monitors.keySet().find { it.monitorServiceClassName == message.fullyQualifiedMonitorPath }
-            monitors.get(key) << new ResetAlarm()
+            def key = monitors.keySet().find { it.canonicalMonitorName == message.canonicalMonitorName }
+            monitors.get(key) << new MonitoredServiceActor.ResetAlarm()
         } else {
 
             log.info("Got a clear alarm request for all monitors...")
 
-            monitors.values().each { it << new ResetAlarm() }
+            monitors.values().each { it << new MonitoredServiceActor.ResetAlarm() }
         }
-
     }
 
     /**
      *
-     * If a MonitoredServiceActor sends a
+     * BroadcastPollResponse messages come from the MonitoredServiceActor(s). They indicate a request to have their responses
+     *   sent to all poll response handlers. Poll response handlers may choose, however, to disregard the message.
      *
      * @param message
      */
-    void onMessage(DetailedPollResponse message) {
+    void onMessage(MonitoredServiceActor.BroadcastPollResponse message) {
 
-        log.info("Sending ${message} to ${pollResponseHandlers.size()} poll response handlers")
+        log.info("Received BroadcastPollResponse ${message}. Relaying message to ${pollResponseHandlers.size()} poll response handlers")
 
         pollResponseHandlers.values().each { it << message }
     }
 
     /**
      *
-     * If a MonitoredServiceActor sends an entire ServiceMonitorRecordHolder, it indicates that it is in
-     *   an alarmed state and thus sends it's entire set of records.
+     * BroadcastAlarm messages come from the MonitoredServiceActor(s). This message occurs when a monitor has reached an
+     *   alarmed state based on poll results. The threshold is defined per monitor.
      *
-     * MissionControlActor is responsible for then notification any NotificationAgentActors with the entire
-     *   set of records. MissionControlActor is also responsible for requesting persistence of the alarmed state.
+     * The Mission Control actor will send each, entire record set to all notification agents. Notification agents may
+     *   choose, however, to disregard the message. Mission Control will also send persistence requests to all persistence
+     *   services if the monitor is configured to immediately persist.
      *
      * @param message
      */
-    void onMessage(ServiceMonitorRecordHolder message) {
+    void onMessage(MonitoredServiceActor.BroadcastAlarm message) {
 
-        log.info("Sending ${message} to ${notificationAgents.size()} notification agents")
+        //todo create a copy and send the copy of the data
 
+        log.info("Received BroadcastAlarm ${message}. Relaying message to ${notificationAgents.size()} notification agents")
         notificationAgents.values().each { it << message }
+
+        if (message.persistImmediately) {
+
+            log.info("BroadcastAlarm indicates immediate persistence. Sending persistence request to ${recordPersistenceServices.size()} persistence services")
+            recordPersistenceServices.values().each { it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: message.recordHolder) }
+        }
     }
 
 }

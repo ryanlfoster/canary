@@ -1,8 +1,9 @@
 package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
+import com.citytechinc.monitoring.api.monitor.PollResponse
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
@@ -17,14 +18,25 @@ import org.apache.sling.commons.scheduler.Scheduler
 @Slf4j
 final class MonitoredServiceActor extends DynamicDispatchActor {
 
-    static def jobprefix = 'scheduled-monitor-'
+    static String jobprefix = 'scheduled-monitor-'
 
     // MESSAGES
     static class Poll {}
-    static class AutoResumePoll {}
+    static class AutoResumePolling {}
+    static class ResetAlarm {}
+    static class GetRecords {}
+
+    static class BroadcastAlarm {
+        RecordHolder recordHolder
+        Boolean persistImmediately
+    }
+    static class BroadcastPollResponse {
+        DetailedPollResponse pollResponse
+        String canonicalMonitorName
+    }
 
     MonitoredServiceWrapper wrapper
-    ServiceMonitorRecordHolder recordHolder
+    RecordHolder recordHolder
     Scheduler scheduler
     MissionControlActor missionControl
 
@@ -36,19 +48,23 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         unschedulePolling()
     }
 
-    void onMessage(AutoResumePoll message) {
+    void onMessage(AutoResumePolling message) {
+
+        log.info("Received message to auto resume polling. Scheduling normal polling...")
         schedulePolling()
     }
 
-    void onMessage(MissionControlActor.GetMonitorRecordHolder message) {
+    void onMessage(GetRecords message) {
         sender.send(recordHolder)
     }
 
-    void onMessage(MissionControlActor.ResetAlarm message) {
+    void onMessage(ResetAlarm message) {
 
         if (recordHolder.isAlarmed()) {
 
-            //todo reset alarm
+            recordHolder.clearAlarm()
+            schedulePolling()
+
         } else {
 
             log.warn("Reset alarm received but not in alarm state")
@@ -57,25 +73,22 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     void onMessage(Poll message) {
 
-        def startTime = new Date()
+        final Date startTime = new Date()
+        final PollResponse pollResponse = wrapper.monitor.poll()
 
-        //todo wrap this call in an actor with a timeout
-        def pollResponse = wrapper.monitor.poll()
-
-        def detailedPollResponse = new DetailedPollResponse(startTime: startTime,
+        DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
                 responseType: pollResponse.pollResponseType,
-                stackTrace: pollResponse.exceptionStackTrace,
-                monitoredServiceClassname: wrapper.monitor.class.name)
+                stackTrace: pollResponse.exceptionStackTrace)
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
         recordHolder.addRecord(detailedPollResponse)
-        missionControl << detailedPollResponse
+        missionControl << new BroadcastPollResponse(pollResponse: detailedPollResponse, canonicalMonitorName: recordHolder.canonicalMonitorName)
 
         if (recordHolder.isAlarmed()) {
 
             // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
-            missionControl << recordHolder
+            missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistRecordHolderWhenAlarmed())
 
             // REMOVE JOB SCHEDULER
             unschedulePolling()
@@ -88,17 +101,13 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def schedulePolling = {
 
-        if (!recordHolder.isAlarmed()) {
+        log.info("Adding scheduled job defined under the key: ${schedulerJobKey()}")
 
-            scheduler.addPeriodicJob(schedulerJobKey(), {
+        scheduler.addPeriodicJob(schedulerJobKey(), {
 
-                log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! JOB RAN")
-                this << new Poll()
+            this << new Poll()
 
-            }, [:], wrapper.pollIntervalInMilliseconds, false)
-
-            log.info("Adding scheduled job defined under the key: ${schedulerJobKey()}")
-        }
+        }, [:], wrapper.pollIntervalInSeconds, false)
     }
 
     def unschedulePolling = {
@@ -108,19 +117,21 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     }
 
     def schedulerJobKey = {
-        jobprefix + wrapper.monitorServiceClassName
+        jobprefix + wrapper.canonicalMonitorName
     }
 
     def oneTimeScheduleAutoResume = {
 
-        if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInMilliseconds > 0L) {
+        if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInSeconds > 0L) {
 
-            def now = new Date()
+            log.info("Adding scheduled auto resume job defined under the key: ${schedulerJobKey()}")
+
+            final Date now = new Date()
             scheduler.fireJobAt(schedulerJobKey(), {
 
-                this << new AutoResumePoll()
+                this << new AutoResumePolling()
 
-            }, [:], new Date(now.time + wrapper.autoResumePollIntevalInMilliseconds))
+            }, [:], new Date(now.time + wrapper.autoResumePollIntevalInSeconds))
         }
     }
 }

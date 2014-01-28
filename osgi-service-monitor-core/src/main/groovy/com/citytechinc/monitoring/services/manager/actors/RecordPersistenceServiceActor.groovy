@@ -1,7 +1,7 @@
 package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import groovyx.gpars.actor.DynamicDispatchActor
 
 /**
@@ -15,7 +15,7 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
 
     // MESSAGES
     static class GetRecord { String monitor }
-    static class PersistRecord { ServiceMonitorRecordHolder recordHolder }
+    static class PersistRecord { RecordHolder recordHolder }
 
     RecordPersistenceServiceWrapper wrapper
 

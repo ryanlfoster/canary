@@ -15,23 +15,23 @@ import java.util.concurrent.TimeUnit
 public final class MonitoredServiceWrapper {
 
     final MonitoredService monitor
-    final String monitorServiceClassName
+    final String canonicalMonitorName
     final MonitoredServiceDefinition definition
-    final Long autoResumePollIntevalInMilliseconds
-    final Long pollIntervalInMilliseconds
+    final Long autoResumePollIntevalInSeconds
+    final Long pollIntervalInSeconds
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
         this.monitor = monitor
-        monitorServiceClassName = monitor.getClass().getCanonicalName()
-        definition = monitor.getClass().getAnnotation(MonitoredServiceDefinition.class)
-        pollIntervalInMilliseconds = TimeUnit.MILLISECONDS.convert(definition.pollInterval(), definition.pollIntervalUnit())
+        canonicalMonitorName = monitor.class.canonicalName
+        definition = monitor.class.getAnnotation(MonitoredServiceDefinition)
+        pollIntervalInSeconds = TimeUnit.SECONDS.convert(definition.pollInterval(), definition.pollIntervalUnit())
 
-        final AutoResumingPoller autoResumingPollerDefinition = monitor.getClass().getAnnotation(AutoResumingPoller.class)
+        final AutoResumingPoller autoResumingPollerDefinition = monitor.class.getAnnotation(AutoResumingPoller)
 
         if (autoResumingPollerDefinition != null) {
-            autoResumePollIntevalInMilliseconds = TimeUnit.MILLISECONDS.convert(autoResumingPollerDefinition.interval(), autoResumingPollerDefinition.unit())
+            autoResumePollIntevalInSeconds = TimeUnit.SECONDS.convert(autoResumingPollerDefinition.interval(), autoResumingPollerDefinition.unit())
         } else {
-            autoResumePollIntevalInMilliseconds = 0L
+            autoResumePollIntevalInSeconds = 0L
         }
     }
 }

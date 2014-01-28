@@ -1,6 +1,6 @@
 package com.citytechinc.monitoring.api.notification
 
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 
 /**
  *
@@ -18,5 +18,5 @@ public interface NotificationAgent {
      *
      * @param record
      */
-    public void notify(List<ServiceMonitorRecordHolder> recordHolders)
+    public void notify(List<RecordHolder> recordHolders)
 }

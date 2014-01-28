@@ -2,7 +2,6 @@ package com.citytechinc.monitoring.services.manager.actors
 
 import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
-import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import groovyx.gpars.actor.DynamicDispatchActor
 
 /**
@@ -16,37 +15,13 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
 
     PollResponseWrapper wrapper
 
-    /**
-     *
-     * Performs filtering of DetailedPollResponse messages. If the wrapper definition
-     *   allows the message to pass, we will call the handler. This call is blocking.
-     *
-     *   If the wrapper definition does not allow the message to pass, the message is dropped.
-     *
-     * @param message
-     */
-    void onMessage(DetailedPollResponse message) {
+    void onMessage(MonitoredServiceActor.BroadcastPollResponse message) {
 
-        switch (wrapper.definition.strategy()) {
+        if (((wrapper.definition.strategy() == SubscriptionStrategy.opt_into) && (wrapper.definition.specifics().collect { it.name }.contains(message.canonicalMonitorName)))
+            || ((wrapper.definition.strategy() == SubscriptionStrategy.opt_out_of) && (!wrapper.definition.specifics().collect { it.name }.contains(message.canonicalMonitorName)))
+            || (wrapper.definition.strategy() == SubscriptionStrategy.all)) {
 
-            case SubscriptionStrategy.opt_into:
-
-                if (wrapper.definition.specifics().collect { it.name }.contains(message.monitoredServiceClassname))
-                    wrapper.handler.handleResponse(message)
-
-                break
-
-            case SubscriptionStrategy.opt_out_of:
-
-                if (!wrapper.definition.specifics().collect { it.name }.contains(message.monitoredServiceClassname))
-                    wrapper.handler.handleResponse(message)
-
-                break
-
-            case SubscriptionStrategy.all:
-            default:
-
-                wrapper.handler.handleResponse(message)
+            wrapper.handler.handleResponse(message.canonicalMonitorName, message.pollResponse)
         }
     }
 }

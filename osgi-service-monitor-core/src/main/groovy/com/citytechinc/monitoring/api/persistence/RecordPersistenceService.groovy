@@ -1,6 +1,6 @@
 package com.citytechinc.monitoring.api.persistence
 
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.google.common.base.Optional
 
 /**
@@ -16,12 +16,12 @@ public interface RecordPersistenceService {
      *
      * @param recordHolder
      */
-    void persistRecordHolder(ServiceMonitorRecordHolder recordHolder)
+    void persistRecordHolder(RecordHolder recordHolder)
 
     /**
      *
      * @param monitorClass
      * @return
      */
-    Optional<ServiceMonitorRecordHolder> getRecordHolder(String monitorClass)
+    Optional<RecordHolder> getRecordHolder(String monitorClass)
 }

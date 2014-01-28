@@ -9,7 +9,7 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrappe
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.constants.Constants
-import com.citytechinc.monitoring.services.jcrpersistence.ServiceMonitorRecordHolder
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
 import com.citytechinc.monitoring.services.manager.actors.MonitoredServiceActor
 import com.google.common.collect.Lists
@@ -210,7 +210,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MissionControlActor.GetMonitorRecordHolder()
+            missionControl << new MissionControlActor.GetRecords()
         }
     }
 
@@ -243,11 +243,11 @@ class DefaultServiceManager implements ServiceManager {
 
             alarmedMonitors = registeredMonitors.each {
 
-                def message = new MissionControlActor.GetMonitorRecordHolder(fullyQualifiedMonitorPath: it.class.name)
-                def response = missionControl.sendAndWait(message) as ServiceMonitorRecordHolder
+                def message = new MissionControlActor.GetRecords(canonicalMonitorName: it.class.name)
+                RecordHolder recordHolder = missionControl.sendAndWait(message) as RecordHolder
 
-                if (response.isAlarmed()) {
-                    alarmedMonitors.add(it.class.name)
+                if (recordHolder.isAlarmed()) {
+                    alarmedMonitors.add(recordHolder.monitoredService)
                 }
             }
         }
@@ -256,14 +256,14 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
-    ServiceMonitorRecordHolder getRecordHolder(String fullyQualifiedMonitorPath) {
+    RecordHolder getRecordHolder(String fullyQualifiedMonitorPath) {
 
         def recordHolder
 
         if (missionControl?.isActive()) {
 
-            def message = new MissionControlActor.GetMonitorRecordHolder(fullyQualifiedMonitorPath: identifer)
-            recordHolder = missionControl.sendAndWait(message) as ServiceMonitorRecordHolder
+            def message = new MissionControlActor.GetRecords(canonicalMonitorName: fullyQualifiedMonitorPath)
+            recordHolder = missionControl.sendAndWait(message) as RecordHolder
         }
 
         recordHolder
@@ -274,7 +274,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MissionControlActor.ResetAlarm(fullyQualifiedMonitorPath: fullyQualifiedMonitorPath)
+            missionControl << new MissionControlActor.ResetAlarm(canonicalMonitorName: fullyQualifiedMonitorPath)
         }
     }
 
