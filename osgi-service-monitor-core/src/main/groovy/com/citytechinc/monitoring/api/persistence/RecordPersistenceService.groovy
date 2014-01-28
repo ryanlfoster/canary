@@ -20,8 +20,8 @@ public interface RecordPersistenceService {
 
     /**
      *
-     * @param monitorClass
+     * @param canonicalMonitorName
      * @return
      */
-    Optional<RecordHolder> getRecordHolder(String monitorClass)
+    Optional<RecordHolder> getRecordHolder(String canonicalMonitorName)
 }

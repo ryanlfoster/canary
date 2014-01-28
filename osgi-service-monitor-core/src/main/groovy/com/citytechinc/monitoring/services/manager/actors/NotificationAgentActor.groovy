@@ -60,7 +60,12 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         log.info("Flushing queue of size ${queuedMessages.size()}")
 
-        wrapper.agent.notify(queuedMessages)
+        try {
+            wrapper.agent.notify(queuedMessages)
+        } catch (Exception e) {
+            log.error("An exception occurred while flushing the message queue, calling the notification agent", e)
+        }
+
         queuedMessages.clear()
     }
 
@@ -84,7 +89,12 @@ final class NotificationAgentActor extends DynamicDispatchActor {
         } else {
 
             log.info("Aggregation undefined, sending message without delay...")
-            wrapper.agent.notify([message])
+
+            try {
+                wrapper.agent.notify([message])
+            } catch (Exception e) {
+                log.error("An exception occurred calling the notification agent", e)
+            }
         }
     }
 

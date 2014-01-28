@@ -73,30 +73,35 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     void onMessage(Poll message) {
 
-        final Date startTime = new Date()
-        final PollResponse pollResponse = wrapper.monitor.poll()
+        try {
 
-        DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
-                endTime: new Date(),
-                responseType: pollResponse.pollResponseType,
-                stackTrace: pollResponse.exceptionStackTrace)
+            final Date startTime = new Date()
+            final PollResponse pollResponse = wrapper.monitor.poll()
 
-        // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
-        recordHolder.addRecord(detailedPollResponse)
-        missionControl << new BroadcastPollResponse(pollResponse: detailedPollResponse, canonicalMonitorName: recordHolder.canonicalMonitorName)
+            DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
+                    endTime: new Date(),
+                    responseType: pollResponse.pollResponseType,
+                    stackTrace: pollResponse.exceptionStackTrace)
 
-        if (recordHolder.isAlarmed()) {
+            // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
+            recordHolder.addRecord(detailedPollResponse)
+            missionControl << new BroadcastPollResponse(pollResponse: detailedPollResponse, canonicalMonitorName: recordHolder.canonicalMonitorName)
 
-            // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
-            missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistRecordHolderWhenAlarmed())
+            if (recordHolder.isAlarmed()) {
 
-            // REMOVE JOB SCHEDULER
-            unschedulePolling()
+                // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
+                missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistRecordHolderWhenAlarmed())
 
-            // SCHEDULE AUTO RESUME POLLING
-            oneTimeScheduleAutoResume()
+                // REMOVE JOB SCHEDULER
+                unschedulePolling()
+
+                // SCHEDULE AUTO RESUME POLLING
+                oneTimeScheduleAutoResume()
+            }
+
+        } catch (Exception e) {
+            log.error("An exception occurred while calling the monitored service: ${wrapper.canonicalMonitorName}", e)
         }
-
     }
 
     def schedulePolling = {

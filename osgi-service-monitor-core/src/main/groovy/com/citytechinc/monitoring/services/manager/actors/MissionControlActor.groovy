@@ -9,6 +9,7 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrappe
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
+import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
@@ -25,11 +26,16 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 final class MissionControlActor extends DynamicDispatchActor {
 
+    static String jobprefix = 'scheduled-monitor-'
+    static Long MONITOR_INSTANTIATION_TIMEOUT_IN_SECONDS = 15L
+    static Long MONITOR_INSTANTIATION_TIMEOUT_IN_MS = TimeUnit.MILLISECONDS.convert(MONITOR_INSTANTIATION_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+
     // MESSAGES
     static class RegisterService { def service }
     static class UnregisterService { def service }
     static class GetRecords { String canonicalMonitorName }
     static class ResetAlarm { String canonicalMonitorName }
+    static class InstantiateMonitors { }
 
     Scheduler scheduler
 
@@ -39,57 +45,52 @@ final class MissionControlActor extends DynamicDispatchActor {
     final Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
     final Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
+    Boolean hasPassedMonitorActorInstantiationTimeout = false
+
+    void afterStart() {
+
+        log.info("Mission control has been started, waiting for ${MONITOR_INSTANTIATION_TIMEOUT_IN_SECONDS} seconds to start monitors...")
+
+        final Date now = new Date()
+        scheduler.fireJobAt(jobprefix, {
+
+            this << new InstantiateMonitors()
+
+        }, [:], new Date(now.time + MONITOR_INSTANTIATION_TIMEOUT_IN_MS))
+    }
+
+    void afterStop() {
+
+        log.info("Cleaning up timed job...")
+        scheduler.removeJob(jobprefix)
+    }
+
+    void onMessage(InstantiateMonitors message) {
+
+        log.info("Starting ${monitors.size()} monitors...")
+
+        hasPassedMonitorActorInstantiationTimeout = true
+
+        monitors.keySet().each { MonitoredServiceWrapper wrapper ->
+
+            instantiateMonitoredServiceActor(wrapper)
+        }
+    }
+
     void onMessage(RegisterService message) {
 
         log.info("Received registration message for service ${message.service}")
 
         if (message.service instanceof MonitoredService) {
 
-            def wrapper = new MonitoredServiceWrapper(message.service)
+            final MonitoredServiceWrapper wrapper = new MonitoredServiceWrapper(message.service)
 
             if (!monitors.containsKey(wrapper)) {
 
-                if (recordPersistenceServices.isEmpty()) {
-
-                    log.info("No record persistence services to poll for data, starting a clean actor...")
-
-                    // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
-                    def actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
-                    actor.start()
-
-                    monitors.put(wrapper, actor)
+                if (hasPassedMonitorActorInstantiationTimeout) {
+                    instantiateMonitoredServiceActor(wrapper)
                 } else {
-
-                    /**
-                     * Sort the persistence services by ranking and get the first (highest order ranking). Use the obtained
-                     *   key to get a handle on the actor instance and send a message requesting the Record data. The message
-                     *   transmission is non-blocking. Its response will invoke the closure, providing the record holder from
-                     *   the persistence service, and start the actor with history.
-                     */
-                    def persistenceWrapper = recordPersistenceServices.keySet().sort { it.definition.ranking() }.first()
-
-                    log.info("Polling ${persistenceWrapper.service.class} for records...")
-
-                    recordPersistenceServices.get(persistenceWrapper).sendAndContinue(new RecordPersistenceServiceActor.GetRecord(wrapper.canonicalMonitorName), { recordHolder ->
-
-                        log.info("Received record ${recordHolder} from persistence service")
-
-                        def actor
-
-                        if (recordHolder.present()) {
-
-                            log.info("Record holder is present, setting record holder on actor, starting actor...")
-                            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
-                        } else {
-
-                            log.info("Record holder is absent, starting a clean actor...")
-                            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
-                        }
-
-                        monitors.put(wrapper, actor)
-
-                        actor.start()
-                    })
+                    monitors.put(wrapper, null)
                 }
 
             } else {
@@ -99,11 +100,11 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         } else if (message.service instanceof NotificationAgent) {
 
-            def wrapper = new NotificationAgentWrapper(message.service)
+            final NotificationAgentWrapper wrapper = new NotificationAgentWrapper(message.service)
 
             if (!notificationAgents.containsKey(wrapper)) {
 
-                def actor = new NotificationAgentActor(wrapper: wrapper, scheduler: scheduler)
+                NotificationAgentActor actor = new NotificationAgentActor(wrapper: wrapper, scheduler: scheduler)
                 actor.start()
 
                 notificationAgents.put(wrapper, actor)
@@ -114,11 +115,11 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         } else if (message.service instanceof RecordPersistenceService) {
 
-            def wrapper = new RecordPersistenceServiceWrapper(message.service)
+            final RecordPersistenceServiceWrapper wrapper = new RecordPersistenceServiceWrapper(message.service)
 
             if (!recordPersistenceServices.containsKey(wrapper)) {
 
-                def actor = new RecordPersistenceServiceActor(wrapper: wrapper)
+                RecordPersistenceServiceActor actor = new RecordPersistenceServiceActor(wrapper: wrapper)
                 actor.start()
 
                 recordPersistenceServices.put(wrapper, actor)
@@ -129,11 +130,11 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         } else if (message.service instanceof PollResponseHandler) {
 
-            def wrapper = new PollResponseWrapper(message.service)
+            final PollResponseWrapper wrapper = new PollResponseWrapper(message.service)
 
             if (!pollResponseHandlers.containsKey(wrapper)) {
 
-                def actor = new PollResponseHandlerActor(wrapper: wrapper)
+                PollResponseHandlerActor actor = new PollResponseHandlerActor(wrapper: wrapper)
                 actor.start()
 
                 pollResponseHandlers.put(wrapper, actor)
@@ -150,14 +151,22 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         if (message.service instanceof MonitoredService) {
 
-            def wrapper = new MonitoredServiceWrapper(message.service)
+            final MonitoredServiceWrapper wrapper = new MonitoredServiceWrapper(message.service)
 
             if (monitors.containsKey(wrapper)) {
 
-                log.info("Terminating actor for monitored service ${message.service}")
+                if (monitors.get(wrapper)) {
 
-                monitors.get(wrapper).terminate()
+                    log.info("Terminating actor for monitored service ${message.service}")
+                    monitors.get(wrapper)?.terminate()
+
+                } else {
+
+                    log.info("Removing non-started actor for monitored service ${message.service}")
+                }
+
                 monitors.remove(wrapper)
+
             } else {
 
                 log.warn("Monitored service ${message.service} is not registered")
@@ -165,7 +174,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         } else if (message.service instanceof NotificationAgent) {
 
-            def wrapper = new NotificationAgentWrapper(message.service)
+            final NotificationAgentWrapper wrapper = new NotificationAgentWrapper(message.service)
 
             if (notificationAgents.containsKey(wrapper)) {
 
@@ -180,7 +189,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         } else if (message.service instanceof RecordPersistenceService) {
 
-            def wrapper = new RecordPersistenceServiceWrapper(message.service)
+            final RecordPersistenceServiceWrapper wrapper = new RecordPersistenceServiceWrapper(message.service)
 
             if (recordPersistenceServices.containsKey(wrapper)) {
 
@@ -195,7 +204,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         } else if (message.service instanceof PollResponseHandler) {
 
-            def wrapper = new PollResponseWrapper(message.service)
+            final PollResponseWrapper wrapper = new PollResponseWrapper(message.service)
 
             if (pollResponseHandlers.containsKey(wrapper)) {
 
@@ -213,7 +222,7 @@ final class MissionControlActor extends DynamicDispatchActor {
     /**
      *
      * A poll request coming from the outside world. We'll push this poll request to all
-     *   the monitor actors.
+     *   the canonicalMonitorName actors.
      *
      * @param message
      */
@@ -226,7 +235,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     /**
      *
-     * A record retrieval request from the outside world. We'll find the corresponding monitor actor
+     * A record retrieval request from the outside world. We'll find the corresponding canonicalMonitorName actor
      *   and request that it send us its records.
      *
      * This call is blocking with a max time of 1 second.
@@ -249,7 +258,7 @@ final class MissionControlActor extends DynamicDispatchActor {
      *   should only come from the Service Manager on behalf of external OSGi services/calls.
      *
      * The actor will then turn around and send a ResetAlarm message specific to the Monitored Service Actor. If no
-     *   explicit monitor is defined, all monitors will receive the message. They may choose, however, to disregard the
+     *   explicit canonicalMonitorName is defined, all monitors will receive the message. They may choose, however, to disregard the
      *   message.
      *
      * @param message
@@ -286,12 +295,12 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     /**
      *
-     * BroadcastAlarm messages come from the MonitoredServiceActor(s). This message occurs when a monitor has reached an
-     *   alarmed state based on poll results. The threshold is defined per monitor.
+     * BroadcastAlarm messages come from the MonitoredServiceActor(s). This message occurs when a canonicalMonitorName has reached an
+     *   alarmed state based on poll results. The threshold is defined per canonicalMonitorName.
      *
      * The Mission Control actor will send each, entire record set to all notification agents. Notification agents may
      *   choose, however, to disregard the message. Mission Control will also send persistence requests to all persistence
-     *   services if the monitor is configured to immediately persist.
+     *   services if the canonicalMonitorName is configured to immediately persist.
      *
      * @param message
      */
@@ -306,6 +315,54 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             log.info("BroadcastAlarm indicates immediate persistence. Sending persistence request to ${recordPersistenceServices.size()} persistence services")
             recordPersistenceServices.values().each { it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: message.recordHolder) }
+        }
+    }
+
+    void instantiateMonitoredServiceActor(MonitoredServiceWrapper wrapper) {
+
+        if (recordPersistenceServices.isEmpty()) {
+
+            log.info("No record persistence services to poll for data, starting a clean actor...")
+
+            MonitoredServiceActor actor
+
+            // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
+            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
+            actor.start()
+
+            monitors.put(wrapper, actor)
+
+        } else {
+
+            /**
+             * Sort the persistence services by ranking and get the first (highest order ranking). Use the obtained
+             *   key to get a handle on the actor instance and send a message requesting the Record data. The message
+             *   transmission is non-blocking. Its response will invoke the closure, providing the record holder from
+             *   the persistence service, and start the actor with history.
+             */
+            def persistenceWrapper = recordPersistenceServices.keySet().sort { it.definition.ranking() }.first()
+
+            log.info("Polling ${persistenceWrapper.service.class} for records...")
+
+            recordPersistenceServices.get(persistenceWrapper).sendAndContinue(new RecordPersistenceServiceActor.GetRecord(canonicalMonitorName: wrapper.canonicalMonitorName), { Optional<RecordHolder> recordHolder ->
+
+                log.info("Received record ${recordHolder} from persistence service")
+
+                MonitoredServiceActor actor
+
+                if (recordHolder.present) {
+
+                    log.info("Record holder is present, setting record holder on actor, starting actor...")
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
+                } else {
+
+                    log.info("Record holder is absent, starting a clean actor...")
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
+                }
+
+                actor.start()
+                monitors.put(wrapper, actor)
+            })
         }
     }
 
