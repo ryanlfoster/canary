@@ -68,6 +68,13 @@ import java.util.concurrent.TimeUnit
      */
     boolean persistWhenAlarmed() default false
 
-    int pollMaxExecutionTimeInSeconds() default 3
+    /**
+     *
+     * This is the maximum time in seconds allowed for an individual poll. If this value is reached, the poll is dropped
+     *   and the response is recorded as interrupted, which is a failure.
+     *
+     * @return
+     */
+    int pollMaxExecutionTimeInSeconds() default 10
 
 }
