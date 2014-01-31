@@ -126,7 +126,9 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     "Recent Poll Response",
                     "Avg Exec Time (ms)",
                     "Polls",
-                    "Failures"};
+                    "Failures",
+                    "Total Polls",
+                    "Total Failures"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,
@@ -135,6 +137,8 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.LONG,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
                     SimpleType.INTEGER,
                     SimpleType.INTEGER};
 
@@ -146,15 +150,23 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
                 final RecordHolder record = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName());
 
-                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getCanonicalMonitorName(),
-                        record.isAlarmed(),
-                        record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
-                        record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
-                        record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
-                        record.averagePollExecutionTime(),
-                        record.numberOfPolls(),
-                        record.numberOfFailures()}));
+                if (record != null) {
+
+                    tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                            wrapper.getCanonicalMonitorName(),
+                            record.isAlarmed(),
+                            record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
+                            record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
+                            record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
+                            record.averagePollExecutionTime(),
+                            record.numberOfPolls(),
+                            record.numberOfFailures(),
+                            record.getTotalNumberOfPolls(),
+                            record.getTotalFailures() }));
+                } else {
+
+                    LOG.warn("Record for {} is non-existent", wrapper.getCanonicalMonitorName());
+                }
             }
 
         } catch (final Exception exception) {
