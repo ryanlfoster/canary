@@ -48,24 +48,6 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     Boolean hasPassedMonitorActorInstantiationTimeout = false
 
-    void afterStart() {
-
-        log.info("Mission control has been started, waiting for ${MONITOR_INSTANTIATION_TIMEOUT_IN_SECONDS} seconds to start monitors...")
-
-        final Date now = new Date()
-        scheduler.fireJobAt(jobprefix, {
-
-            this << new InstantiateMonitors()
-
-        }, [:], new Date(now.time + MONITOR_INSTANTIATION_TIMEOUT_IN_MS))
-    }
-
-    void afterStop() {
-
-        log.info("Cleaning up timed job...")
-        scheduler.removeJob(jobprefix)
-    }
-
     void onMessage(InstantiateMonitors message) {
 
         log.info("Starting ${monitors.size()} monitors...")

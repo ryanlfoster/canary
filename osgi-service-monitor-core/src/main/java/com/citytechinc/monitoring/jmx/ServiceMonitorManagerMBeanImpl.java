@@ -2,6 +2,7 @@ package com.citytechinc.monitoring.jmx;
 
 import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper;
+import com.citytechinc.monitoring.constants.Constants;
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder;
 import com.citytechinc.monitoring.services.manager.ServiceManager;
 import org.apache.felix.scr.annotations.Component;
@@ -124,14 +125,14 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     "Recent Poll Date",
                     "Recent Poll Response",
                     "Avg Exec Time (ms)",
-                    "Number of Polls",
-                    "Number of Failures"};
+                    "Polls",
+                    "Failures"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,
                     SimpleType.BOOLEAN,
-                    SimpleType.DATE,
-                    SimpleType.DATE,
+                    SimpleType.STRING,
+                    SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.LONG,
                     SimpleType.INTEGER,
@@ -143,17 +144,17 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             for (final MonitoredServiceWrapper wrapper : serviceManager.listMonitoredServices()) {
 
-                final RecordHolder records = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName());
+                final RecordHolder record = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName());
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getCanonicalMonitorName(),
-                        records.isAlarmed(),
-                        records.firstPoll(),
-                        records.mostRecentPollDate(),
-                        records.mostRecentPollResponse().toString(),
-                        records.averagePollExecutionTime(),
-                        records.numberOfPolls(),
-                        records.numberOfFailures()}));
+                        record.isAlarmed(),
+                        record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
+                        record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
+                        record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
+                        record.averagePollExecutionTime(),
+                        record.numberOfPolls(),
+                        record.numberOfFailures()}));
             }
 
         } catch (final Exception exception) {

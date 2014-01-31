@@ -173,6 +173,12 @@ class DefaultServiceManager implements ServiceManager {
         registeredPersistenceServices.each { missionControl << new MissionControlActor.RegisterService(service: it) }
         registeredPollResponseHandlers.each { missionControl << new MissionControlActor.RegisterService(service: it) }
 
+        log.info("Sleeping for 15 seconds...")
+        sleep(15000)
+
+        log.info("Sending instantiate monitors...")
+        missionControl << new MissionControlActor.InstantiateMonitors()
+
         log.info("Mission control started.")
     }
 

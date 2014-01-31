@@ -2,10 +2,13 @@ package com.citytechinc.monitoring.services.jcrpersistence
 
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.monitoring.api.monitor.PollResponseType
+import com.google.common.base.Optional
 import com.google.common.collect.Lists
 import com.google.common.collect.Queues
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
+
+import javax.swing.text.html.Option
 
 /**
  *
@@ -22,6 +25,8 @@ class RecordHolder {
     final String canonicalMonitorName
     final Integer alarmThreshold
     final Integer maxNumberOfRecords
+    Integer totalNumberOfPolls = 0
+    Integer totalFailures = 0
 
     private RecordHolder(String canonicalMonitorName, Integer maxNumberOfRecords, Integer alarmThreshold) {
         this.canonicalMonitorName = canonicalMonitorName
@@ -45,6 +50,13 @@ class RecordHolder {
     }
 
     void addRecord(DetailedPollResponse record) {
+
+        ++totalNumberOfPolls
+
+        if (record.responseType != PollResponseType.success) {
+            ++totalFailures
+        }
+
         if (records.size() == maxNumberOfRecords) {
             records.remove()
         }
@@ -60,16 +72,19 @@ class RecordHolder {
         records as List
     }
 
-    Date firstPoll() {
-        records.peek()?.startTime
+    Optional<Date> firstPoll() {
+
+        Optional<Date> firstPoll = records.empty ? Optional.absent() : Optional.of(records.peek().startTime)
     }
 
-    Date mostRecentPollDate() {
-        getRecords().reverse()?.first()?.startTime
+    Optional<Date> mostRecentPollDate() {
+
+        Optional<Date> mostRecentPollDate = records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().startTime)
     }
 
-    PollResponseType mostRecentPollResponse() {
-        getRecords().reverse()?.first()?.responseType
+    Optional<PollResponseType> mostRecentPollResponse() {
+
+        Optional<PollResponseType> mostRecentPollResponse = records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().responseType)
     }
 
     Integer numberOfPolls() {
