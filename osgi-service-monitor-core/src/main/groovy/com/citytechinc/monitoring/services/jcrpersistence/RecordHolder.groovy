@@ -8,8 +8,6 @@ import com.google.common.collect.Queues
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 
-import javax.swing.text.html.Option
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
