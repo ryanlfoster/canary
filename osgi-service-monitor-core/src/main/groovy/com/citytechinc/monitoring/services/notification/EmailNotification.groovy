@@ -54,6 +54,7 @@ class EmailNotification implements NotificationAgent {
 
     @Override
     void notify(List<RecordHolder> recordHolders) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
+
     }
 }

@@ -1,8 +1,8 @@
 package com.citytechinc.monitoring.jmx;
 
 import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
-import com.adobe.granite.jmx.annotation.Description;
-import com.adobe.granite.jmx.annotation.Name;
+import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper;
+import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder;
 import com.citytechinc.monitoring.services.manager.ServiceManager;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
@@ -12,8 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.NotCompliantMBeanException;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
-import java.util.List;
+import javax.management.openmbean.TabularType;
 
 /**
  *
@@ -47,28 +51,117 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public TabularDataSupport listMonitoredServices() {
-        return null;
+    public TabularDataSupport getMonitorDefinitions() {
+
+        TabularDataSupport tabularDataSupport = null;
+
+        try {
+
+            final String[] itemNamesDescriptionsAndIndexName = {
+                    "Name",
+                    "Poll Interval",
+                    "Alarm Threshold",
+                    "History Size",
+                    "Persist when alarmed?",
+                    "Max Exec Time",
+                    "Auto Resume?"};
+
+            final OpenType[] itemTypes = {
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.BOOLEAN,
+                    SimpleType.INTEGER,
+                    SimpleType.STRING};
+
+            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
+            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor Definitions", pageType, itemNamesDescriptionsAndIndexName);
+            tabularDataSupport = new TabularDataSupport(pageTabularType);
+
+            for (final MonitoredServiceWrapper wrapper : serviceManager.listMonitoredServices()) {
+
+                final String autoResume;
+
+                if (wrapper.getAutoResumingPollerDefinition() != null) {
+
+                    autoResume = wrapper.getAutoResumingPollerDefinition().interval() + " " + wrapper.getAutoResumingPollerDefinition().unit();
+
+                } else {
+
+                    autoResume = "--";
+                }
+
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                    wrapper.getMonitor().getClass().getCanonicalName(),
+                    wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
+                    wrapper.getDefinition().alarmThreshold(),
+                    wrapper.getDefinition().maxPollHistoryEntries(),
+                    wrapper.getDefinition().persistWhenAlarmed(),
+                    wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
+                    autoResume}));
+            }
+
+        } catch (final Exception exception) {
+
+            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor Definitions", exception);
+        }
+
+        return tabularDataSupport;
     }
 
     @Override
-    public TabularDataSupport listRecordPersistenceServices() {
-        return null;
-    }
+    public TabularDataSupport getMonitorStates() {
 
-    @Override
-    public TabularDataSupport listNotificationAgents() {
-        return null;
-    }
+        TabularDataSupport tabularDataSupport = null;
 
-    @Override
-    public TabularDataSupport listPollResponseHandlers() {
-        return null;
-    }
+        try {
 
-    @Override
-    public List<String> listAlarmedMonitors() {
-        return null;
+            final String[] itemNamesDescriptionsAndIndexName = {
+                    "Name",
+                    "Alarmed?",
+                    "1st Poll Date",
+                    "Recent Poll Date",
+                    "Recent Poll Response",
+                    "Avg Exec Time (ms)",
+                    "Number of Polls",
+                    "Number of Failures"};
+
+            final OpenType[] itemTypes = {
+                    SimpleType.STRING,
+                    SimpleType.BOOLEAN,
+                    SimpleType.DATE,
+                    SimpleType.DATE,
+                    SimpleType.STRING,
+                    SimpleType.LONG,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER};
+
+            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
+            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor States", pageType, itemNamesDescriptionsAndIndexName);
+            tabularDataSupport = new TabularDataSupport(pageTabularType);
+
+            for (final MonitoredServiceWrapper wrapper : serviceManager.listMonitoredServices()) {
+
+                final RecordHolder records = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName());
+
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getCanonicalMonitorName(),
+                        records.isAlarmed(),
+                        records.firstPoll(),
+                        records.mostRecentPollDate(),
+                        records.mostRecentPollResponse().toString(),
+                        records.averagePollExecutionTime(),
+                        records.numberOfPolls(),
+                        records.numberOfFailures()}));
+            }
+
+        } catch (final Exception exception) {
+
+            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor States", exception);
+        }
+
+        return tabularDataSupport;
     }
 
     @Override

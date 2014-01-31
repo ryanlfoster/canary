@@ -3,6 +3,7 @@ package com.citytechinc.monitoring.jmx;
 import com.adobe.granite.jmx.annotation.Description;
 import com.adobe.granite.jmx.annotation.Name;
 
+import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import java.util.List;
 
@@ -22,20 +23,11 @@ public interface ServiceMonitorManagerMBean {
     @Description("Request that all monitors persist their data")
     public void requestAllMonitorsPersist();
 
-    @Description("Lists the monitors and their definitions")
-    public TabularDataSupport listMonitoredServices();
+    @Description("Lists ")
+    public TabularDataSupport getMonitorDefinitions();
 
-    @Description("Lists the persistence services and their definitions")
-    public TabularDataSupport listRecordPersistenceServices();
-
-    @Description("Lists the notification agents and their definitions")
-    public TabularDataSupport listNotificationAgents();
-
-    @Description("Lists the poll response handlers and their definitions")
-    public TabularDataSupport listPollResponseHandlers();
-
-    @Description("Lists alarmed monitors")
-    public List<String> listAlarmedMonitors();
+    @Description("Provides historical information for each registered monitor")
+    public TabularDataSupport getMonitorStates();
 
     @Description("Resets all alarmed monitors")
     public void resetAllAlarms();

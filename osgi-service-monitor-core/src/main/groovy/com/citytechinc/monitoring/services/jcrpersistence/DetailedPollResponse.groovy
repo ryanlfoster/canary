@@ -20,4 +20,9 @@ class DetailedPollResponse {
     PollResponseType responseType
     String stackTrace
     Boolean cleared = false
+
+    Long runTimeInMilliseconds() {
+
+        endTime.time - startTime.time
+    }
 }

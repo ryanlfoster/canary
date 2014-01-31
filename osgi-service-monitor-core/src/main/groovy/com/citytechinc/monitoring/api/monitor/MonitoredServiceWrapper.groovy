@@ -17,6 +17,7 @@ public final class MonitoredServiceWrapper {
     final MonitoredService monitor
     final String canonicalMonitorName
     final MonitoredServiceDefinition definition
+    final AutoResumingPoller autoResumingPollerDefinition
     final Long autoResumePollIntevalInMilliseconds
     final Long pollIntervalInSeconds
     final Long pollMaxExecutionTimeInMillseconds
@@ -28,7 +29,7 @@ public final class MonitoredServiceWrapper {
         pollIntervalInSeconds = TimeUnit.SECONDS.convert(definition.pollInterval(), definition.pollIntervalUnit())
         pollMaxExecutionTimeInMillseconds = TimeUnit.MILLISECONDS.convert(definition.pollMaxExecutionTimeInSeconds(), TimeUnit.SECONDS)
 
-        final AutoResumingPoller autoResumingPollerDefinition = monitor.class.getAnnotation(AutoResumingPoller)
+        autoResumingPollerDefinition = monitor.class.getAnnotation(AutoResumingPoller)
 
         if (autoResumingPollerDefinition != null) {
             autoResumePollIntevalInMilliseconds = TimeUnit.MILLISECONDS.convert(autoResumingPollerDefinition.interval(), autoResumingPollerDefinition.unit())

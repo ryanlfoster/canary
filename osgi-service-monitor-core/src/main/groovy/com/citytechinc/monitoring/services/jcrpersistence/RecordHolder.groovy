@@ -20,12 +20,15 @@ class RecordHolder {
 
     final Queue<DetailedPollResponse> records
     final String canonicalMonitorName
-    final Integer sequentialFailedPollsToTriggerAlarm
+    final Integer alarmThreshold
+    final Integer maxNumberOfRecords
 
-    private RecordHolder(String canonicalMonitorName, Integer numberOfRecords, Integer sequentialFailedPollsToTriggerAlarm) {
+    private RecordHolder(String canonicalMonitorName, Integer maxNumberOfRecords, Integer alarmThreshold) {
         this.canonicalMonitorName = canonicalMonitorName
-        records = Queues.newArrayBlockingQueue(numberOfRecords)
-        this.sequentialFailedPollsToTriggerAlarm = sequentialFailedPollsToTriggerAlarm
+        this.alarmThreshold = alarmThreshold
+        this.maxNumberOfRecords = maxNumberOfRecords
+
+        records = Queues.newArrayBlockingQueue(maxNumberOfRecords)
     }
 
     public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
@@ -42,6 +45,10 @@ class RecordHolder {
     }
 
     void addRecord(DetailedPollResponse record) {
+        if (records.size() == maxNumberOfRecords) {
+            records.remove()
+        }
+
         records.offer(record)
     }
 
@@ -53,19 +60,56 @@ class RecordHolder {
         records as List
     }
 
+    Date firstPoll() {
+        records.peek()?.startTime
+    }
+
+    Date mostRecentPollDate() {
+        getRecords().reverse()?.first()?.startTime
+    }
+
+    PollResponseType mostRecentPollResponse() {
+        getRecords().reverse()?.first()?.responseType
+    }
+
+    Integer numberOfPolls() {
+        records.size()
+    }
+
+    Integer numberOfFailures() {
+        getRecords().count { it.responseType != PollResponseType.success}
+    }
+
+    Long averagePollExecutionTime() {
+
+        Long averageExecutionTime = 0L
+
+        if (records.size() > 0) {
+
+            Long numberOfRecords = records.size() as Long
+            Long totalExecutionTime = 0L
+
+            getRecords().each { totalExecutionTime += it.runTimeInMilliseconds()}
+
+            averageExecutionTime = totalExecutionTime / numberOfRecords
+        }
+
+        averageExecutionTime
+    }
+
     Boolean isAlarmed() {
 
         final Boolean alarmed
 
-        if (getRecords().size() < sequentialFailedPollsToTriggerAlarm) {
+        if (getRecords().size() < alarmThreshold) {
 
             alarmed = false
         } else {
 
             final List<DetailedPollResponse> scrutizedRecords
 
-            if (getRecords().size() > sequentialFailedPollsToTriggerAlarm) {
-                scrutizedRecords = Lists.partition(getRecords().reverse(), sequentialFailedPollsToTriggerAlarm).first()
+            if (getRecords().size() > alarmThreshold) {
+                scrutizedRecords = Lists.partition(getRecords().reverse(), alarmThreshold).first()
             } else {
                 scrutizedRecords = getRecords().reverse()
             }
