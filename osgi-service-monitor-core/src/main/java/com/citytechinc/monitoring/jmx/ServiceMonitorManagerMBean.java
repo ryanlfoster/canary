@@ -23,11 +23,20 @@ public interface ServiceMonitorManagerMBean {
     @Description("Request that all monitors persist their data")
     public void requestAllMonitorsPersist();
 
-    @Description("Lists ")
+    @Description("Lists registered monitor definitions, such as polling intervals, record container sizes, etc...")
     public TabularDataSupport getMonitorDefinitions();
 
-    @Description("Provides historical information for each registered monitor")
+    @Description("Provides an at-a-glance view of the state of all monitors")
     public TabularDataSupport getMonitorStates();
+
+    @Description("Fill me in...")
+    public TabularDataSupport getPollResponseHandlerDefinitions();
+
+    @Description("Lists registered poll response handlers, number of processed requests, average execution time, etc...")
+    public TabularDataSupport getPollResponseHandlerStatistics();
+
+    @Description("Get records for a specific monitor")
+    public TabularDataSupport getRecordsForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
 
     @Description("Resets all alarmed monitors")
     public void resetAllAlarms();

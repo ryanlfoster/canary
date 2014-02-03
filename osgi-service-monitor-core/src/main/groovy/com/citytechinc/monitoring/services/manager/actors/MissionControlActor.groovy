@@ -10,6 +10,7 @@ import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
+import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
@@ -26,10 +27,6 @@ import java.util.concurrent.TimeUnit
  */
 @Slf4j
 final class MissionControlActor extends DynamicDispatchActor {
-
-    static String jobprefix = 'scheduled-monitor-'
-    static Long MONITOR_INSTANTIATION_TIMEOUT_IN_SECONDS = 15L
-    static Long MONITOR_INSTANTIATION_TIMEOUT_IN_MS = TimeUnit.MILLISECONDS.convert(MONITOR_INSTANTIATION_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
 
     // MESSAGES
     static class RegisterService { def service }
@@ -289,8 +286,6 @@ final class MissionControlActor extends DynamicDispatchActor {
      */
     void onMessage(MonitoredServiceActor.BroadcastAlarm message) {
 
-        //todo create a copy and send the copy of the data
-
         log.info("Received BroadcastAlarm ${message}. Relaying message to ${notificationAgents.size()} notification agents")
         notificationAgents.values().each { it << message }
 
@@ -347,6 +342,36 @@ final class MissionControlActor extends DynamicDispatchActor {
                 monitors.put(wrapper, actor)
             })
         }
+    }
+
+    void onMessage(NotificationAgentActor.GetStatistics message) {
+
+        log.info("Got a record request for ${message.canonicalAgentName}")
+
+        NotificationAgentWrapper key = notificationAgents.keySet().find { it.agent.class.canonicalName == message.canonicalAgentName }
+        Statistics records = notificationAgents.get(key).sendAndWait(new NotificationAgentActor.GetStatistics(), 1L, TimeUnit.SECONDS)
+
+        sender.send(records)
+    }
+
+    void onMessage(PollResponseHandlerActor.GetStatistics message) {
+
+        log.info("Got a record request for ${message.canonicalResponseHandler}")
+
+        PollResponseWrapper key = pollResponseHandlers.keySet().find { it.handler.class.canonicalName == message.canonicalResponseHandler }
+        Statistics records = pollResponseHandlers.get(key).sendAndWait(new PollResponseHandlerActor.GetStatistics(), 1L, TimeUnit.SECONDS)
+
+        sender.send(records)
+    }
+
+    void onMessage(RecordPersistenceServiceActor.GetStatistics message) {
+
+        log.info("Got a record request for ${message.canonicalPersistenceHandler}")
+
+        RecordPersistenceServiceWrapper key = recordPersistenceServices.keySet().find { it.service.class.canonicalName == message.canonicalPersistenceHandler }
+        Statistics records = recordPersistenceServices.get(key).sendAndWait(new RecordPersistenceServiceActor.GetStatistics(), 1L, TimeUnit.SECONDS)
+
+        sender.send(records)
     }
 
 }

@@ -11,7 +11,9 @@ import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
+import com.citytechinc.monitoring.services.manager.actors.PollResponseHandlerActor
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
+import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -238,6 +240,20 @@ class DefaultServiceManager implements ServiceManager {
     @Override
     List<PollResponseWrapper> listPollResponseHandlers() {
         registeredPollResponseHandlers.collect { new PollResponseWrapper(it) }
+    }
+
+    @Override
+    Statistics getPollResponseHandlerStatistics(String canonicalName) {
+
+        Statistics statistics
+
+        if (missionControl?.isActive()) {
+
+            def message = new PollResponseHandlerActor.GetStatistics(canonicalResponseHandler: canonicalName)
+            statistics = missionControl.sendAndWait(message)
+        }
+
+        statistics
     }
 
     @Override

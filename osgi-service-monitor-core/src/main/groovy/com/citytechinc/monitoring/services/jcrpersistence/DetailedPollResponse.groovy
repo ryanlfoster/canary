@@ -11,7 +11,7 @@ import groovy.transform.ToString
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@ToString
+@ToString(includeNames = true)
 @AutoClone
 class DetailedPollResponse {
 

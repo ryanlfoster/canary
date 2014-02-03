@@ -5,8 +5,11 @@ import com.citytechinc.monitoring.api.monitor.PollResponseType
 import com.google.common.base.Optional
 import com.google.common.collect.Lists
 import com.google.common.collect.Queues
+import groovy.transform.AutoClone
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
+
+import java.math.RoundingMode
 
 /**
  *
@@ -15,16 +18,18 @@ import groovy.util.logging.Slf4j
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@ToString(includeFields=true)
+@ToString(includeFields = true, includeNames = true)
 @Slf4j
+@AutoClone
 class RecordHolder {
 
-    final Queue<DetailedPollResponse> records
+    final Queue<DetailedPollResponse> records = [] as Queue
     final String canonicalMonitorName
     final Integer alarmThreshold
     final Integer maxNumberOfRecords
-    Integer totalNumberOfPolls = 0
-    Integer totalFailures = 0
+
+    Integer lifetimeNumberOfPolls = 0
+    Integer lifetimeNumberOfFailures = 0
 
     private RecordHolder(String canonicalMonitorName, Integer maxNumberOfRecords, Integer alarmThreshold) {
         this.canonicalMonitorName = canonicalMonitorName
@@ -49,10 +54,10 @@ class RecordHolder {
 
     void addRecord(DetailedPollResponse record) {
 
-        ++totalNumberOfPolls
+        ++lifetimeNumberOfPolls
 
         if (record.responseType != PollResponseType.success) {
-            ++totalFailures
+            ++lifetimeNumberOfFailures
         }
 
         if (records.size() == maxNumberOfRecords) {
@@ -85,12 +90,18 @@ class RecordHolder {
         Optional<PollResponseType> mostRecentPollResponse = records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().responseType)
     }
 
-    Integer numberOfPolls() {
+    Integer recordNumberOfPolls() {
         records.size()
     }
 
-    Integer numberOfFailures() {
+    Integer recordNumberOfFailures() {
         getRecords().count { it.responseType != PollResponseType.success}
+    }
+
+    BigDecimal lifetimeFailureRate() {
+
+        BigDecimal failureRate = new BigDecimal(lifetimeNumberOfFailures).divide(new BigDecimal(lifetimeNumberOfPolls))
+        failureRate.movePointRight()
     }
 
     Long averagePollExecutionTime() {

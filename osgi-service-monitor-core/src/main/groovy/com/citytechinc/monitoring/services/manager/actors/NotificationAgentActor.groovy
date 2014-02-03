@@ -4,9 +4,13 @@ import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.notification.SubscriptionStrategy
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
+import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
+import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
+
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -22,9 +26,11 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     // MESSAGES
     static class FlushQueue { }
+    static class GetStatistics { String canonicalAgentName }
 
     NotificationAgentWrapper wrapper
     Scheduler scheduler
+    Statistics statistics = new Statistics()
 
     void afterStop() {
 
@@ -61,11 +67,18 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         log.info("Flushing queue of size ${queuedMessages.size()}")
 
+        Stopwatch stopwatch = Stopwatch.createStarted()
+
         try {
+            ++statistics.numberOfProcessedMessages
             wrapper.agent.notify(queuedMessages)
         } catch (Exception e) {
+            ++statistics.numberOfMessageExceptions
             log.error("An exception occurred while flushing the message queue, calling the notification agent", e)
         }
+
+        stopwatch.stop()
+        statistics.addProcessTime(stopwatch.elapsed(TimeUnit.MILLISECONDS))
 
         queuedMessages.clear()
     }
@@ -91,11 +104,18 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             log.info("Aggregation undefined, sending message without delay...")
 
+            Stopwatch stopwatch = Stopwatch.createStarted()
+
             try {
+                ++statistics.numberOfProcessedMessages
                 wrapper.agent.notify([message])
             } catch (Exception e) {
+                ++statistics.numberOfMessageExceptions
                 log.error("An exception occurred calling the notification agent", e)
             }
+
+            stopwatch.stop()
+            statistics.addProcessTime(stopwatch.elapsed(TimeUnit.MILLISECONDS))
         }
     }
 

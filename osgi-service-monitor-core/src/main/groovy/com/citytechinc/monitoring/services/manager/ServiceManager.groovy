@@ -5,6 +5,7 @@ import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
+import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
 
 /**
  *
@@ -48,6 +49,12 @@ public interface ServiceManager {
      * @return
      */
     public List<PollResponseWrapper> listPollResponseHandlers()
+
+    /**
+     *
+     * @return
+     */
+    public Statistics getPollResponseHandlerStatistics(String canonicalName)
 
     /**
      *
