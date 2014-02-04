@@ -45,6 +45,13 @@ final class NotificationAgentActor extends DynamicDispatchActor {
      */
     List<RecordHolder> queuedMessages = []
 
+    void onMessage(GetStatistics message) {
+
+        log.info("Received statistics request for ${wrapper.class.canonicalName}")
+
+        sender.send(statistics.clone())
+    }
+
     /**
      *
      * Performs filtering of RecordHolder messages. If the wrapper definition
@@ -55,8 +62,8 @@ final class NotificationAgentActor extends DynamicDispatchActor {
      */
     void onMessage(MonitoredServiceActor.BroadcastAlarm message) {
 
-        if (((wrapper.definition.strategy() == SubscriptionStrategy.opt_into) && (wrapper.definition.specifics().collect { it.name }.contains(message.recordHolder.canonicalMonitorName)))
-                || ((wrapper.definition.strategy() == SubscriptionStrategy.opt_out_of) && (!wrapper.definition.specifics().collect { it.name }.contains(message.recordHolder.canonicalMonitorName)))
+        if (((wrapper.definition.strategy() == SubscriptionStrategy.opt_into) && (wrapper.definition.specifics().contains(message.recordHolder.canonicalMonitorName)))
+                || ((wrapper.definition.strategy() == SubscriptionStrategy.opt_out_of) && (!wrapper.definition.specifics().contains(message.recordHolder.canonicalMonitorName)))
                 || (wrapper.definition.strategy() == SubscriptionStrategy.all)) {
 
             handleMessage(message.recordHolder)

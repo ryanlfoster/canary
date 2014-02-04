@@ -27,6 +27,13 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
     RecordPersistenceServiceWrapper wrapper
     Statistics statistics = new Statistics()
 
+    void onMessage(GetStatistics message) {
+
+        log.info("Received statistics request for ${wrapper.class.canonicalName}")
+
+        sender.send(statistics.clone())
+    }
+
     void onMessage(GetRecord message) {
 
         Stopwatch stopwatch = Stopwatch.createStarted()

@@ -17,31 +17,34 @@ import java.util.List;
 @Description("CITYTECH OSGi Service Monitor Management")
 public interface ServiceMonitorManagerMBean {
 
-    @Description("Request that all monitors poll now. Monitors will continue polling at their scheduled intervals. Alarmed monitors will not poll.")
-    public void requestAllMonitorsPoll();
-
-    @Description("Request that all monitors persist their data")
-    public void requestAllMonitorsPersist();
-
-    @Description("Lists registered monitor definitions, such as polling intervals, record container sizes, etc...")
+    @Description("Lists registered monitors and their definitions")
     public TabularDataSupport getMonitorDefinitions();
 
-    @Description("Provides an at-a-glance view of the state of all monitors")
+    @Description("Retrieves an at-a-glance state of all registered monitors")
     public TabularDataSupport getMonitorStates();
 
-    @Description("Fill me in...")
-    public TabularDataSupport getPollResponseHandlerDefinitions();
+    @Description("Lists notification agents and statistics")
+    public TabularDataSupport getNotificationAgents();
 
-    @Description("Lists registered poll response handlers, number of processed requests, average execution time, etc...")
-    public TabularDataSupport getPollResponseHandlerStatistics();
+    @Description("Lists poll response handlers and statistics")
+    public TabularDataSupport getPollResponseHandlers();
+
+    @Description("Lists registered poll response handlers and statistics")
+    public TabularDataSupport getRecordPersistenceServices();
 
     @Description("Get records for a specific monitor")
     public TabularDataSupport getRecordsForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
 
-    @Description("Resets all alarmed monitors")
+    @Description("Send poll request to all monitors")
+    public void requestAllMonitorsPoll();
+
+    @Description("Send persistence request to all monitors")
+    public void requestAllMonitorsPersist();
+
+    @Description("Send alarm reset message to all monitors")
     public void resetAllAlarms();
 
-    @Description("Reset a specific alarmed ServiceMonitor")
+    @Description("Send alarm reset message to a specific monitor")
     public void resetAlarm(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
 
 }

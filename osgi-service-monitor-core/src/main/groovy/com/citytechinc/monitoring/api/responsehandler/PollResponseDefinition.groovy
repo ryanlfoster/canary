@@ -27,5 +27,5 @@ public @interface PollResponseDefinition {
      *
      * @return
      */
-    Class[] specifics() default []
+    String[] specifics() default []
 }

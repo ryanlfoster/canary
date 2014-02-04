@@ -4,6 +4,9 @@ import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
 import com.adobe.granite.jmx.annotation.Description;
 import com.adobe.granite.jmx.annotation.Name;
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper;
+import com.citytechinc.monitoring.api.notification.NotificationAgent;
+import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper;
+import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper;
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper;
 import com.citytechinc.monitoring.constants.Constants;
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse;
@@ -183,7 +186,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public TabularDataSupport getPollResponseHandlerDefinitions() {
+    public TabularDataSupport getNotificationAgents() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -192,24 +195,34 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
                     "Strategy",
-                    "Specifics"};
+                    "Specifics",
+                    "Number of Processed Messages",
+                    "Number of Message Exceptions",
+                    "Avg Message Process Time (ms)"};
 
             final OpenType[] itemTypes = {
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.STRING};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors", "Poll Response Handler Definitions", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Notification Agents", "Poll Response Handler Definitions", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
+            for (final NotificationAgentWrapper wrapper : serviceManager.listNotificationAgents()) {
 
-            for (final PollResponseWrapper wrapper : serviceManager.listPollResponseHandlers()) {
+                final Statistics statistics = serviceManager.getNotificationAgentStatistics(wrapper.getAgent().getClass().getCanonicalName());
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getHandler().getClass().getCanonicalName(),
+                        wrapper.getAgent().getClass().getCanonicalName(),
                         wrapper.getDefinition().strategy().toString(),
-                        wrapper.getDefinition().specifics().toString()}));
+                        wrapper.getDefinition().specifics().toString(),
+                        statistics != null ? statistics.getNumberOfProcessedMessages().toString() : "--",
+                        statistics != null ? statistics.getNumberOfMessageExceptions().toString() : "--",
+                        statistics != null ? statistics.getAverageMessageProcessTime().toString() : "--"}));
 
             }
 
@@ -222,7 +235,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public TabularDataSupport getPollResponseHandlerStatistics() {
+    public TabularDataSupport getPollResponseHandlers() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -230,43 +243,50 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
+                    "Strategy",
+                    "Specifics",
                     "Number of Processed Messages",
                     "Number of Message Exceptions",
-                    "Average Message Process Time"};
+                    "Avg Message Process Time (ms)"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,
-                    SimpleType.INTEGER,
-                    SimpleType.INTEGER,
-                    SimpleType.LONG};
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.STRING};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors", "Poll Response Handler Statistics", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Poll Response Handlers", "Poll Response Handler Definitions", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
+
 
             for (final PollResponseWrapper wrapper : serviceManager.listPollResponseHandlers()) {
 
                 final Statistics statistics = serviceManager.getPollResponseHandlerStatistics(wrapper.getHandler().getClass().getCanonicalName());
 
-                if (statistics != null) {
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getHandler().getClass().getCanonicalName(),
+                        wrapper.getDefinition().strategy().toString(),
+                        wrapper.getDefinition().specifics().toString(),
+                        statistics != null ? statistics.getNumberOfProcessedMessages().toString() : "--",
+                        statistics != null ? statistics.getNumberOfMessageExceptions().toString() : "--",
+                        statistics != null ? statistics.getAverageMessageProcessTime().toString() : "--"}));
 
-                    tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                            wrapper.getHandler().getClass().getCanonicalName(),
-                            statistics.getNumberOfProcessedMessages(),
-                            statistics.getNumberOfMessageExceptions(),
-                            statistics.getAverageMessageProcessTime()}));
-                } else {
-
-                    LOG.warn("Statistics for {} is non-existent", wrapper.getHandler().getClass().getCanonicalName());
-                }
             }
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor States", exception);
+            LOG.error("An exception occurred building the TabularDataSupport listing the Poll Response Handler Definitions", exception);
         }
 
         return tabularDataSupport;
+    }
+
+    @Override
+    public TabularDataSupport getRecordPersistenceServices() {
+        return null;
     }
 
     @Override

@@ -35,8 +35,8 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
 
     void onMessage(MonitoredServiceActor.BroadcastPollResponse message) {
 
-        if (((wrapper.definition.strategy() == SubscriptionStrategy.opt_into) && (wrapper.definition.specifics().collect { it.name }.contains(message.canonicalMonitorName)))
-            || ((wrapper.definition.strategy() == SubscriptionStrategy.opt_out_of) && (!wrapper.definition.specifics().collect { it.name }.contains(message.canonicalMonitorName)))
+        if (((wrapper.definition.strategy() == SubscriptionStrategy.opt_into) && (wrapper.definition.specifics().contains(message.canonicalMonitorName)))
+            || ((wrapper.definition.strategy() == SubscriptionStrategy.opt_out_of) && (!wrapper.definition.specifics().contains(message.canonicalMonitorName)))
             || (wrapper.definition.strategy() == SubscriptionStrategy.all)) {
 
             Stopwatch stopwatch = Stopwatch.createStarted()

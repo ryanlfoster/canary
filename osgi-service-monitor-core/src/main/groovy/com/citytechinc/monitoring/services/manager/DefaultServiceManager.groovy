@@ -11,6 +11,7 @@ import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
+import com.citytechinc.monitoring.services.manager.actors.NotificationAgentActor
 import com.citytechinc.monitoring.services.manager.actors.PollResponseHandlerActor
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
 import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
@@ -235,6 +236,20 @@ class DefaultServiceManager implements ServiceManager {
     @Override
     List<NotificationAgentWrapper> listNotificationAgents() {
         registeredNotificationAgents.collect { new NotificationAgentWrapper(it) }
+    }
+
+    @Override
+    Statistics getNotificationAgentStatistics(String canonicalName) {
+
+        Statistics statistics
+
+        if (missionControl?.isActive()) {
+
+            def message = new NotificationAgentActor.GetStatistics(canonicalAgentName: canonicalName)
+            statistics = missionControl.sendAndWait(message)
+        }
+
+        statistics
     }
 
     @Override

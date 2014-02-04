@@ -25,5 +25,5 @@ public @interface NotificationAgentDefinition {
      *
      * @return
      */
-    Class[] specifics() default []
+    String[] specifics() default []
 }

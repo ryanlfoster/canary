@@ -46,6 +46,13 @@ public interface ServiceManager {
 
     /**
      *
+     * @param canonicalName
+     * @return
+     */
+    public Statistics getNotificationAgentStatistics(String canonicalName)
+
+    /**
+     *
      * @return
      */
     public List<PollResponseWrapper> listPollResponseHandlers()
