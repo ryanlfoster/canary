@@ -29,7 +29,7 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
 
     void onMessage(GetStatistics message) {
 
-        log.info("Received statistics request for ${wrapper.class.canonicalName}")
+        log.debug("Received statistics request for ${wrapper.class.canonicalName}")
 
         sender.send(statistics.clone())
     }

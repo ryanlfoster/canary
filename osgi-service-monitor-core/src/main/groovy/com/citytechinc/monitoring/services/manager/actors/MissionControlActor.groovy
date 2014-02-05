@@ -48,7 +48,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(PersistRecords message) {
 
-        log.info("Received a PersistRecords request. Sending record requests to all monitors and issuing callback to write to all persistence services...")
+        log.debug("Received a PersistRecords request. Sending record requests to all monitors and issuing callback to write to all persistence services...")
 
         monitors.values().each { it.sendAndContinue(new MonitoredServiceActor.GetRecords(), { RecordHolder recordHolder ->
 
@@ -60,7 +60,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(InstantiateMonitors message) {
 
-        log.info("Starting ${monitors.size()} monitors...")
+        log.debug("Starting ${monitors.size()} monitors...")
 
         hasPassedMonitorActorInstantiationTimeout = true
 
@@ -72,7 +72,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(RegisterService message) {
 
-        log.info("Received registration message for service ${message.service}")
+        log.debug("Received registration message for service ${message.service}")
 
         if (message.service instanceof MonitoredService) {
 
@@ -140,7 +140,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(UnregisterService message) {
 
-        log.info("Received un-registration message for service ${message.service}")
+        log.debug("Received un-registration message for service ${message.service}")
 
         if (message.service instanceof MonitoredService) {
 
@@ -150,12 +150,12 @@ final class MissionControlActor extends DynamicDispatchActor {
 
                 if (monitors.get(wrapper)) {
 
-                    log.info("Terminating actor for monitored service ${message.service}")
+                    log.debug("Terminating actor for monitored service ${message.service}")
                     monitors.get(wrapper)?.terminate()
 
                 } else {
 
-                    log.info("Removing non-started actor for monitored service ${message.service}")
+                    log.debug("Removing non-started actor for monitored service ${message.service}")
                 }
 
                 monitors.remove(wrapper)
@@ -171,7 +171,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             if (notificationAgents.containsKey(wrapper)) {
 
-                log.info("Terminating actor for notification agent ${message.service}")
+                log.debug("Terminating actor for notification agent ${message.service}")
 
                 notificationAgents.get(wrapper).terminate()
                 notificationAgents.remove(wrapper)
@@ -186,7 +186,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             if (recordPersistenceServices.containsKey(wrapper)) {
 
-                log.info("Terminating actor for record persistence service ${message.service}")
+                log.debug("Terminating actor for record persistence service ${message.service}")
 
                 recordPersistenceServices.get(wrapper).terminate()
                 recordPersistenceServices.remove(wrapper)
@@ -201,7 +201,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             if (pollResponseHandlers.containsKey(wrapper)) {
 
-                log.info("Terminating actor for poll response handler ${message.service}")
+                log.debug("Terminating actor for poll response handler ${message.service}")
 
                 pollResponseHandlers.get(wrapper).terminate()
                 pollResponseHandlers.remove(wrapper)
@@ -221,7 +221,7 @@ final class MissionControlActor extends DynamicDispatchActor {
      */
     void onMessage(MonitoredServiceActor.Poll message) {
 
-        log.info("Sending poll requests to all ${monitors.size()} monitor actors...")
+        log.debug("Sending poll requests to all ${monitors.size()} monitor actors...")
 
         monitors.values().each { it << message }
     }
@@ -237,7 +237,7 @@ final class MissionControlActor extends DynamicDispatchActor {
      */
     void onMessage(GetRecords message) {
 
-        log.info("Got a record request for ${message.canonicalMonitorName}")
+        log.debug("Got a record request for ${message.canonicalMonitorName}")
 
         def key = monitors.keySet().find { it.canonicalMonitorName == message.canonicalMonitorName }
         def records = monitors.get(key).sendAndWait(new MonitoredServiceActor.GetRecords(), 1L, TimeUnit.SECONDS)
@@ -260,13 +260,13 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         if (message.canonicalMonitorName) {
 
-            log.info("Got a clear alarm request for ${message.canonicalMonitorName}...")
+            log.debug("Got a clear alarm request for ${message.canonicalMonitorName}...")
 
             def key = monitors.keySet().find { it.canonicalMonitorName == message.canonicalMonitorName }
             monitors.get(key) << new MonitoredServiceActor.ResetAlarm()
         } else {
 
-            log.info("Got a clear alarm request for all monitors...")
+            log.debug("Got a clear alarm request for all monitors...")
 
             monitors.values().each { it << new MonitoredServiceActor.ResetAlarm() }
         }
@@ -281,7 +281,7 @@ final class MissionControlActor extends DynamicDispatchActor {
      */
     void onMessage(MonitoredServiceActor.BroadcastPollResponse message) {
 
-        log.info("Received BroadcastPollResponse ${message}. Relaying message to ${pollResponseHandlers.size()} poll response handlers")
+        log.debug("Received BroadcastPollResponse ${message}. Relaying message to ${pollResponseHandlers.size()} poll response handlers")
 
         pollResponseHandlers.values().each { it << message }
     }
@@ -299,12 +299,12 @@ final class MissionControlActor extends DynamicDispatchActor {
      */
     void onMessage(MonitoredServiceActor.BroadcastAlarm message) {
 
-        log.info("Received BroadcastAlarm ${message}. Relaying message to ${notificationAgents.size()} notification agents")
+        log.debug("Received BroadcastAlarm ${message}. Relaying message to ${notificationAgents.size()} notification agents")
         notificationAgents.values().each { it << message }
 
         if (message.persistImmediately) {
 
-            log.info("BroadcastAlarm indicates immediate persistence. Sending persistence request to ${recordPersistenceServices.size()} persistence services")
+            log.debug("BroadcastAlarm indicates immediate persistence. Sending persistence request to ${recordPersistenceServices.size()} persistence services")
             recordPersistenceServices.values().each { it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: message.recordHolder) }
         }
     }
@@ -313,7 +313,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         if (recordPersistenceServices.isEmpty()) {
 
-            log.info("No record persistence services to poll for data, starting a clean actor...")
+            log.debug("No record persistence services to poll for data, starting a clean actor...")
 
             MonitoredServiceActor actor
 
@@ -333,21 +333,21 @@ final class MissionControlActor extends DynamicDispatchActor {
              */
             def persistenceWrapper = recordPersistenceServices.keySet().sort { it.definition.ranking() }.first()
 
-            log.info("Polling ${persistenceWrapper.service.class} for records...")
+            log.debug("Polling ${persistenceWrapper.service.class} for records...")
 
             recordPersistenceServices.get(persistenceWrapper).sendAndContinue(new RecordPersistenceServiceActor.GetRecord(canonicalMonitorName: wrapper.canonicalMonitorName), { Optional<RecordHolder> recordHolder ->
 
-                log.info("Received record ${recordHolder} from persistence service")
+                log.debug("Received record ${recordHolder} from persistence service")
 
                 MonitoredServiceActor actor
 
                 if (recordHolder.present) {
 
-                    log.info("Record holder is present, setting record holder on actor, starting actor...")
+                    log.debug("Record holder is present, setting record holder on actor, starting actor...")
                     actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
                 } else {
 
-                    log.info("Record holder is absent, starting a clean actor...")
+                    log.debug("Record holder is absent, starting a clean actor...")
                     actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
                 }
 
@@ -359,7 +359,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(NotificationAgentActor.GetStatistics message) {
 
-        log.info("Got a record request for ${message.canonicalAgentName}")
+        log.debug("Got a record request for ${message.canonicalAgentName}")
 
         NotificationAgentWrapper key = notificationAgents.keySet().find { it.agent.class.canonicalName == message.canonicalAgentName }
         Statistics records = notificationAgents.get(key).sendAndWait(new NotificationAgentActor.GetStatistics(), 1L, TimeUnit.SECONDS)
@@ -369,7 +369,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(PollResponseHandlerActor.GetStatistics message) {
 
-        log.info("Got a record request for ${message.canonicalResponseHandler}")
+        log.debug("Got a record request for ${message.canonicalResponseHandler}")
 
         PollResponseWrapper key = pollResponseHandlers.keySet().find { it.handler.class.canonicalName == message.canonicalResponseHandler }
         Statistics records = pollResponseHandlers.get(key).sendAndWait(new PollResponseHandlerActor.GetStatistics(), 1L, TimeUnit.SECONDS)
@@ -379,7 +379,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(RecordPersistenceServiceActor.GetStatistics message) {
 
-        log.info("Got a record request for ${message.canonicalPersistenceHandler}")
+        log.debug("Got a record request for ${message.canonicalPersistenceHandler}")
 
         RecordPersistenceServiceWrapper key = recordPersistenceServices.keySet().find { it.service.class.canonicalName == message.canonicalPersistenceHandler }
         Statistics records = recordPersistenceServices.get(key).sendAndWait(new RecordPersistenceServiceActor.GetStatistics(), 1L, TimeUnit.SECONDS)

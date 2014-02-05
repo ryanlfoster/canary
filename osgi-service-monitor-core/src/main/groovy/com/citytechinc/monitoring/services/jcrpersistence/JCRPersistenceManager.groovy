@@ -63,6 +63,8 @@ class JCRPersistenceManager implements RecordPersistenceService {
     @Override
     void persistRecordHolder(RecordHolder recordHolder) {
 
+        log.debug("Persiting data for monitor: ${recordHolder.canonicalMonitorName}")
+
         def session
 
         try {
@@ -77,7 +79,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
                 node.remove()
                 session.save()
 
-                log.info("Removed node ${nodePath} to make room for new record set")
+                log.debug("Removed node ${nodePath} to make room for new record set")
             }
 
             def rootStorageNode = session.getNode(ServiceConstants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH)

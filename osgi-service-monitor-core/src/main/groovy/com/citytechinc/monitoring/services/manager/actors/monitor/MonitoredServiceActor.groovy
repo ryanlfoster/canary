@@ -60,7 +60,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     void onMessage(AutoResumePolling message) {
 
-        log.info("Received message to auto resume polling. Scheduling normal polling...")
+        log.debug("Received message to auto resume polling. Scheduling normal polling...")
         schedulePolling()
     }
 
@@ -110,7 +110,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def schedulePolling = {
 
-        log.info("Adding scheduled job defined under the key: ${schedulerJobKey()}")
+        log.debug("Adding scheduled job defined under the key: ${schedulerJobKey()}")
 
         scheduler.addPeriodicJob(schedulerJobKey(), {
 
@@ -121,7 +121,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def unschedulePolling = {
 
-        log.info("Removing scheduled job for key ${schedulerJobKey()}")
+        log.debug("Removing scheduled job for key ${schedulerJobKey()}")
         scheduler.removeJob(schedulerJobKey())
     }
 
@@ -133,7 +133,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
         if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInMilliseconds > 0L) {
 
-            log.info("Adding scheduled auto resume job defined under the key: ${schedulerJobKey()}")
+            log.debug("Adding scheduled auto resume job defined under the key: ${schedulerJobKey()}")
 
             final Date now = new Date()
             scheduler.fireJobAt(schedulerJobKey(), {

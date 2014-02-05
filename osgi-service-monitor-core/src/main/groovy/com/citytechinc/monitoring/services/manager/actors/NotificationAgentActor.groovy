@@ -34,7 +34,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     void afterStop() {
 
-        log.info("Removing job ${jobprefix + wrapper.agent.class.name}")
+        log.debug("Removing job ${jobprefix + wrapper.agent.class.name}")
         scheduler.removeJob(jobprefix + wrapper.agent.class.name)
     }
 
@@ -47,7 +47,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     void onMessage(GetStatistics message) {
 
-        log.info("Received statistics request for ${wrapper.class.canonicalName}")
+        log.debug("Received statistics request for ${wrapper.class.canonicalName}")
 
         sender.send(statistics.clone())
     }
@@ -72,7 +72,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     void onMessage(FlushQueue message) {
 
-        log.info("Flushing queue of size ${queuedMessages.size()}")
+        log.debug("Flushing queue of size ${queuedMessages.size()}")
 
         Stopwatch stopwatch = Stopwatch.createStarted()
 
@@ -104,12 +104,12 @@ final class NotificationAgentActor extends DynamicDispatchActor {
                 }, [:], new Date(now.time + wrapper.aggregationWindowInMilliseconds))
             }
 
-            log.info("Adding message to queue with size of ${queuedMessages.size()}")
+            log.debug("Adding message to queue with size of ${queuedMessages.size()}")
             queuedMessages.add(message)
 
         } else {
 
-            log.info("Aggregation undefined, sending message without delay...")
+            log.debug("Aggregation undefined, sending message without delay...")
 
             Stopwatch stopwatch = Stopwatch.createStarted()
 

@@ -162,11 +162,11 @@ class DefaultServiceManager implements ServiceManager {
     @Activate
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        log.info("Starting mission control...")
+        log.debug("Starting mission control...")
         missionControl = new MissionControlActor(scheduler: scheduler)
         missionControl.start()
 
-        log.info("Registering ${registeredMonitors.size()} monitors, " +
+        log.debug("Registering ${registeredMonitors.size()} monitors, " +
                 "${registeredNotificationAgents.size()} notification agents, " +
                 "${registeredPersistenceServices.size()} persistence handlers, and " +
                 "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
@@ -176,13 +176,13 @@ class DefaultServiceManager implements ServiceManager {
         registeredPersistenceServices.each { missionControl << new MissionControlActor.RegisterService(service: it) }
         registeredPollResponseHandlers.each { missionControl << new MissionControlActor.RegisterService(service: it) }
 
-        log.info("Sleeping for 15 seconds...")
+        log.debug("Sleeping for 15 seconds...")
         sleep(15000)
 
-        log.info("Sending instantiate monitors...")
+        log.debug("Sending instantiate monitors...")
         missionControl << new MissionControlActor.InstantiateMonitors()
 
-        log.info("Mission control started.")
+        log.debug("Mission control started.")
     }
 
     @Deactivate
@@ -190,7 +190,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl.isActive()) {
 
-            log.info("Unregistering ${registeredMonitors.size()} monitors, " +
+            log.debug("Unregistering ${registeredMonitors.size()} monitors, " +
                     "${registeredNotificationAgents.size()} notification agents, " +
                     "${registeredPersistenceServices.size()} persistence handlers, and " +
                     "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
@@ -200,7 +200,7 @@ class DefaultServiceManager implements ServiceManager {
             registeredPersistenceServices.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
             registeredPollResponseHandlers.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
 
-            log.info("Shutting down mission control...")
+            log.debug("Shutting down mission control...")
             missionControl.stop()
         }
     }
