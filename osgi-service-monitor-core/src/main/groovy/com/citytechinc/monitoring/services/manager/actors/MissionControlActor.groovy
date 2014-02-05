@@ -33,6 +33,7 @@ final class MissionControlActor extends DynamicDispatchActor {
     static class UnregisterService { def service }
     static class GetRecords { String canonicalMonitorName }
     static class ResetAlarm { String canonicalMonitorName }
+    static class PersistRecords { }
     static class InstantiateMonitors { }
 
     Scheduler scheduler
@@ -44,6 +45,18 @@ final class MissionControlActor extends DynamicDispatchActor {
     final Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
     Boolean hasPassedMonitorActorInstantiationTimeout = false
+
+    void onMessage(PersistRecords message) {
+
+        log.info("Received a PersistRecords request. Sending record requests to all monitors and issuing callback to write to all persistence services...")
+
+        monitors.values().each { it.sendAndContinue(new MonitoredServiceActor.GetRecords(), { RecordHolder recordHolder ->
+
+            recordPersistenceServices.values().each {
+                it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: recordHolder)
+            }
+        })}
+    }
 
     void onMessage(InstantiateMonitors message) {
 

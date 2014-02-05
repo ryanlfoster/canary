@@ -14,14 +14,11 @@ import java.util.List;
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Description("CITYTECH OSGi Service Monitor Management")
+@Description("CITYTECH OSGi Service Monitor Management and Reporting")
 public interface ServiceMonitorManagerMBean {
 
-    @Description("Lists registered monitors and their definitions")
-    public TabularDataSupport getMonitorDefinitions();
-
-    @Description("Retrieves an at-a-glance state of all registered monitors")
-    public TabularDataSupport getMonitorStates();
+    @Description("Lists poll response handlers and statistics")
+    public TabularDataSupport getMonitors();
 
     @Description("Lists notification agents and statistics")
     public TabularDataSupport getNotificationAgents();

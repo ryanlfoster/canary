@@ -1,12 +1,8 @@
 package com.citytechinc.monitoring.jmx;
 
 import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
-import com.adobe.granite.jmx.annotation.Description;
-import com.adobe.granite.jmx.annotation.Name;
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper;
-import com.citytechinc.monitoring.api.notification.NotificationAgent;
 import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper;
-import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper;
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper;
 import com.citytechinc.monitoring.constants.Constants;
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse;
@@ -27,6 +23,7 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
+import java.util.Arrays;
 
 /**
  *
@@ -36,7 +33,7 @@ import javax.management.openmbean.TabularType;
  *
  */
 @Component(immediate = true)
-@Property(name = "jmx.objectname", value = "com.citytechinc.monitoring.jmx:type=CITYTECH OSGi Service Monitor Management")
+@Property(name = "jmx.objectname", value = "com.citytechinc.monitoring.jmx:type=CITYTECH OSGi Service Monitor Management and Reporting")
 @Service
 public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean implements ServiceMonitorManagerMBean {
 
@@ -60,7 +57,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public TabularDataSupport getMonitorDefinitions() {
+    public TabularDataSupport getMonitors() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -68,24 +65,43 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
-                    "Poll Interval",
-                    "Alarm Threshold",
-                    "History Size",
-                    "Persist when alarmed?",
-                    "Max Exec Time",
-                    "Auto Resume?"};
+                    "Configured Poll Interval",
+                    "Configured Alarm Threshold",
+                    "Configured History Size",
+                    "Configured to persist when alarmed?",
+                    "Configured Max Execution Time",
+                    "Configured to Auto Resume?",
+                    "Alarmed?",
+                    "1st Poll Date",
+                    "Recent Poll Date",
+                    "Recent Poll Response",
+                    "Avg Exec Time (ms)",
+                    "Record Polls",
+                    "Record Failures",
+                    "Lifetime Polls",
+                    "Lifetime Failures"};
 
             final OpenType[] itemTypes = {
-                    SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.INTEGER,
-                    SimpleType.INTEGER,
-                    SimpleType.BOOLEAN,
-                    SimpleType.INTEGER,
-                    SimpleType.STRING};
+                    SimpleType.STRING,      // Name
+                    SimpleType.STRING,      // Configured Poll Interval
+                    SimpleType.INTEGER,     // Configured Alarm Threshold
+                    SimpleType.INTEGER,     // Configured History Size
+                    SimpleType.BOOLEAN,     // Configured to persist when alarmed?
+                    SimpleType.INTEGER,     // Configured Max Execution Time
+                    SimpleType.STRING,      // Configured to Auto Resume?
+
+                    SimpleType.STRING,     // Alarmed? (was bool)
+                    SimpleType.STRING,      // 1st Poll Date
+                    SimpleType.STRING,      // Recent Poll Date
+                    SimpleType.STRING,      // Recent Poll Response
+                    SimpleType.STRING,        // Avg Exec Time (ms) (was long)
+                    SimpleType.STRING,     // Record Polls (was int)
+                    SimpleType.STRING,     // Record Failures (was int)
+                    SimpleType.STRING,     // Lifetime Polls (was int)
+                    SimpleType.STRING};    // Lifetime Failures (was int)
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor Definitions", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor States", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final MonitoredServiceWrapper wrapper : serviceManager.listMonitoredServices()) {
@@ -101,80 +117,25 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     autoResume = "--";
                 }
 
-                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                    wrapper.getMonitor().getClass().getCanonicalName(),
-                    wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
-                    wrapper.getDefinition().alarmThreshold(),
-                    wrapper.getDefinition().maxPollHistoryEntries(),
-                    wrapper.getDefinition().persistWhenAlarmed(),
-                    wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
-                    autoResume}));
-            }
-
-        } catch (final Exception exception) {
-
-            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor Definitions", exception);
-        }
-
-        return tabularDataSupport;
-    }
-
-    @Override
-    public TabularDataSupport getMonitorStates() {
-
-        TabularDataSupport tabularDataSupport = null;
-
-        try {
-
-            final String[] itemNamesDescriptionsAndIndexName = {
-                    "Name",
-                    "Alarmed?",
-                    "1st Poll Date",
-                    "Recent Poll Date",
-                    "Recent Poll Response",
-                    "Avg Exec Time (ms)",
-                    "Record Polls",
-                    "Record Failures",
-                    "Lifetime Polls",
-                    "Lifetime Failures"};
-
-            final OpenType[] itemTypes = {
-                    SimpleType.STRING,
-                    SimpleType.BOOLEAN,
-                    SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.LONG,
-                    SimpleType.INTEGER,
-                    SimpleType.INTEGER,
-                    SimpleType.INTEGER,
-                    SimpleType.INTEGER};
-
-            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor States", pageType, itemNamesDescriptionsAndIndexName);
-            tabularDataSupport = new TabularDataSupport(pageTabularType);
-
-            for (final MonitoredServiceWrapper wrapper : serviceManager.listMonitoredServices()) {
-
                 final RecordHolder record = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName());
 
-                if (record != null) {
-
-                    tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                            wrapper.getCanonicalMonitorName(),
-                            record.isAlarmed(),
-                            record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
-                            record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
-                            record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
-                            record.averagePollExecutionTime(),
-                            record.recordNumberOfPolls(),
-                            record.recordNumberOfFailures(),
-                            record.getLifetimeNumberOfPolls(),
-                            record.getLifetimeNumberOfFailures() }));
-                } else {
-
-                    LOG.warn("Record for {} is non-existent", wrapper.getCanonicalMonitorName());
-                }
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getMonitor().getClass().getCanonicalName(),
+                        wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
+                        wrapper.getDefinition().alarmThreshold(),
+                        wrapper.getDefinition().maxPollHistoryEntries(),
+                        wrapper.getDefinition().persistWhenAlarmed(),
+                        wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
+                        autoResume,
+                        record != null ? record.isAlarmed().toString() : "--",
+                        record != null && record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
+                        record != null && record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
+                        record != null && record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
+                        record != null ? record.averagePollExecutionTime().toString() : "--",
+                        record != null ? record.recordNumberOfPolls().toString() : "--",
+                        record != null ? record.recordNumberOfFailures().toString() : "--",
+                        record != null ? record.getLifetimeNumberOfPolls().toString() : "--",
+                        record != null ? record.getLifetimeNumberOfFailures().toString() : "--"}));
             }
 
         } catch (final Exception exception) {
@@ -219,7 +180,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getAgent().getClass().getCanonicalName(),
                         wrapper.getDefinition().strategy().toString(),
-                        wrapper.getDefinition().specifics().toString(),
+                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
                         statistics != null ? statistics.getNumberOfProcessedMessages().toString() : "--",
                         statistics != null ? statistics.getNumberOfMessageExceptions().toString() : "--",
                         statistics != null ? statistics.getAverageMessageProcessTime().toString() : "--"}));
@@ -269,7 +230,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
                         wrapper.getDefinition().strategy().toString(),
-                        wrapper.getDefinition().specifics().toString(),
+                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
                         statistics != null ? statistics.getNumberOfProcessedMessages().toString() : "--",
                         statistics != null ? statistics.getNumberOfMessageExceptions().toString() : "--",
                         statistics != null ? statistics.getAverageMessageProcessTime().toString() : "--"}));

@@ -219,7 +219,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MissionControlActor.GetRecords()
+            missionControl << new MissionControlActor.PersistRecords()
         }
     }
 

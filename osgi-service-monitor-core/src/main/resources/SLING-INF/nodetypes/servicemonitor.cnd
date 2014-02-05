@@ -1,13 +1,18 @@
 <citytech = 'http://www.citytechinc.com'>
 
-[citytech:MonitorRecordHolder] > nt:unstructured, sling:Resource
-  - monitoredService (string)
-  - totalPolls (long)
-  - totalSuccessfulPolls (long)
-  - totalUnsuccessfulPolls (long)
+[citytech:MonitorServiceStorage]
+  + * (citytech:RecordHolder)
 
-[citytech:MonitorRecord] > nt:unstructured, sling:Resource
-  - startTime (string)
-  - endTime (string)
-  - responseType (string)
+[citytech:RecordHolder]
+  - lifetimeNumberOfPolls (long) mandatory
+  - lifetimeNumberOfFailures (long) mandatory
+  - lifetimeAverageProcessTime (long) mandatory
+  + * (citytech:DetailedPollResponse)
+
+[citytech:DetailedPollResponse]
+  - startTime (date) mandatory
+  - endTime (date) mandatory
+  - responseType (string) mandatory
   - stackTrace (string)
+  - cleared (boolean) mandatory
+
