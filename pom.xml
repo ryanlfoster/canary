@@ -144,6 +144,11 @@
 
             <!-- 3rd party -->
             <dependency>
+                <groupId>com.citytechinc.cq</groupId>
+                <artifactId>cq-groovy-extension</artifactId>
+                <version>0.4.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${groovy.version}</version>

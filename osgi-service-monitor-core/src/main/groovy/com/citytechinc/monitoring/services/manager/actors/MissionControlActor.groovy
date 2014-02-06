@@ -8,15 +8,13 @@ import com.citytechinc.monitoring.api.persistence.RecordPersistenceService
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.monitoring.api.responsehandler.PollResponseHandler
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
+import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
-import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
-
-import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -28,34 +26,114 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 final class MissionControlActor extends DynamicDispatchActor {
 
+    public enum RecordType {
+
+        MONITOR, NOTIFICATION_AGENT, POLL_RESPONSE_HANDLER, RECORD_PERSISTENCE_SERVICE
+    }
+
     // MESSAGES
-    static class RegisterService { def service }
-    static class UnregisterService { def service }
-    static class GetRecords { String canonicalMonitorName }
-    static class ResetAlarm { String canonicalMonitorName }
-    static class PersistRecords { }
+    static class ResetAlarm { String identifier }
     static class InstantiateMonitors { }
+
+    static class RequestAllMonitorsPoll { }
+    static class RequestPersistenceOfAllMonitorRecords { }
+
+    static class PollResponseReceipt {
+
+        DetailedPollResponse detailedPollResponse
+        String identifier
+    }
+
+    static class ServiceLifecycleEvent {
+
+        def service
+        Boolean isRegistration
+    }
+
+    static class InternalProcessAccounting {
+
+        RecordType recordType
+        Long processTime
+        String identifier
+        Boolean exceptionOccurred
+    }
+
+    static class GetRecords {
+
+        String identifier
+    }
+
+    static class GetStatistics {
+
+        RecordType recordType
+        String identifier
+    }
 
     Scheduler scheduler
 
-    // WRAPPERS AND ACTORS
-    final Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
-    final Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
-    final Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
-    final Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
+    Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
+    Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
+    Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
+    Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
+
+    Map<String, RecordHolder> monitorRecords = [:]
+    Map<String, Statistics> notificationAgentStatistics = [:]
+    Map<String, Statistics> pollResponseHandlerStatistics = [:]
+    Map<String, Statistics> recordPersistenceServiceStatistics = [:]
 
     Boolean hasPassedMonitorActorInstantiationTimeout = false
 
-    void onMessage(PersistRecords message) {
+    void onMessage(GetStatistics message) {
 
-        log.debug("Received a PersistRecords request. Sending record requests to all monitors and issuing callback to write to all persistence services...")
+        Optional<Statistics> retrievedStatistics = Optional.absent()
 
-        monitors.values().each { it.sendAndContinue(new MonitoredServiceActor.GetRecords(), { RecordHolder recordHolder ->
+        if (message.recordType == RecordType.NOTIFICATION_AGENT && notificationAgentStatistics.containsKey(message.identifier)) {
 
-            recordPersistenceServices.values().each {
-                it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: recordHolder)
+            retrievedStatistics = Optional.of(notificationAgentStatistics.get(message.identifier))
+        } else if (message.recordType == RecordType.POLL_RESPONSE_HANDLER && pollResponseHandlerStatistics.containsKey(message.identifier)) {
+
+            retrievedStatistics = Optional.of(pollResponseHandlerStatistics.get(message.identifier))
+        } else if (message.recordType == RecordType.RECORD_PERSISTENCE_SERVICE && recordPersistenceServiceStatistics.containsKey(message.identifier)) {
+
+            retrievedStatistics = Optional.of(recordPersistenceServiceStatistics.get(message.identifier))
+        }
+
+        sender.send(retrievedStatistics)
+    }
+
+    void onMessage(GetRecords message) {
+
+        Optional<RecordHolder> retrievedRecords = Optional.absent()
+
+        if (monitorRecords.containsKey(message.identifier)) {
+            retrievedRecords = Optional.of(monitorRecords.get(message.identifier))
+        }
+
+        sender.send(retrievedRecords)
+    }
+
+    void onMessage(InternalProcessAccounting message) {
+
+        Statistics statistics = null
+
+        if (message.recordType == RecordType.NOTIFICATION_AGENT) {
+            statistics = notificationAgentStatistics.get(message.identifier)
+        } else if (message.recordType == RecordType.POLL_RESPONSE_HANDLER) {
+            statistics = pollResponseHandlerStatistics.get(message.identifier)
+        } else if (message.recordType == RecordType.RECORD_PERSISTENCE_SERVICE) {
+            statistics = recordPersistenceServiceStatistics.get(message.identifier)
+        }
+
+        if (statistics) {
+
+            ++statistics.processedMessages
+
+            if (message.exceptionOccurred) {
+                ++statistics.messageExceptions
             }
-        })}
+
+            statistics.addAndCalculateAverageProcessTime(message.processTime)
+        }
     }
 
     void onMessage(InstantiateMonitors message) {
@@ -70,15 +148,13 @@ final class MissionControlActor extends DynamicDispatchActor {
         }
     }
 
-    void onMessage(RegisterService message) {
-
-        log.debug("Received registration message for service ${message.service}")
+    void onMessage(ServiceLifecycleEvent message) {
 
         if (message.service instanceof MonitoredService) {
 
-            final MonitoredServiceWrapper wrapper = new MonitoredServiceWrapper(message.service)
+            MonitoredServiceWrapper wrapper = new MonitoredServiceWrapper(message.service)
 
-            if (!monitors.containsKey(wrapper)) {
+            if (message.isRegistration && !monitors.containsKey(wrapper)) {
 
                 if (hasPassedMonitorActorInstantiationTimeout) {
                     instantiateMonitoredServiceActor(wrapper)
@@ -86,226 +162,130 @@ final class MissionControlActor extends DynamicDispatchActor {
                     monitors.put(wrapper, null)
                 }
 
-            } else {
+            } else if (!message.isRegistration && monitors.containsKey(wrapper)) {
 
-                log.warn("Monitored service ${message.service} already registered")
+                monitors.remove(wrapper)?.terminate()
             }
 
         } else if (message.service instanceof NotificationAgent) {
 
-            final NotificationAgentWrapper wrapper = new NotificationAgentWrapper(message.service)
+            NotificationAgentWrapper wrapper = new NotificationAgentWrapper(message.service)
 
-            if (!notificationAgents.containsKey(wrapper)) {
+            if (message.isRegistration && !notificationAgents.containsKey(wrapper)) {
 
-                NotificationAgentActor actor = new NotificationAgentActor(wrapper: wrapper, scheduler: scheduler)
+                NotificationAgentActor actor = new NotificationAgentActor(wrapper: wrapper, scheduler: scheduler, missionControl: this)
                 actor.start()
 
                 notificationAgents.put(wrapper, actor)
-            } else {
+                notificationAgentStatistics.put(wrapper.agent.class.canonicalName, new Statistics())
 
-                log.warn("Notification agent ${message.service} already registered")
+            } else if (!message.isRegistration && notificationAgents.containsKey(wrapper)) {
+
+                notificationAgents.remove(wrapper)?.terminate()
+                notificationAgentStatistics.remove(wrapper.agent.class.canonicalName)
             }
 
         } else if (message.service instanceof RecordPersistenceService) {
 
-            final RecordPersistenceServiceWrapper wrapper = new RecordPersistenceServiceWrapper(message.service)
+            RecordPersistenceServiceWrapper wrapper = new RecordPersistenceServiceWrapper(message.service)
 
-            if (!recordPersistenceServices.containsKey(wrapper)) {
+            if (message.isRegistration && !recordPersistenceServices.containsKey(wrapper)) {
 
-                RecordPersistenceServiceActor actor = new RecordPersistenceServiceActor(wrapper: wrapper)
+                RecordPersistenceServiceActor actor = new RecordPersistenceServiceActor(wrapper: wrapper, missionControl: this)
                 actor.start()
 
                 recordPersistenceServices.put(wrapper, actor)
-            } else {
+                recordPersistenceServiceStatistics.put(wrapper.service.class.canonicalName, new Statistics())
 
-                log.warn("Record persistence service ${message.service} already registered")
+            } else if (!message.isRegistration && recordPersistenceServices.containsKey(wrapper)) {
+
+                recordPersistenceServices.remove(wrapper)?.terminate()
+                recordPersistenceServiceStatistics.remove(wrapper.service.class.canonicalName)
             }
 
         } else if (message.service instanceof PollResponseHandler) {
 
-            final PollResponseWrapper wrapper = new PollResponseWrapper(message.service)
+            PollResponseWrapper wrapper = new PollResponseWrapper(message.service)
 
-            if (!pollResponseHandlers.containsKey(wrapper)) {
+            if (message.isRegistration && !pollResponseHandlers.containsKey(wrapper)) {
 
-                PollResponseHandlerActor actor = new PollResponseHandlerActor(wrapper: wrapper)
+                PollResponseHandlerActor actor = new PollResponseHandlerActor(wrapper: wrapper, missionControl: this)
                 actor.start()
 
                 pollResponseHandlers.put(wrapper, actor)
-            } else {
+                pollResponseHandlerStatistics.put(wrapper.handler.class.canonicalName, new Statistics())
 
-                log.warn("Poll response handler ${message.service} already registered")
+            } else if (!message.isRegistration && pollResponseHandlers.containsKey(wrapper)) {
+
+                pollResponseHandlers.remove(wrapper)?.terminate()
+                pollResponseHandlerStatistics.remove(wrapper.handler.class.canonicalName)
             }
         }
     }
 
-    void onMessage(UnregisterService message) {
+    void onMessage(RequestPersistenceOfAllMonitorRecords message) {
 
-        log.debug("Received un-registration message for service ${message.service}")
+        monitorRecords.values().each { RecordHolder recordHolder ->
 
-        if (message.service instanceof MonitoredService) {
+            recordPersistenceServices.values().each { RecordPersistenceServiceActor actor ->
 
-            final MonitoredServiceWrapper wrapper = new MonitoredServiceWrapper(message.service)
-
-            if (monitors.containsKey(wrapper)) {
-
-                if (monitors.get(wrapper)) {
-
-                    log.debug("Terminating actor for monitored service ${message.service}")
-                    monitors.get(wrapper)?.terminate()
-
-                } else {
-
-                    log.debug("Removing non-started actor for monitored service ${message.service}")
-                }
-
-                monitors.remove(wrapper)
-
-            } else {
-
-                log.warn("Monitored service ${message.service} is not registered")
-            }
-
-        } else if (message.service instanceof NotificationAgent) {
-
-            final NotificationAgentWrapper wrapper = new NotificationAgentWrapper(message.service)
-
-            if (notificationAgents.containsKey(wrapper)) {
-
-                log.debug("Terminating actor for notification agent ${message.service}")
-
-                notificationAgents.get(wrapper).terminate()
-                notificationAgents.remove(wrapper)
-            } else {
-
-                log.warn("Notification agent ${message.service} is not registered")
-            }
-
-        } else if (message.service instanceof RecordPersistenceService) {
-
-            final RecordPersistenceServiceWrapper wrapper = new RecordPersistenceServiceWrapper(message.service)
-
-            if (recordPersistenceServices.containsKey(wrapper)) {
-
-                log.debug("Terminating actor for record persistence service ${message.service}")
-
-                recordPersistenceServices.get(wrapper).terminate()
-                recordPersistenceServices.remove(wrapper)
-            } else {
-
-                log.warn("Record persistence service ${message.service} is not registered")
-            }
-
-        } else if (message.service instanceof PollResponseHandler) {
-
-            final PollResponseWrapper wrapper = new PollResponseWrapper(message.service)
-
-            if (pollResponseHandlers.containsKey(wrapper)) {
-
-                log.debug("Terminating actor for poll response handler ${message.service}")
-
-                pollResponseHandlers.get(wrapper).terminate()
-                pollResponseHandlers.remove(wrapper)
-            } else {
-
-                log.warn("Poll response handler ${message.service} is not registered")
+                actor << new RecordPersistenceServiceActor.PersistRecord(recordHolder: recordHolder)
             }
         }
     }
 
-    /**
-     *
-     * A poll request coming from the outside world. We'll push this poll request to all
-     *   the canonicalMonitorName actors.
-     *
-     * @param message
-     */
-    void onMessage(MonitoredServiceActor.Poll message) {
+    void onMessage(RequestAllMonitorsPoll message) {
 
-        log.debug("Sending poll requests to all ${monitors.size()} monitor actors...")
-
-        monitors.values().each { it << message }
+        monitors.values().each { it << new MonitoredServiceActor.Poll() }
     }
 
-    /**
-     *
-     * A record retrieval request from the outside world. We'll find the corresponding canonicalMonitorName actor
-     *   and request that it send us its records.
-     *
-     * This call is blocking with a max time of 1 second.
-     *
-     * @param message
-     */
-    void onMessage(GetRecords message) {
-
-        log.debug("Got a record request for ${message.canonicalMonitorName}")
-
-        def key = monitors.keySet().find { it.canonicalMonitorName == message.canonicalMonitorName }
-        def records = monitors.get(key).sendAndWait(new MonitoredServiceActor.GetRecords(), 1L, TimeUnit.SECONDS)
-
-        sender.send(records)
-    }
-
-    /**
-     *
-     * The ResetAlarm message that takes an argument is specific to the Mission Control Actor. These messages
-     *   should only come from the Service Manager on behalf of external OSGi services/calls.
-     *
-     * The actor will then turn around and send a ResetAlarm message specific to the Monitored Service Actor. If no
-     *   explicit canonicalMonitorName is defined, all monitors will receive the message. They may choose, however, to disregard the
-     *   message.
-     *
-     * @param message
-     */
     void onMessage(ResetAlarm message) {
 
-        if (message.canonicalMonitorName) {
+        if (message.identifier) {
 
-            log.debug("Got a clear alarm request for ${message.canonicalMonitorName}...")
+            log.info("Resetting alarm for monitor ${message.identifier}")
+            monitorRecords.get(message.identifier).resetAlarm()
 
-            def key = monitors.keySet().find { it.canonicalMonitorName == message.canonicalMonitorName }
-            monitors.get(key) << new MonitoredServiceActor.ResetAlarm()
         } else {
 
-            log.debug("Got a clear alarm request for all monitors...")
+            log.trace("Received a global alarm reset, issuing reset to all monitor records")
 
-            monitors.values().each { it << new MonitoredServiceActor.ResetAlarm() }
+            monitorRecords.values().each { RecordHolder recordHolder ->
+
+                if (recordHolder.isAlarmed()) {
+
+                    log.info("Resetting alarm for monitor ${recordHolder.canonicalMonitorName}")
+                    recordHolder.resetAlarm()
+                }
+            }
         }
     }
 
-    /**
-     *
-     * BroadcastPollResponse messages come from the MonitoredServiceActor(s). They indicate a request to have their responses
-     *   sent to all poll response handlers. Poll response handlers may choose, however, to disregard the message.
-     *
-     * @param message
-     */
-    void onMessage(MonitoredServiceActor.BroadcastPollResponse message) {
+    void onMessage(PollResponseReceipt message) {
 
-        log.debug("Received BroadcastPollResponse ${message}. Relaying message to ${pollResponseHandlers.size()} poll response handlers")
+        // ADD POLL RESPONSE
+        def recordHolder = monitorRecords.get(message.identifier)
+        recordHolder.addRecord(message.detailedPollResponse)
 
-        pollResponseHandlers.values().each { it << message }
-    }
+        // PASS RESPONSE ON TO HANDLERS
+        pollResponseHandlers.keySet().each { PollResponseWrapper pollResponseWrapper ->
 
-    /**
-     *
-     * BroadcastAlarm messages come from the MonitoredServiceActor(s). This message occurs when a canonicalMonitorName has reached an
-     *   alarmed state based on poll results. The threshold is defined per canonicalMonitorName.
-     *
-     * The Mission Control actor will send each, entire record set to all notification agents. Notification agents may
-     *   choose, however, to disregard the message. Mission Control will also send persistence requests to all persistence
-     *   services if the canonicalMonitorName is configured to immediately persist.
-     *
-     * @param message
-     */
-    void onMessage(MonitoredServiceActor.BroadcastAlarm message) {
+            def actor = pollResponseHandlers.get(pollResponseWrapper)
 
-        log.debug("Received BroadcastAlarm ${message}. Relaying message to ${notificationAgents.size()} notification agents")
-        notificationAgents.values().each { it << message }
+            ++pollResponseHandlerStatistics.get(pollResponseWrapper.handler.class.canonicalName).deliveredMessages
+            actor << message
+        }
 
-        if (message.persistImmediately) {
+        // IF THE MONITOR IS ALARMED, SEND THE RECORD HOLDER TO NOTIFICATION AGENTS
+        if (recordHolder.isAlarmed()) {
 
-            log.debug("BroadcastAlarm indicates immediate persistence. Sending persistence request to ${recordPersistenceServices.size()} persistence services")
-            recordPersistenceServices.values().each { it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: message.recordHolder) }
+            notificationAgents.keySet().each { NotificationAgentWrapper notificationAgentWrapper ->
+
+                def actor = notificationAgents.get(notificationAgentWrapper)
+
+                ++notificationAgentStatistics.get(notificationAgentWrapper.agent.class.canonicalName).deliveredMessages
+                actor << recordHolder.clone()
+            }
         }
     }
 
@@ -318,10 +298,11 @@ final class MissionControlActor extends DynamicDispatchActor {
             MonitoredServiceActor actor
 
             // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
-            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
+            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this)
             actor.start()
 
             monitors.put(wrapper, actor)
+            monitorRecords.put(wrapper.canonicalMonitorName, RecordHolder.CREATE_NEW(wrapper))
 
         } else {
 
@@ -343,48 +324,16 @@ final class MissionControlActor extends DynamicDispatchActor {
 
                 if (recordHolder.present) {
 
-                    log.debug("Record holder is present, setting record holder on actor, starting actor...")
-                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this)
                 } else {
 
-                    log.debug("Record holder is absent, starting a clean actor...")
-                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this)
                 }
 
                 actor.start()
                 monitors.put(wrapper, actor)
+                monitorRecords.put(wrapper.canonicalMonitorName, RecordHolder.CREATE_NEW(wrapper))
             })
         }
     }
-
-    void onMessage(NotificationAgentActor.GetStatistics message) {
-
-        log.debug("Got a record request for ${message.canonicalAgentName}")
-
-        NotificationAgentWrapper key = notificationAgents.keySet().find { it.agent.class.canonicalName == message.canonicalAgentName }
-        Statistics records = notificationAgents.get(key).sendAndWait(new NotificationAgentActor.GetStatistics(), 1L, TimeUnit.SECONDS)
-
-        sender.send(records)
-    }
-
-    void onMessage(PollResponseHandlerActor.GetStatistics message) {
-
-        log.debug("Got a record request for ${message.canonicalResponseHandler}")
-
-        PollResponseWrapper key = pollResponseHandlers.keySet().find { it.handler.class.canonicalName == message.canonicalResponseHandler }
-        Statistics records = pollResponseHandlers.get(key).sendAndWait(new PollResponseHandlerActor.GetStatistics(), 1L, TimeUnit.SECONDS)
-
-        sender.send(records)
-    }
-
-    void onMessage(RecordPersistenceServiceActor.GetStatistics message) {
-
-        log.debug("Got a record request for ${message.canonicalPersistenceHandler}")
-
-        RecordPersistenceServiceWrapper key = recordPersistenceServices.keySet().find { it.service.class.canonicalName == message.canonicalPersistenceHandler }
-        Statistics records = recordPersistenceServices.get(key).sendAndWait(new RecordPersistenceServiceActor.GetStatistics(), 1L, TimeUnit.SECONDS)
-
-        sender.send(records)
-    }
-
 }

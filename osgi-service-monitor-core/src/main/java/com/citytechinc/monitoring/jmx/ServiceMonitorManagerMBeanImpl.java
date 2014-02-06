@@ -3,12 +3,15 @@ package com.citytechinc.monitoring.jmx;
 import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
 import com.citytechinc.monitoring.api.monitor.MonitoredServiceWrapper;
 import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper;
+import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper;
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper;
 import com.citytechinc.monitoring.constants.Constants;
 import com.citytechinc.monitoring.services.jcrpersistence.DetailedPollResponse;
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder;
 import com.citytechinc.monitoring.services.manager.ServiceManager;
-import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics;
+import com.citytechinc.monitoring.services.manager.actors.MissionControlActor;
+import com.citytechinc.monitoring.services.manager.actors.Statistics;
+import com.google.common.base.Optional;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
@@ -90,21 +93,21 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.INTEGER,     // Configured Max Execution Time
                     SimpleType.STRING,      // Configured to Auto Resume?
 
-                    SimpleType.STRING,     // Alarmed? (was bool)
+                    SimpleType.BOOLEAN,     // Alarmed?
                     SimpleType.STRING,      // 1st Poll Date
                     SimpleType.STRING,      // Recent Poll Date
                     SimpleType.STRING,      // Recent Poll Response
-                    SimpleType.STRING,        // Avg Exec Time (ms) (was long)
-                    SimpleType.STRING,     // Record Polls (was int)
-                    SimpleType.STRING,     // Record Failures (was int)
-                    SimpleType.STRING,     // Lifetime Polls (was int)
-                    SimpleType.STRING};    // Lifetime Failures (was int)
+                    SimpleType.LONG,        // Avg Exec Time (ms)
+                    SimpleType.INTEGER,     // Record Polls
+                    SimpleType.INTEGER,     // Record Failures
+                    SimpleType.INTEGER,     // Lifetime Polls
+                    SimpleType.INTEGER};    // Lifetime Failures
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
             final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor States", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final MonitoredServiceWrapper wrapper : serviceManager.listMonitoredServices()) {
+            for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServices()) {
 
                 final String autoResume;
 
@@ -117,7 +120,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     autoResume = "--";
                 }
 
-                final RecordHolder record = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName());
+                final RecordHolder record = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName()).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getMonitor().getClass().getCanonicalName(),
@@ -127,15 +130,15 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                         wrapper.getDefinition().persistWhenAlarmed(),
                         wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
                         autoResume,
-                        record != null ? record.isAlarmed().toString() : "--",
-                        record != null && record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
-                        record != null && record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
-                        record != null && record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
-                        record != null ? record.averagePollExecutionTime().toString() : "--",
-                        record != null ? record.recordNumberOfPolls().toString() : "--",
-                        record != null ? record.recordNumberOfFailures().toString() : "--",
-                        record != null ? record.getLifetimeNumberOfPolls().toString() : "--",
-                        record != null ? record.getLifetimeNumberOfFailures().toString() : "--"}));
+                        record.isAlarmed(),
+                        record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
+                        record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
+                        record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
+                        record.averagePollExecutionTime(),
+                        record.recordNumberOfPolls(),
+                        record.recordNumberOfFailures(),
+                        record.getLifetimeNumberOfPolls(),
+                        record.getLifetimeNumberOfFailures()}));
             }
 
         } catch (final Exception exception) {
@@ -157,6 +160,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     "Name",
                     "Strategy",
                     "Specifics",
+                    "Number of Delivered Messages",
                     "Number of Processed Messages",
                     "Number of Message Exceptions",
                     "Avg Message Process Time (ms)"};
@@ -165,31 +169,32 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.STRING};
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Notification Agents", "Poll Response Handler Definitions", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Notification Agents", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final NotificationAgentWrapper wrapper : serviceManager.listNotificationAgents()) {
+            for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgents()) {
 
-                final Statistics statistics = serviceManager.getNotificationAgentStatistics(wrapper.getAgent().getClass().getCanonicalName());
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getAgent().getClass().getCanonicalName(), MissionControlActor.RecordType.NOTIFICATION_AGENT).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getAgent().getClass().getCanonicalName(),
                         wrapper.getDefinition().strategy().toString(),
                         Arrays.asList(wrapper.getDefinition().specifics()).toString(),
-                        statistics != null ? statistics.getNumberOfProcessedMessages().toString() : "--",
-                        statistics != null ? statistics.getNumberOfMessageExceptions().toString() : "--",
-                        statistics != null ? statistics.getAverageMessageProcessTime().toString() : "--"}));
-
+                        statistics.getDeliveredMessages(),
+                        statistics.getProcessedMessages(),
+                        statistics.getMessageExceptions(),
+                        statistics.getAverageMessageProcessTime()}));
             }
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Poll Response Handler Definitions", exception);
+            LOG.error("An exception occurred building the TabularDataSupport listing the Notification Agents", exception);
         }
 
         return tabularDataSupport;
@@ -206,6 +211,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     "Name",
                     "Strategy",
                     "Specifics",
+                    "Number of Delivered Messages",
                     "Number of Processed Messages",
                     "Number of Message Exceptions",
                     "Avg Message Process Time (ms)"};
@@ -214,32 +220,32 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.STRING};
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Poll Response Handlers", "Poll Response Handler Definitions", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Poll Response Handlers", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
+            for (final PollResponseWrapper wrapper : serviceManager.getPollResponseHandlers()) {
 
-            for (final PollResponseWrapper wrapper : serviceManager.listPollResponseHandlers()) {
-
-                final Statistics statistics = serviceManager.getPollResponseHandlerStatistics(wrapper.getHandler().getClass().getCanonicalName());
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getHandler().getClass().getCanonicalName(), MissionControlActor.RecordType.POLL_RESPONSE_HANDLER).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
                         wrapper.getDefinition().strategy().toString(),
                         Arrays.asList(wrapper.getDefinition().specifics()).toString(),
-                        statistics != null ? statistics.getNumberOfProcessedMessages().toString() : "--",
-                        statistics != null ? statistics.getNumberOfMessageExceptions().toString() : "--",
-                        statistics != null ? statistics.getAverageMessageProcessTime().toString() : "--"}));
-
+                        statistics.getDeliveredMessages(),
+                        statistics.getProcessedMessages(),
+                        statistics.getMessageExceptions(),
+                        statistics.getAverageMessageProcessTime()}));
             }
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Poll Response Handler Definitions", exception);
+            LOG.error("An exception occurred building the TabularDataSupport listing the Poll Response Handlers", exception);
         }
 
         return tabularDataSupport;
@@ -247,7 +253,50 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
     @Override
     public TabularDataSupport getRecordPersistenceServices() {
-        return null;
+
+        TabularDataSupport tabularDataSupport = null;
+
+        try {
+
+            final String[] itemNamesDescriptionsAndIndexName = {
+                    "Name",
+                    "Ranking",
+                    "Number of Delivered Messages",
+                    "Number of Processed Messages",
+                    "Number of Message Exceptions",
+                    "Avg Message Process Time (ms)"};
+
+            final OpenType[] itemTypes = {
+                    SimpleType.STRING,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER,
+                    SimpleType.LONG};
+
+            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
+            final TabularType pageTabularType = new TabularType("List of Record Persistence Services", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            tabularDataSupport = new TabularDataSupport(pageTabularType);
+
+            for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServices()) {
+
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getService().getClass().getCanonicalName(), MissionControlActor.RecordType.RECORD_PERSISTENCE_SERVICE).get();
+
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getService().getClass().getCanonicalName(),
+                        wrapper.getDefinition().ranking(),
+                        statistics.getDeliveredMessages(),
+                        statistics.getProcessedMessages(),
+                        statistics.getMessageExceptions(),
+                        statistics.getAverageMessageProcessTime()}));
+            }
+
+        } catch (final Exception exception) {
+
+            LOG.error("An exception occurred building the TabularDataSupport listing the Record Persistence Services", exception);
+        }
+
+        return tabularDataSupport;
     }
 
     @Override
@@ -274,14 +323,14 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.BOOLEAN};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors", "In-memory poll responses for a Monitor", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("Records for Monitored Service", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            final RecordHolder record = serviceManager.getRecordHolder(monitoredService);
+            Optional<RecordHolder> record = serviceManager.getRecordHolder(monitoredService);
 
-            if (record != null) {
+            if (record.isPresent()) {
 
-                for (final DetailedPollResponse detailedPollResponse : record.getRecords()) {
+                for (final DetailedPollResponse detailedPollResponse : record.get().getRecords()) {
 
                     tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                             Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
@@ -291,10 +340,6 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                             detailedPollResponse.getStackTrace(),
                             detailedPollResponse.getCleared() }));
                 }
-
-            } else {
-
-                LOG.warn("Record for {} is non-existent", monitoredService);
             }
 
         } catch (final Exception exception) {

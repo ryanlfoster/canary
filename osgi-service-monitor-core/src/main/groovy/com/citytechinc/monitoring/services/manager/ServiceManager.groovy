@@ -5,7 +5,10 @@ import com.citytechinc.monitoring.api.notification.NotificationAgentWrapper
 import com.citytechinc.monitoring.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
-import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
+import com.citytechinc.monitoring.services.manager.actors.MissionControlActor.RecordType
+import com.citytechinc.monitoring.services.manager.actors.RecordPersistenceServiceActor
+import com.citytechinc.monitoring.services.manager.actors.Statistics
+import com.google.common.base.Optional
 
 /**
  *
@@ -16,75 +19,24 @@ import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
  */
 public interface ServiceManager {
 
-    /**
-     *
-     */
-    public void requestAllMonitorsPoll();
+    public List<MonitoredServiceWrapper> getMonitoredServices()
 
-    /**
-     *
-     */
-    public void requestAllMonitorsPersist();
+    public List<NotificationAgentWrapper> getNotificationAgents()
 
-    /**
-     *
-     * @return
-     */
-    public List<MonitoredServiceWrapper> listMonitoredServices()
+    public List<PollResponseWrapper> getPollResponseHandlers()
 
-    /**
-     *
-     * @return
-     */
-    public List<RecordPersistenceServiceWrapper> listRecordPersistenceServices()
+    public List<RecordPersistenceServiceWrapper> getRecordPersistenceServices()
 
-    /**
-     *
-     * @return
-     */
-    public List<NotificationAgentWrapper> listNotificationAgents()
+    public Optional<Statistics> getStatistics(String identifier, RecordType recordType)
 
-    /**
-     *
-     * @param canonicalName
-     * @return
-     */
-    public Statistics getNotificationAgentStatistics(String canonicalName)
+    public Optional<RecordHolder> getRecordHolder(String identifier)
 
-    /**
-     *
-     * @return
-     */
-    public List<PollResponseWrapper> listPollResponseHandlers()
+    public void requestAllMonitorsPoll()
 
-    /**
-     *
-     * @return
-     */
-    public Statistics getPollResponseHandlerStatistics(String canonicalName)
+    public void requestAllMonitorsPersist()
 
-    /**
-     *
-     * @return
-     */
-    public List<String> listAlarmedMonitors()
+    public void resetAlarm(String identifier)
 
-    /**
-     *
-     * @param canonicalMonitorName
-     * @return
-     */
-    public RecordHolder getRecordHolder(String canonicalMonitorName)
-
-    /**
-     *
-     * @param canonicalMonitorName
-     */
-    public void resetAlarm(String canonicalMonitorName)
-
-    /**
-     *
-     */
     public void resetAllAlarms()
 
 }

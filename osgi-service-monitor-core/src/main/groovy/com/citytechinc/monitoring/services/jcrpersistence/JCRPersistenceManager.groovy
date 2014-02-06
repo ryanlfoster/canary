@@ -28,8 +28,7 @@ import javax.jcr.Session
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-//@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
-@Component(immediate = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = ServiceConstants.VENDOR_NAME) ])

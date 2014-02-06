@@ -1,15 +1,15 @@
-<citytech = 'http://www.citytechinc.com'>
+<ctservmon = 'http://code.citytechinc.com/osgi-service-monitor/'>
 
-[citytech:MonitorServiceStorage]
-  + * (citytech:RecordHolder)
+[ctservmon:MonitorServiceStorage]
+  + * (ctservmon:RecordHolder)
 
-[citytech:RecordHolder]
+[ctservmon:RecordHolder]
   - lifetimeNumberOfPolls (long) mandatory
   - lifetimeNumberOfFailures (long) mandatory
   - lifetimeAverageProcessTime (long) mandatory
-  + * (citytech:DetailedPollResponse)
+  + * (ctservmon:DetailedPollResponse)
 
-[citytech:DetailedPollResponse]
+[ctservmon:DetailedPollResponse]
   - startTime (date) mandatory
   - endTime (date) mandatory
   - responseType (string) mandatory

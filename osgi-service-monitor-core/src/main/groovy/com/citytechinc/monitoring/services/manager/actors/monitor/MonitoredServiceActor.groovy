@@ -26,20 +26,8 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     // MESSAGES
     static class Poll {}
     static class AutoResumePolling {}
-    static class ResetAlarm {}
-    static class GetRecords {}
-
-    static class BroadcastAlarm {
-        RecordHolder recordHolder
-        Boolean persistImmediately
-    }
-    static class BroadcastPollResponse {
-        DetailedPollResponse pollResponse
-        String canonicalMonitorName
-    }
 
     MonitoredServiceWrapper wrapper
-    RecordHolder recordHolder
     Scheduler scheduler
     MissionControlActor missionControl
     PollingActor pollingActor
@@ -64,48 +52,17 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         schedulePolling()
     }
 
-    void onMessage(GetRecords message) {
-        sender.send(recordHolder.clone())
-    }
-
-    void onMessage(ResetAlarm message) {
-
-        if (recordHolder.isAlarmed()) {
-
-            recordHolder.clearAlarm()
-            schedulePolling()
-
-        } else {
-
-            log.warn("Reset alarm received but not in alarm state")
-        }
-    }
-
     void onMessage(Poll message) {
 
-        final Date startTime = new Date()
-        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.pollMaxExecutionTimeInMillseconds, TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
+        def startTime = new Date()
+        PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.pollMaxExecutionTimeInMillseconds, TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
 
-        DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
+        def detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
                 responseType: pollResponse.pollResponseType,
                 stackTrace: pollResponse.exceptionStackTrace)
 
-        // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
-        recordHolder.addRecord(detailedPollResponse)
-        missionControl << new BroadcastPollResponse(pollResponse: detailedPollResponse, canonicalMonitorName: recordHolder.canonicalMonitorName)
-
-        if (recordHolder.isAlarmed()) {
-
-            // SEND RECORDS TO MISSION CONTROL FOR BROADCAST TO PERSISTENCE SERVICES
-            missionControl << new BroadcastAlarm(recordHolder: recordHolder, persistImmediately: wrapper.definition.persistWhenAlarmed())
-
-            // REMOVE JOB SCHEDULER
-            unschedulePolling()
-
-            // SCHEDULE AUTO RESUME POLLING
-            oneTimeScheduleAutoResume()
-        }
+        missionControl << new MissionControlActor.PollResponseReceipt(detailedPollResponse: detailedPollResponse, identifier: wrapper.canonicalMonitorName)
     }
 
     def schedulePolling = {

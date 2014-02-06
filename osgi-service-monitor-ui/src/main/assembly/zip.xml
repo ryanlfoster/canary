@@ -49,6 +49,7 @@
             <scope>provided</scope>
             <includes>
                 <include>com.citytechinc.monitoring:osgi-service-monitor-core</include>
+                <include>com.citytechinc.cq:cq-groovy-extension</include>
                 <include>org.codehaus.jackson</include>
                 <include>com.google.guava</include>
                 <include>org.codehaus.jsr166-mirror</include>

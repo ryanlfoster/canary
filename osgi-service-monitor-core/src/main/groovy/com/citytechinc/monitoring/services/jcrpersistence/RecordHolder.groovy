@@ -67,7 +67,7 @@ class RecordHolder {
         records.offer(record)
     }
 
-    void clearAlarm() {
+    void resetAlarm() {
         getRecords().last().cleared = true
     }
 

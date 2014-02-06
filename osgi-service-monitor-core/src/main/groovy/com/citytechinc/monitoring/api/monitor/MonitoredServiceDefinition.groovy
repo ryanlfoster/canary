@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
     /**
      *
-     * A sensible name for the canonicalMonitorName. If none is defined, the class name is used.
+     * A sensible name for the identifier. If none is defined, the class name is used.
      *
      * @return
      */
@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit
 
     /**
      *
-     * This flag indicates that any canonicalMonitorName that goes into an 'alarmed' state will request persistence.
+     * This flag indicates that any identifier that goes into an 'alarmed' state will request persistence.
      *
      * @return
      */

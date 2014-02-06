@@ -11,10 +11,10 @@ import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
-import com.citytechinc.monitoring.services.manager.actors.NotificationAgentActor
-import com.citytechinc.monitoring.services.manager.actors.PollResponseHandlerActor
+import com.citytechinc.monitoring.services.manager.actors.RecordPersistenceServiceActor
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
-import com.citytechinc.monitoring.services.manager.actors.monitor.Statistics
+import com.citytechinc.monitoring.services.manager.actors.Statistics
+import com.google.common.base.Optional
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -84,7 +84,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredMonitors.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.RegisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
 
@@ -95,7 +95,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.UnregisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
         }
     }
 
@@ -104,7 +104,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredNotificationAgents.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.RegisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
 
@@ -115,7 +115,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.UnregisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
         }
     }
 
@@ -124,7 +124,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredPersistenceServices.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.RegisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
 
@@ -135,7 +135,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.UnregisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
         }
     }
 
@@ -144,7 +144,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredPollResponseHandlers.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.RegisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
 
@@ -155,7 +155,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.UnregisterService(service: service)
+            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
         }
     }
 
@@ -171,13 +171,13 @@ class DefaultServiceManager implements ServiceManager {
                 "${registeredPersistenceServices.size()} persistence handlers, and " +
                 "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
 
-        registeredMonitors.each { missionControl << new MissionControlActor.RegisterService(service: it) }
-        registeredNotificationAgents.each { missionControl << new MissionControlActor.RegisterService(service: it) }
-        registeredPersistenceServices.each { missionControl << new MissionControlActor.RegisterService(service: it) }
-        registeredPollResponseHandlers.each { missionControl << new MissionControlActor.RegisterService(service: it) }
+        registeredMonitors.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
+        registeredNotificationAgents.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
+        registeredPersistenceServices.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
+        registeredPollResponseHandlers.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
 
         log.debug("Sleeping for 15 seconds...")
-        sleep(15000)
+        sleep(1000)
 
         log.debug("Sending instantiate monitors...")
         missionControl << new MissionControlActor.InstantiateMonitors()
@@ -195,10 +195,10 @@ class DefaultServiceManager implements ServiceManager {
                     "${registeredPersistenceServices.size()} persistence handlers, and " +
                     "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
 
-            registeredMonitors.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
-            registeredNotificationAgents.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
-            registeredPersistenceServices.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
-            registeredPollResponseHandlers.each { missionControl << new MissionControlActor.UnregisterService(service: it) }
+            registeredMonitors.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
+            registeredNotificationAgents.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
+            registeredPersistenceServices.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
+            registeredPollResponseHandlers.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
 
             log.debug("Shutting down mission control...")
             missionControl.stop()
@@ -216,102 +216,49 @@ class DefaultServiceManager implements ServiceManager {
 
     @Override
     void requestAllMonitorsPersist() {
-
-        if (missionControl?.isActive()) {
-
-            missionControl << new MissionControlActor.PersistRecords()
-        }
+        missionControl << new MissionControlActor.RequestPersistenceOfAllMonitorRecords()
     }
 
     @Override
-    List<MonitoredServiceWrapper> listMonitoredServices() {
+    List<MonitoredServiceWrapper> getMonitoredServices() {
         registeredMonitors.collect { new MonitoredServiceWrapper(it) }
     }
 
     @Override
-    List<RecordPersistenceServiceWrapper> listRecordPersistenceServices() {
-        registeredPersistenceServices.collect { new RecordPersistenceServiceWrapper(it) }
-    }
-
-    @Override
-    List<NotificationAgentWrapper> listNotificationAgents() {
+    List<NotificationAgentWrapper> getNotificationAgents() {
         registeredNotificationAgents.collect { new NotificationAgentWrapper(it) }
     }
 
     @Override
-    Statistics getNotificationAgentStatistics(String canonicalName) {
-
-        Statistics statistics
-
-        if (missionControl?.isActive()) {
-
-            def message = new NotificationAgentActor.GetStatistics(canonicalAgentName: canonicalName)
-            statistics = missionControl.sendAndWait(message)
-        }
-
-        statistics
-    }
-
-    @Override
-    List<PollResponseWrapper> listPollResponseHandlers() {
+    List<PollResponseWrapper> getPollResponseHandlers() {
         registeredPollResponseHandlers.collect { new PollResponseWrapper(it) }
     }
 
     @Override
-    Statistics getPollResponseHandlerStatistics(String canonicalName) {
-
-        Statistics statistics
-
-        if (missionControl?.isActive()) {
-
-            def message = new PollResponseHandlerActor.GetStatistics(canonicalResponseHandler: canonicalName)
-            statistics = missionControl.sendAndWait(message)
-        }
-
-        statistics
+    List<RecordPersistenceServiceWrapper> getRecordPersistenceServices() {
+        registeredPersistenceServices.collect { new RecordPersistenceServiceWrapper(it) }
     }
 
     @Override
-    List<String> listAlarmedMonitors() {
+    Optional<Statistics> getStatistics(String identifier, MissionControlActor.RecordType recordType) {
 
-        def alarmedMonitors = []
-
-        if (missionControl?.isActive()) {
-
-            alarmedMonitors = registeredMonitors.each {
-
-                def message = new MissionControlActor.GetRecords(canonicalMonitorName: it.class.name)
-                RecordHolder recordHolder = missionControl.sendAndWait(message) as RecordHolder
-
-                if (recordHolder.isAlarmed()) {
-                    alarmedMonitors.add(recordHolder.monitoredService)
-                }
-            }
-        }
-
-        alarmedMonitors
+        def message = new MissionControlActor.GetStatistics(identifier: identifier, recordType: recordType)
+        missionControl.sendAndWait(message)
     }
 
     @Override
-    RecordHolder getRecordHolder(String canonicalMonitorName) {
+    Optional<RecordHolder> getRecordHolder(String identifier) {
 
-        def recordHolder
-
-        if (missionControl?.isActive()) {
-
-            def message = new MissionControlActor.GetRecords(canonicalMonitorName: canonicalMonitorName)
-            recordHolder = missionControl.sendAndWait(message) as RecordHolder
-        }
-
-        recordHolder
+        def message = new MissionControlActor.GetRecords(identifier: identifier)
+        missionControl.sendAndWait(message)
     }
 
     @Override
-    void resetAlarm(String canonicalMonitorName) {
+    void resetAlarm(String identifier) {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MissionControlActor.ResetAlarm(canonicalMonitorName: canonicalMonitorName)
+            missionControl << new MissionControlActor.ResetAlarm(identifier: identifier)
         }
     }
 

@@ -63,7 +63,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>com.citytechinc.monitoring.extension.metaclass.Activator</Bundle-Activator>
+                        <Bundle-Activator>com.citytechinc.monitoring.Activator</Bundle-Activator>
                         <Export-Package>com.citytechinc.monitoring.*</Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Bundle-Category>citytech</Bundle-Category>
@@ -155,6 +155,11 @@
         </dependency>
 
         <!-- 3rd party -->
+        <dependency>
+            <groupId>com.citytechinc.cq</groupId>
+            <artifactId>cq-groovy-extension</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>

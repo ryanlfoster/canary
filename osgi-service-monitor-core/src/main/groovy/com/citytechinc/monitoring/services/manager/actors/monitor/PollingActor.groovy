@@ -23,7 +23,7 @@ class PollingActor extends DynamicDispatchActor {
             sender.send(service.poll())
         } catch (Exception e) {
 
-            log.error("An exception occurred while calling the monitored service: ${service.class.canonicalName}", e)
+            log.debug("An exception occurred while calling the monitored service: ${service.class.canonicalName}. Recording exception...", e)
             sender.send(PollResponse.EXCEPTION(e))
         }
     }

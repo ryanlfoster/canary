@@ -1,5 +1,6 @@
-package com.citytechinc.monitoring.extension.metaclass
+package com.citytechinc.monitoring
 
+import com.citytechinc.cq.groovy.extension.metaclass.GroovyExtensionMetaClassRegistry
 import org.osgi.framework.BundleActivator
 import org.osgi.framework.BundleContext
 
