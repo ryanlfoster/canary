@@ -66,7 +66,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    boolean persistWhenAlarmed() default false
+    boolean persistWhenAlarmed() default true
 
     /**
      *
