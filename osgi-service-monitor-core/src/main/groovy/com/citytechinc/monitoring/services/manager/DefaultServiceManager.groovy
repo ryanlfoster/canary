@@ -11,7 +11,6 @@ import com.citytechinc.monitoring.api.responsehandler.PollResponseWrapper
 import com.citytechinc.monitoring.constants.Constants
 import com.citytechinc.monitoring.services.jcrpersistence.RecordHolder
 import com.citytechinc.monitoring.services.manager.actors.MissionControlActor
-import com.citytechinc.monitoring.services.manager.actors.RecordPersistenceServiceActor
 import com.citytechinc.monitoring.services.manager.actors.monitor.MonitoredServiceActor
 import com.citytechinc.monitoring.services.manager.actors.Statistics
 import com.google.common.base.Optional
@@ -216,7 +215,7 @@ class DefaultServiceManager implements ServiceManager {
 
     @Override
     void requestAllMonitorsPersist() {
-        missionControl << new MissionControlActor.RequestPersistenceOfAllMonitorRecords()
+        missionControl << new MissionControlActor.RequestAllMonitorsPersist()
     }
 
     @Override
