@@ -1,0 +1,18 @@
+<canary = 'http://code.citytechinc.com/canary/'>
+
+[canary:MonitorServiceStorage]
+  + * (canary:RecordHolder)
+
+[canary:RecordHolder]
+  - lifetimeNumberOfPolls (long) mandatory
+  - lifetimeNumberOfFailures (long) mandatory
+  - lifetimeAverageProcessTime (long) mandatory
+  + * (canary:DetailedPollResponse)
+
+[canary:DetailedPollResponse]
+  - startTime (date) mandatory
+  - endTime (date) mandatory
+  - responseType (string) mandatory
+  - stackTrace (string)
+  - cleared (boolean) mandatory
+

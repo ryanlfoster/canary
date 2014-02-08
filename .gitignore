@@ -6,5 +6,4 @@
 .metadata
 .classpath
 .settings/
-osgi-service-monitor-core/target
-osgi-service-monitor-ui/target
+target/

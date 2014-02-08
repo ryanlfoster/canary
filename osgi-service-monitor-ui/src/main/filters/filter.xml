@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspaceFilter version="1.0">
-    <filter root="/apps/osgi-service-monitor">
-        <exclude pattern="/apps/osgi-service-monitor/install(/.*)?"/>
-    </filter>
-    <filter root="/etc/designs/osgi-service-monitor" >
-        <exclude pattern="/etc/designs/osgi-service-monitor/jcr:content(/.*)?"/>
-    </filter>
-</workspaceFilter>
