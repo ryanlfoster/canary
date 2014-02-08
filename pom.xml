@@ -179,7 +179,7 @@
                         <Bundle-Activator>com.citytechinc.canary.Activator</Bundle-Activator>
                         <Export-Package>com.citytechinc.canary.api.*</Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Bundle-Category>canary</Bundle-Category>
+                        <Bundle-Category>citytech</Bundle-Category>
                         <Sling-Nodetypes>SLING-INF/nodetypes/canary.cnd</Sling-Nodetypes>
                     </instructions>
                 </configuration>
