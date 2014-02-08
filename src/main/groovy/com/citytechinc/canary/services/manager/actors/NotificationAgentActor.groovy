@@ -2,6 +2,7 @@ package com.citytechinc.canary.services.manager.actors
 
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor

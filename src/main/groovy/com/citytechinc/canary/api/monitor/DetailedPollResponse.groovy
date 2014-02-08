@@ -1,6 +1,5 @@
 package com.citytechinc.canary.api.monitor
 
-import com.citytechinc.canary.api.monitor.PollResponseType
 import groovy.transform.AutoClone
 import groovy.transform.ToString
 
