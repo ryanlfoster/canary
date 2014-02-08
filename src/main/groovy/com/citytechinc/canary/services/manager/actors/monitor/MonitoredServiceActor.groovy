@@ -112,7 +112,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def schedulerJobKey = {
 
-        jobprefix + wrapper.canonicalMonitorName
+        jobprefix + wrapper.identifier
     }
 
     def oneTimeScheduleAutoResume = {

@@ -74,17 +74,17 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         def actor
 
-        if (message.type == GetStatistics.Type.NOTIFICATION_AGENT && notificationAgents.keySet().find { it.agent.class.canonicalName == message.identifier}) {
+        if (message.type == GetStatistics.Type.NOTIFICATION_AGENT && notificationAgents.keySet().find { it.identifier == message.identifier}) {
 
-            actor = notificationAgents.get(notificationAgents.keySet().find { it.agent.class.canonicalName == message.identifier })
+            actor = notificationAgents.get(notificationAgents.keySet().find { it.identifier == message.identifier })
 
-        } else if (message.type == GetStatistics.Type.POLL_RESPONSE_HANDLER && pollResponseHandlers.keySet().find { it.handler.class.canonicalName == message.identifier}) {
+        } else if (message.type == GetStatistics.Type.POLL_RESPONSE_HANDLER && pollResponseHandlers.keySet().find { it.identifier == message.identifier}) {
 
-            actor = pollResponseHandlers.get(pollResponseHandlers.keySet().find { it.handler.class.canonicalName == message.identifier })
+            actor = pollResponseHandlers.get(pollResponseHandlers.keySet().find { it.identifier == message.identifier })
 
-        } else if (message.type == GetStatistics.Type.RECORD_PERSISTENCE_SERVICE && recordPersistenceServices.keySet().find { it.service.class.canonicalName == message.identifier}) {
+        } else if (message.type == GetStatistics.Type.RECORD_PERSISTENCE_SERVICE && recordPersistenceServices.keySet().find { it.identifier == message.identifier}) {
 
-            actor = recordPersistenceServices.get(recordPersistenceServices.keySet().find { it.service.class.canonicalName == message.identifier })
+            actor = recordPersistenceServices.get(recordPersistenceServices.keySet().find { it.identifier == message.identifier })
         }
 
         Optional<Statistics> statistics
@@ -97,9 +97,9 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         def actor
 
-        if (monitors.keySet().find { it.monitor.class.canonicalName == message.identifier }) {
+        if (monitors.keySet().find { it.identifier == message.identifier }) {
 
-            actor = monitors.get(monitors.keySet().find { it.monitor.class.canonicalName == message.identifier })
+            actor = monitors.get(monitors.keySet().find { it.identifier == message.identifier })
         }
 
         Optional<RecordHolder> records
@@ -210,7 +210,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void onMessage(RequestMonitorResetIfAlarmed message) {
 
-        MonitoredServiceWrapper wrapper = monitors.keySet().find { it.monitor.class.canonicalName == message.identifier }
+        MonitoredServiceWrapper wrapper = monitors.keySet().find { it.identifier == message.identifier }
 
         if (wrapper) {
 
@@ -231,7 +231,7 @@ final class MissionControlActor extends DynamicDispatchActor {
         }
 
         // IF THE MONITOR DEFINITION STATES PERSISTENCE WHEN ALARMED, SEND RECORD HOLDERS TO PERSISTENCE SERVICES
-        if (monitors.keySet().find { it.canonicalMonitorName == message.canonicalMonitorName }?.definition?.persistWhenAlarmed()) {
+        if (monitors.keySet().find { it.identifier == message.canonicalMonitorName }?.definition?.persistWhenAlarmed()) {
 
             recordPersistenceServices.values().each { RecordPersistenceServiceActor actor ->
 
@@ -275,7 +275,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             log.debug("Polling ${persistenceWrapper.service.class} for records...")
 
-            persistenceActor.sendAndContinue(new RecordPersistenceServiceActor.GetPersistedRecord(identifier: wrapper.canonicalMonitorName), { Optional<RecordHolder> recordHolder ->
+            persistenceActor.sendAndContinue(new RecordPersistenceServiceActor.GetPersistedRecord(identifier: wrapper.identifier), { Optional<RecordHolder> recordHolder ->
 
                 log.debug("Received record ${recordHolder} from persistence service")
 

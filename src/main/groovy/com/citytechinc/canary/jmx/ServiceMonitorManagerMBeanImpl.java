@@ -120,7 +120,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     autoResume = "--";
                 }
 
-                final RecordHolder record = serviceManager.getRecordHolder(wrapper.getCanonicalMonitorName()).get();
+                final RecordHolder record = serviceManager.getRecordHolder(wrapper.getIdentifier()).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getMonitor().getClass().getCanonicalName(),

@@ -37,12 +37,12 @@ class RecordHolder {
 
     public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
 
-        return new RecordHolder(wrapper.canonicalMonitorName, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
+        return new RecordHolder(wrapper.identifier, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
     }
 
     public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<DetailedPollResponse> records) {
 
-        RecordHolder holder = new RecordHolder(wrapper.canonicalMonitorName, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
+        RecordHolder holder = new RecordHolder(wrapper.identifier, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
         records.each { holder.addRecord(it) }
 
         holder
@@ -73,17 +73,17 @@ class RecordHolder {
 
     Optional<Date> firstPoll() {
 
-        Optional<Date> firstPoll = records.empty ? Optional.absent() : Optional.of(records.peek().startTime)
+        records.empty ? Optional.absent() : Optional.of(records.peek().startTime)
     }
 
     Optional<Date> mostRecentPollDate() {
 
-        Optional<Date> mostRecentPollDate = records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().startTime)
+        records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().startTime)
     }
 
     Optional<PollResponseType> mostRecentPollResponse() {
 
-        Optional<PollResponseType> mostRecentPollResponse = records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().responseType)
+        records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().responseType)
     }
 
     Integer recordNumberOfPolls() {
@@ -126,15 +126,15 @@ class RecordHolder {
             alarmed = false
         } else {
 
-            final List<DetailedPollResponse> scrutizedRecords
+            final List<DetailedPollResponse> scrutinizedRecords
 
             if (getRecords().size() > alarmThreshold) {
-                scrutizedRecords = Lists.partition(getRecords().reverse(), alarmThreshold).first()
+                scrutinizedRecords = Lists.partition(getRecords().reverse(), alarmThreshold).first()
             } else {
-                scrutizedRecords = getRecords().reverse()
+                scrutinizedRecords = getRecords().reverse()
             }
 
-            alarmed = scrutizedRecords.findAll { it.responseType != PollResponseType.success }.findAll { !it.cleared }.size() > 0
+            alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.success }.findAll { !it.cleared }.size() > 0
         }
 
         alarmed

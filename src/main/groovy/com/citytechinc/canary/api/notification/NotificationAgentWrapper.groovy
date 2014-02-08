@@ -14,13 +14,15 @@ import java.util.concurrent.TimeUnit
 @EqualsAndHashCode
 public final class NotificationAgentWrapper {
 
-    final NotificationAgent agent
+    @Delegate final NotificationAgent agent
+    final String identifier
     final NotificationAgentDefinition definition
     final AggregateAlarms aggregateAlarms
     final Long aggregationWindowInMilliseconds
 
     public NotificationAgentWrapper(NotificationAgent agent) {
         this.agent = agent
+        identifier = agent.class.canonicalName
         definition = agent.getClass().getAnnotation(NotificationAgentDefinition.class)
         aggregateAlarms = agent.getClass().getAnnotation(AggregateAlarms.class)
 

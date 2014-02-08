@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit
 @EqualsAndHashCode
 public final class MonitoredServiceWrapper {
 
-    final MonitoredService monitor
-    final String canonicalMonitorName
+    @Delegate final MonitoredService monitor
+    final String identifier
     final MonitoredServiceDefinition definition
     final AutoResumingPoller autoResumingPollerDefinition
     final Long autoResumePollIntevalInMilliseconds
@@ -24,7 +24,7 @@ public final class MonitoredServiceWrapper {
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
         this.monitor = monitor
-        canonicalMonitorName = monitor.class.canonicalName
+        identifier = monitor.class.canonicalName
         definition = monitor.class.getAnnotation(MonitoredServiceDefinition)
         pollIntervalInSeconds = TimeUnit.SECONDS.convert(definition.pollInterval(), definition.pollIntervalUnit())
         pollMaxExecutionTimeInMillseconds = TimeUnit.MILLISECONDS.convert(definition.pollMaxExecutionTimeInSeconds(), TimeUnit.SECONDS)

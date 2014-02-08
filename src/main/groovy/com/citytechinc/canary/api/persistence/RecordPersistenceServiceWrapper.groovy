@@ -12,11 +12,13 @@ import groovy.transform.EqualsAndHashCode
 @EqualsAndHashCode
 public final class RecordPersistenceServiceWrapper {
 
-    final RecordPersistenceService service
+    @Delegate final RecordPersistenceService service
+    final String identifier
     final RecordPersistenceServiceDefinition definition
 
     public RecordPersistenceServiceWrapper(final RecordPersistenceService service) {
         this.service = service
+        identifier = service.class.canonicalName
         this.definition = service.getClass().getAnnotation(RecordPersistenceServiceDefinition.class)
     }
 }
