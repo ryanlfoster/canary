@@ -13,7 +13,8 @@ public interface PollResponseHandler {
 
     /**
      *
-     * @param serviceMonitorRecord
+     * @param identifer
+     * @param detailedPollResponse
      */
-    void handleResponse(String canonicalMonitorName, DetailedPollResponse serviceMonitorRecord)
+    void handleResponse(String identifer, DetailedPollResponse detailedPollResponse)
 }

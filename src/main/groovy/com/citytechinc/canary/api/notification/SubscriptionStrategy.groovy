@@ -9,5 +9,5 @@ package com.citytechinc.canary.api.notification
  */
 public enum SubscriptionStrategy {
 
-    all, opt_into, opt_out_of
+    ALL, OPT_INTO, OPT_OUT_OF
 }

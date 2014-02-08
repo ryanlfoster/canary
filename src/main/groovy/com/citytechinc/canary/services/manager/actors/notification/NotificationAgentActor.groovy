@@ -1,8 +1,10 @@
-package com.citytechinc.canary.services.manager.actors
+package com.citytechinc.canary.services.manager.actors.notification
 
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
+import com.citytechinc.canary.services.manager.actors.MissionControlActor
+import com.citytechinc.canary.services.manager.actors.Statistics
 import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
@@ -20,14 +22,14 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 final class NotificationAgentActor extends DynamicDispatchActor {
 
-    static String jobprefix = 'scheduled-notification-agent-flush-'
+    static String jobprefix = 'canaryna-'
 
     // MESSAGES
     static class FlushQueue { }
 
     NotificationAgentWrapper wrapper
     Scheduler scheduler
-    MissionControlActor missionControl
+    Statistics statistics = new Statistics()
 
     void afterStop() {
 
@@ -36,11 +38,17 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     Map<String, RecordHolder> queuedMessages = [:]
 
+    void onMessage(MissionControlActor.GetStatistics message) {
+        sender.send(statistics.clone())
+    }
+
     void onMessage(RecordHolder message) {
 
-        if (((wrapper.definition.strategy() == SubscriptionStrategy.opt_into) && (wrapper.definition.specifics().contains(message.canonicalMonitorName)))
-                || ((wrapper.definition.strategy() == SubscriptionStrategy.opt_out_of) && (!wrapper.definition.specifics().contains(message.canonicalMonitorName)))
-                || (wrapper.definition.strategy() == SubscriptionStrategy.all)) {
+        ++statistics.deliveredMessages
+
+        if (((wrapper.definition.strategy() == SubscriptionStrategy.OPT_INTO) && (wrapper.definition.specifics().contains(message.canonicalMonitorName)))
+                || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(message.canonicalMonitorName)))
+                || (wrapper.definition.strategy() == SubscriptionStrategy.ALL)) {
 
             handleMessage(message)
         }
@@ -51,22 +59,21 @@ final class NotificationAgentActor extends DynamicDispatchActor {
         log.debug("Flushing queue of size ${queuedMessages.size()}")
 
         Stopwatch stopwatch = Stopwatch.createStarted()
-        Boolean exceptionOccurred = false
 
         try {
+
             wrapper.agent.notify(queuedMessages.values() as List<RecordHolder>)
+            ++statistics.processedMessages
+
         } catch (Exception e) {
-            exceptionOccurred = true
+
             log.error("An exception occurred while flushing the message queue, calling the notification agent", e)
+            ++statistics.messageExceptions
         }
 
         queuedMessages.clear()
 
-        missionControl << new MissionControlActor.InternalProcessAccounting(
-                recordType: MissionControlActor.RecordType.NOTIFICATION_AGENT,
-                processTime: stopwatch.stop().elapsed(TimeUnit.MILLISECONDS),
-                identifier: wrapper.agent.class.canonicalName,
-                exceptionOccurred: exceptionOccurred)
+        statistics.addAndCalculateAverageProcessTime(stopwatch.stop().elapsed(TimeUnit.MILLISECONDS))
     }
 
     private handleMessage(RecordHolder message) {
@@ -91,20 +98,19 @@ final class NotificationAgentActor extends DynamicDispatchActor {
             log.debug("Aggregation undefined, sending message without delay...")
 
             Stopwatch stopwatch = Stopwatch.createStarted()
-            Boolean exceptionOccurred = false
 
             try {
+
                 wrapper.agent.notify([message])
+                ++statistics.processedMessages
+
             } catch (Exception e) {
-                exceptionOccurred = true
+
                 log.error("An exception occurred calling the notification agent", e)
+                ++statistics.messageExceptions
             }
 
-            missionControl << new MissionControlActor.InternalProcessAccounting(
-                    recordType: MissionControlActor.RecordType.NOTIFICATION_AGENT,
-                    processTime: stopwatch.stop().elapsed(TimeUnit.MILLISECONDS),
-                    identifier: wrapper.agent.class.canonicalName,
-                    exceptionOccurred: exceptionOccurred)
+            statistics.addAndCalculateAverageProcessTime(stopwatch.stop().elapsed(TimeUnit.MILLISECONDS))
         }
     }
 

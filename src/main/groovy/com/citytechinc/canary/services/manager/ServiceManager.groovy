@@ -26,7 +26,7 @@ public interface ServiceManager {
 
     public List<RecordPersistenceServiceWrapper> getRecordPersistenceServices()
 
-    public Optional<Statistics> getStatistics(String identifier, MissionControlActor.RecordType recordType)
+    public Optional<Statistics> getStatistics(String identifier, MissionControlActor.GetStatistics.Type type)
 
     public Optional<RecordHolder> getRecordHolder(String identifier)
 

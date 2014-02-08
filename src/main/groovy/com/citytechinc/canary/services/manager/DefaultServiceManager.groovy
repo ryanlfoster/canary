@@ -216,7 +216,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MonitoredServiceActor.Poll()
+            missionControl << new MissionControlActor.RequestAllMonitorsPoll()
         }
     }
 
@@ -246,9 +246,9 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
-    Optional<Statistics> getStatistics(String identifier, MissionControlActor.RecordType recordType) {
+    Optional<Statistics> getStatistics(String identifier, MissionControlActor.GetStatistics.Type type) {
 
-        def message = new MissionControlActor.GetStatistics(identifier: identifier, recordType: recordType)
+        def message = new MissionControlActor.GetStatistics(identifier: identifier, type: type)
         missionControl.sendAndWait(message)
     }
 
@@ -264,7 +264,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MissionControlActor.ResetAlarm(identifier: identifier)
+            missionControl << new MissionControlActor.RequestMonitorResetIfAlarmed(identifier: identifier)
         }
     }
 
@@ -273,7 +273,7 @@ class DefaultServiceManager implements ServiceManager {
 
         if (missionControl?.isActive()) {
 
-            missionControl << new MissionControlActor.ResetAlarm()
+            missionControl << new MissionControlActor.RequestAllMonitorsResetIfAlarmed()
         }
     }
 }

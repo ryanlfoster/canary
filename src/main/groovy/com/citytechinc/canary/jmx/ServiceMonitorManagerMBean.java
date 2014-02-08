@@ -30,13 +30,13 @@ public interface ServiceMonitorManagerMBean {
     @Description("Get records for a specific monitor")
     public TabularDataSupport getRecordsForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
 
-    @Description("Send poll request to all monitors")
+    @Description("Send poll request to ALL monitors")
     public void requestAllMonitorsPoll();
 
-    @Description("Send persistence request to all monitors")
+    @Description("Send persistence request to ALL monitors")
     public void requestAllMonitorsPersist();
 
-    @Description("Send alarm reset message to all monitors")
+    @Description("Send alarm reset message to ALL monitors")
     public void resetAllAlarms();
 
     @Description("Send alarm reset message to a specific monitor")

@@ -1,9 +1,11 @@
 package com.citytechinc.canary.services.manager.actors.monitor
 
+import com.citytechinc.canary.api.monitor.DetailedPollResponse
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.monitor.PollResponse
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
+import com.citytechinc.canary.services.manager.actors.responsehandler.PollResponseHandlerActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
@@ -20,18 +22,22 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 final class MonitoredServiceActor extends DynamicDispatchActor {
 
-    static String jobprefix = 'scheduled-monitor-'
+    static String jobprefix = 'canarymon-'
 
     // MESSAGES
     static class Poll {}
     static class AutoResumePolling {}
+    static class ResetAlarm { }
+    static class GetRecord { }
 
     MonitoredServiceWrapper wrapper
+    RecordHolder recordHolder
     Scheduler scheduler
     MissionControlActor missionControl
     PollingActor pollingActor
 
     void afterStart() {
+
         schedulePolling()
 
         pollingActor = new PollingActor(service: wrapper.monitor)
@@ -39,29 +45,52 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     }
 
     void afterStop() {
-        unschedulePolling()
 
+        unschedulePolling()
         pollingActor.terminate()
     }
 
 
     void onMessage(AutoResumePolling message) {
 
-        log.debug("Received message to auto resume polling. Scheduling normal polling...")
         schedulePolling()
+    }
+
+    void onMessage(GetRecord message) {
+
+        sender.send(recordHolder.clone())
+    }
+
+    void onMessage(ResetAlarm message) {
+
+        if (recordHolder.isAlarmed()) {
+
+            recordHolder.resetAlarm()
+            schedulePolling()
+        }
     }
 
     void onMessage(Poll message) {
 
-        def startTime = new Date()
-        PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.pollMaxExecutionTimeInMillseconds, TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
+        final Date startTime = new Date()
+        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.pollMaxExecutionTimeInMillseconds, TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
 
-        def detailedPollResponse = new DetailedPollResponse(startTime: startTime,
+        DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
                 responseType: pollResponse.pollResponseType,
                 stackTrace: pollResponse.exceptionStackTrace)
 
-        missionControl << new MissionControlActor.PollResponseReceipt(detailedPollResponse: detailedPollResponse, identifier: wrapper.canonicalMonitorName)
+        // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
+        recordHolder.addRecord(detailedPollResponse)
+
+        missionControl << new PollResponseHandlerActor.PollResponseReceipt(identifier: recordHolder.canonicalMonitorName, response: detailedPollResponse)
+
+        if (recordHolder.isAlarmed()) {
+
+            missionControl << recordHolder.clone()
+            unschedulePolling()
+            oneTimeScheduleAutoResume()
+        }
     }
 
     def schedulePolling = {
@@ -82,6 +111,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     }
 
     def schedulerJobKey = {
+
         jobprefix + wrapper.canonicalMonitorName
     }
 

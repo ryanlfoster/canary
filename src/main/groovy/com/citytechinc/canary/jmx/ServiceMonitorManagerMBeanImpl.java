@@ -180,7 +180,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgents()) {
 
-                final Statistics statistics = serviceManager.getStatistics(wrapper.getAgent().getClass().getCanonicalName(), MissionControlActor.RecordType.NOTIFICATION_AGENT).get();
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getAgent().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.NOTIFICATION_AGENT).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getAgent().getClass().getCanonicalName(),
@@ -231,7 +231,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             for (final PollResponseWrapper wrapper : serviceManager.getPollResponseHandlers()) {
 
-                final Statistics statistics = serviceManager.getStatistics(wrapper.getHandler().getClass().getCanonicalName(), MissionControlActor.RecordType.POLL_RESPONSE_HANDLER).get();
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getHandler().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.POLL_RESPONSE_HANDLER).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
@@ -280,7 +280,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServices()) {
 
-                final Statistics statistics = serviceManager.getStatistics(wrapper.getService().getClass().getCanonicalName(), MissionControlActor.RecordType.RECORD_PERSISTENCE_SERVICE).get();
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getService().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.RECORD_PERSISTENCE_SERVICE).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getService().getClass().getCanonicalName(),

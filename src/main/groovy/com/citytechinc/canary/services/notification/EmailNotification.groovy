@@ -30,7 +30,7 @@ import org.osgi.framework.Constants as OsgiConstants
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
-@NotificationAgentDefinition(strategy = SubscriptionStrategy.all)
+@NotificationAgentDefinition(strategy = SubscriptionStrategy.ALL)
 class EmailNotification implements NotificationAgent {
 
     @Reference
