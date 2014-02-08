@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/apps/canary">
+        <exclude pattern="/apps/canary/install(/.*)?"/>
+    </filter>
+    <filter root="/etc/designs/canary" >
+        <exclude pattern="/etc/designs/canary/jcr:content(/.*)?"/>
+    </filter>
+</workspaceFilter>
