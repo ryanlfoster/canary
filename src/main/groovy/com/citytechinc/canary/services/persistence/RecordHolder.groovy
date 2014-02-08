@@ -1,4 +1,4 @@
-package com.citytechinc.canary.services.jcrpersistence
+package com.citytechinc.canary.services.persistence
 
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.monitor.PollResponseType

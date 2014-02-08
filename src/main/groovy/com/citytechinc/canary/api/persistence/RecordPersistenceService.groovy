@@ -1,6 +1,6 @@
 package com.citytechinc.canary.api.persistence
 
-import com.citytechinc.canary.services.jcrpersistence.RecordHolder
+import com.citytechinc.canary.services.persistence.RecordHolder
 import com.google.common.base.Optional
 
 /**

@@ -1,4 +1,4 @@
-package com.citytechinc.canary.services.jcrpersistence
+package com.citytechinc.canary.services.persistence
 
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceDefinition
@@ -7,6 +7,7 @@ import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
+import org.apache.felix.scr.annotations.ConfigurationPolicy
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
@@ -25,8 +26,7 @@ import javax.jcr.Session
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-//@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
-@Component(immediate = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])

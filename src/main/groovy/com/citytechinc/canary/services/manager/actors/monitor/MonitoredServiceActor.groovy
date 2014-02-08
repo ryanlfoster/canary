@@ -2,7 +2,7 @@ package com.citytechinc.canary.services.manager.actors.monitor
 
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.monitor.PollResponse
-import com.citytechinc.canary.services.jcrpersistence.DetailedPollResponse
+import com.citytechinc.canary.services.persistence.DetailedPollResponse
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor

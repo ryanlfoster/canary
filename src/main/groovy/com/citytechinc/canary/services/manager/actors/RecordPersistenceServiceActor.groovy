@@ -1,7 +1,7 @@
 package com.citytechinc.canary.services.manager.actors
 
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
-import com.citytechinc.canary.services.jcrpersistence.RecordHolder
+import com.citytechinc.canary.services.persistence.RecordHolder
 import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor

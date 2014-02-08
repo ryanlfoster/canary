@@ -4,7 +4,7 @@ import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
-import com.citytechinc.canary.services.jcrpersistence.RecordHolder
+import com.citytechinc.canary.services.persistence.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
 import com.google.common.base.Optional

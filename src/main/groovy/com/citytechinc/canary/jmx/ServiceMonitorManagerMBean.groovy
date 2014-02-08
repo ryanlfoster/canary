@@ -1,9 +1,9 @@
-package com.citytechinc.canary.jmx;
+package com.citytechinc.canary.jmx
 
-import com.adobe.granite.jmx.annotation.Description;
-import com.adobe.granite.jmx.annotation.Name;
+import com.adobe.granite.jmx.annotation.Description
+import com.adobe.granite.jmx.annotation.Name
 
-import javax.management.openmbean.TabularDataSupport;
+import javax.management.openmbean.TabularDataSupport
 
 /**
  *
@@ -12,34 +12,34 @@ import javax.management.openmbean.TabularDataSupport;
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Description("CITYTECH OSGi Service Monitor Management and Reporting")
+@Description("CITYTECH, Inc. CQ Canary Framework Management and Reporting")
 public interface ServiceMonitorManagerMBean {
 
     @Description("Lists poll response handlers and statistics")
-    public TabularDataSupport getMonitors();
+    public TabularDataSupport getMonitors()
 
     @Description("Lists notification agents and statistics")
-    public TabularDataSupport getNotificationAgents();
+    public TabularDataSupport getNotificationAgents()
 
     @Description("Lists poll response handlers and statistics")
-    public TabularDataSupport getPollResponseHandlers();
+    public TabularDataSupport getPollResponseHandlers()
 
     @Description("Lists registered poll response handlers and statistics")
-    public TabularDataSupport getRecordPersistenceServices();
+    public TabularDataSupport getRecordPersistenceServices()
 
     @Description("Get records for a specific monitor")
-    public TabularDataSupport getRecordsForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
+    public TabularDataSupport getRecordsForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService)
 
     @Description("Send poll request to all monitors")
-    public void requestAllMonitorsPoll();
+    public void requestAllMonitorsPoll()
 
     @Description("Send persistence request to all monitors")
-    public void requestAllMonitorsPersist();
+    public void requestAllMonitorsPersist()
 
     @Description("Send alarm reset message to all monitors")
-    public void resetAllAlarms();
+    public void resetAllAlarms()
 
     @Description("Send alarm reset message to a specific monitor")
-    public void resetAlarm(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
+    public void resetAlarm(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService)
 
 }
