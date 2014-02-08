@@ -1,6 +1,6 @@
 package com.citytechinc.canary.servlets
 
-import com.citytechinc.canary.constants.ServiceConstants
+import com.citytechinc.canary.constants.Constants
 import org.apache.sling.api.SlingHttpServletResponse
 import org.apache.sling.api.servlets.SlingAllMethodsServlet
 import org.codehaus.jackson.JsonFactory
@@ -33,13 +33,13 @@ public abstract class AbstractJSONResponseServlet extends SlingAllMethodsServlet
      * @param object object to be written as JSON
      */
     protected final void writeJsonResponse(final SlingHttpServletResponse response, final Object object) {
-        writeJsonResponseWithEnums(response, object, false, ServiceConstants.ABSTRACT_JSON_RESPONSE_SERVLET_DEFAULT_DATE_FORMAT)
+        writeJsonResponseWithEnums(response, object, false, Constants.ABSTRACT_JSON_RESPONSE_SERVLET_DEFAULT_DATE_FORMAT)
     }
 
     private void writeJsonResponseWithEnums(final SlingHttpServletResponse response, final Object object,
                                             final boolean useStrings, final String dateFormat) {
-        response.setContentType(ServiceConstants.ABSTRACT_JSON_RESPONSE_SERVLET_CONTENT_TYPE)
-        response.setCharacterEncoding(ServiceConstants.ABSTRACT_JSON_RESPONSE_SERVLET_CHARACTER_ENCODING)
+        response.setContentType(Constants.ABSTRACT_JSON_RESPONSE_SERVLET_CONTENT_TYPE)
+        response.setCharacterEncoding(Constants.ABSTRACT_JSON_RESPONSE_SERVLET_CHARACTER_ENCODING)
 
         try {
 
