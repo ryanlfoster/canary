@@ -1,7 +1,5 @@
-package com.citytechinc.canary.services.persistence
+package com.citytechinc.canary.api.monitor
 
-import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
-import com.citytechinc.canary.api.monitor.PollResponseType
 import com.google.common.base.Optional
 import com.google.common.collect.Lists
 import com.google.common.collect.Queues

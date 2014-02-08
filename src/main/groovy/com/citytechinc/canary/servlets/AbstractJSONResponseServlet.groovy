@@ -1,6 +1,6 @@
 package com.citytechinc.canary.servlets
 
-import com.citytechinc.canary.constants.Constants
+import com.citytechinc.canary.Constants
 import org.apache.sling.api.SlingHttpServletResponse
 import org.apache.sling.api.servlets.SlingAllMethodsServlet
 import org.codehaus.jackson.JsonFactory

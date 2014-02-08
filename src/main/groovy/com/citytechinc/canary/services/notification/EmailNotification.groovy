@@ -3,8 +3,8 @@ package com.citytechinc.canary.services.notification
 import com.citytechinc.canary.api.notification.NotificationAgent
 import com.citytechinc.canary.api.notification.NotificationAgentDefinition
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
-import com.citytechinc.canary.constants.Constants
-import com.citytechinc.canary.services.persistence.RecordHolder
+import com.citytechinc.canary.Constants
+import com.citytechinc.canary.api.monitor.RecordHolder
 import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate

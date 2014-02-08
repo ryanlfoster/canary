@@ -1,4 +1,4 @@
-package com.citytechinc.canary.constants
+package com.citytechinc.canary
 
 import org.apache.commons.lang.time.FastDateFormat
 

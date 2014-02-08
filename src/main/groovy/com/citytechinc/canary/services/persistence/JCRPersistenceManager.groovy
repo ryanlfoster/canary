@@ -1,8 +1,10 @@
 package com.citytechinc.canary.services.persistence
 
+import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceDefinition
-import com.citytechinc.canary.constants.Constants
+import com.citytechinc.canary.Constants
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate

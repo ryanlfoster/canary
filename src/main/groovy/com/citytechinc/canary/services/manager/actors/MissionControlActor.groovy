@@ -8,8 +8,8 @@ import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandler
 import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
-import com.citytechinc.canary.services.persistence.DetailedPollResponse
-import com.citytechinc.canary.services.persistence.RecordHolder
+import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.monitor.MonitoredServiceActor
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j

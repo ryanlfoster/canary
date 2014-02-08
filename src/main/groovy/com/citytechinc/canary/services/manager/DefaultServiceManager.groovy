@@ -8,8 +8,8 @@ import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandler
 import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
-import com.citytechinc.canary.constants.Constants
-import com.citytechinc.canary.services.persistence.RecordHolder
+import com.citytechinc.canary.Constants
+import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
 import com.citytechinc.canary.services.manager.actors.monitor.MonitoredServiceActor

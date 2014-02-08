@@ -1,6 +1,6 @@
 package com.citytechinc.canary.api.notification
 
-import com.citytechinc.canary.services.persistence.RecordHolder
+import com.citytechinc.canary.api.monitor.RecordHolder
 
 /**
  *

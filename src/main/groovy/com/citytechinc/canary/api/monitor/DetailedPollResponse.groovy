@@ -1,4 +1,4 @@
-package com.citytechinc.canary.services.persistence
+package com.citytechinc.canary.api.monitor
 
 import com.citytechinc.canary.api.monitor.PollResponseType
 import groovy.transform.AutoClone

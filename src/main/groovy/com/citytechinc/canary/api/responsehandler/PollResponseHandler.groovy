@@ -1,6 +1,6 @@
 package com.citytechinc.canary.api.responsehandler
 
-import com.citytechinc.canary.services.persistence.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.DetailedPollResponse
 
 /**
  *
