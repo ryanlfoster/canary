@@ -46,12 +46,12 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
 
             try {
 
-                wrapper.handler.handleResponse(message.identifier, message.response)
+                wrapper.handleResponse(message.identifier, message.response)
                 ++statistics.processedMessages
 
             } catch (Exception e) {
 
-                log.error("An exception occurred calling the poll response handler: ${wrapper.handler.class.canonicalName}", e)
+                log.error("An exception occurred calling the poll response handler: ${wrapper.identifier}", e)
                 ++statistics.messageExceptions
             }
 

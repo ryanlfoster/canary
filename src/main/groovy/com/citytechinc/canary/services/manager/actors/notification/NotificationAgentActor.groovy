@@ -33,7 +33,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     void afterStop() {
 
-        scheduler.removeJob(jobprefix + wrapper.agent.class.name)
+        scheduler.removeJob(jobprefix + wrapper.identifier)
     }
 
     Map<String, RecordHolder> queuedMessages = [:]
@@ -62,7 +62,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         try {
 
-            wrapper.agent.notify(queuedMessages.values() as List<RecordHolder>)
+            wrapper.notify(queuedMessages.values() as List<RecordHolder>)
             ++statistics.processedMessages
 
         } catch (Exception e) {
@@ -83,7 +83,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
             if (queuedMessages.isEmpty()) {
 
                 Date now = new Date()
-                scheduler.fireJobAt(jobprefix + wrapper.agent.class.name, {
+                scheduler.fireJobAt(jobprefix + wrapper.identifier, {
 
                     this << new FlushQueue()
 
@@ -101,7 +101,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             try {
 
-                wrapper.agent.notify([message])
+                wrapper.notify([message])
                 ++statistics.processedMessages
 
             } catch (Exception e) {
