@@ -40,7 +40,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
         schedulePolling()
 
-        pollingActor = new PollingActor(service: wrapper.monitor)
+        pollingActor = new PollingActor(wrapper: wrapper)
         pollingActor.start()
     }
 
