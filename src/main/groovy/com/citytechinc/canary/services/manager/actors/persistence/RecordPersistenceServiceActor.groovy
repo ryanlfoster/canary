@@ -67,7 +67,7 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
 
         } catch (Exception e) {
 
-            log.error("An exception occurred attempting to persist record holder for service: ${message.recordHolder.canonicalMonitorName} via persistence service: ${wrapper.identifier}", e)
+            log.error("An exception occurred attempting to persist record holder for service: ${message.recordHolder.monitorIdentifier} via persistence service: ${wrapper.identifier}", e)
             ++statistics.messageExceptions
         }
 

@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    int maxPollHistoryEntries() default 50
+    int maxNumberOfRecords() default 50
 
     /**
      *

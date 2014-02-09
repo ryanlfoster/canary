@@ -29,6 +29,8 @@ import org.apache.sling.commons.osgi.PropertiesUtil
 import org.apache.sling.commons.scheduler.Scheduler
 import org.osgi.framework.Constants as OsgiConstants
 
+import java.util.concurrent.TimeUnit
+
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -80,9 +82,9 @@ class DefaultServiceManager implements ServiceManager {
             unbind = 'unbindPollResponseHandler')
     private List<PollResponseHandler> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
 
-    @Property(label = "Mission Control Monitor Actor Timeout", intValue = 15, description = "The number of seconds the activate block of this service will sleep before issuing a message to the Mission Control actor informing it to instantiate monitor actors.")
+    @Property(label = "Mission Control Monitor Actor Timeout", longValue = 15L, description = "The number of seconds the activate block of this service will sleep before issuing a message to the Mission Control actor informing it to instantiate monitor actors.")
     private static final String MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT = 'missionControlMonitorActorTimeout'
-    private Integer missionControlMonitorActorTimeout;
+    private Long missionControlMonitorActorTimeout;
 
     void bindMonitor(final MonitoredService service) {
         registeredMonitors.add(service)
@@ -166,24 +168,24 @@ class DefaultServiceManager implements ServiceManager {
     @Activate
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        missionControlMonitorActorTimeout = PropertiesUtil.toInteger(properties.get(MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT), 15)
+        missionControlMonitorActorTimeout = TimeUnit.MILLISECONDS.convert(PropertiesUtil.toLong(properties.get(MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT), 15), TimeUnit.SECONDS)
 
         log.debug('Starting mission control...')
         missionControl = new MissionControlActor(scheduler: scheduler)
         missionControl.start()
 
-        log.debug("Registering ${registeredMonitors.size()} monitors, " +
+        log.debug("Sleeping for ${missionControlMonitorActorTimeout} seconds...")
+        sleep(missionControlMonitorActorTimeout)
+
+        log.info("Registering ${registeredMonitors.size()} monitors, " +
                 "${registeredNotificationAgents.size()} notification agents, " +
                 "${registeredPersistenceServices.size()} persistence handlers, and " +
                 "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
 
+        registeredPersistenceServices.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
         registeredMonitors.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
         registeredNotificationAgents.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
-        registeredPersistenceServices.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
         registeredPollResponseHandlers.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
-
-        log.debug("Sleeping for ${missionControlMonitorActorTimeout} seconds...")
-        sleep(missionControlMonitorActorTimeout)
 
         log.debug('Sending instantiate monitors...')
         missionControl << new MissionControlActor.InstantiateMonitors()

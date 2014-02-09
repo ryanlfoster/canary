@@ -46,8 +46,8 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         ++statistics.deliveredMessages
 
-        if (((wrapper.definition.strategy() == SubscriptionStrategy.OPT_INTO) && (wrapper.definition.specifics().contains(message.canonicalMonitorName)))
-                || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(message.canonicalMonitorName)))
+        if (((wrapper.definition.strategy() == SubscriptionStrategy.OPT_INTO) && (wrapper.definition.specifics().contains(message.monitorIdentifier)))
+                || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(message.monitorIdentifier)))
                 || (wrapper.definition.strategy() == SubscriptionStrategy.ALL)) {
 
             handleMessage(message)
@@ -91,7 +91,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
             }
 
             log.debug("Adding message to queue with size of ${queuedMessages.size()}")
-            queuedMessages.put(message.canonicalMonitorName, message)
+            queuedMessages.put(message.monitorIdentifier, message)
 
         } else {
 

@@ -2,7 +2,6 @@ package com.citytechinc.canary.api.monitor
 
 import com.google.common.base.Optional
 import com.google.common.collect.Lists
-import com.google.common.collect.Queues
 import groovy.transform.AutoClone
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
@@ -19,34 +18,13 @@ import groovy.util.logging.Slf4j
 @AutoClone
 class RecordHolder {
 
-    final Queue<DetailedPollResponse> records = [] as Queue
-    final String canonicalMonitorName
-    final Integer alarmThreshold
-    final Integer maxNumberOfRecords
+    Queue<DetailedPollResponse> records = [] as Queue
+    String monitorIdentifier
+    Integer alarmThreshold
+    Integer maxNumberOfRecords
 
     Integer lifetimeNumberOfPolls = 0
     Integer lifetimeNumberOfFailures = 0
-
-    private RecordHolder(String canonicalMonitorName, Integer maxNumberOfRecords, Integer alarmThreshold) {
-        this.canonicalMonitorName = canonicalMonitorName
-        this.alarmThreshold = alarmThreshold
-        this.maxNumberOfRecords = maxNumberOfRecords
-
-        records = Queues.newArrayBlockingQueue(maxNumberOfRecords)
-    }
-
-    public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
-
-        return new RecordHolder(wrapper.identifier, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
-    }
-
-    public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<DetailedPollResponse> records) {
-
-        RecordHolder holder = new RecordHolder(wrapper.identifier, wrapper.definition.maxPollHistoryEntries(), wrapper.definition.alarmThreshold())
-        records.each { holder.addRecord(it) }
-
-        holder
-    }
 
     void addRecord(DetailedPollResponse record) {
 

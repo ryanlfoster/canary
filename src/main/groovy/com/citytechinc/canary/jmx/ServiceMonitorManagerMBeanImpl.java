@@ -126,7 +126,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                         wrapper.getMonitor().getClass().getCanonicalName(),
                         wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
                         wrapper.getDefinition().alarmThreshold(),
-                        wrapper.getDefinition().maxPollHistoryEntries(),
+                        wrapper.getDefinition().maxNumberOfRecords(),
                         wrapper.getDefinition().persistWhenAlarmed(),
                         wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
                         autoResume,

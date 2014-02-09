@@ -1,10 +1,13 @@
 package com.citytechinc.canary.services.persistence
 
 import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
+import com.citytechinc.canary.api.monitor.PollResponseType
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceDefinition
 import com.citytechinc.canary.Constants
+import com.citytechinc.canary.services.manager.ServiceManager
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -28,7 +31,8 @@ import javax.jcr.Session
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
+//@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
+@Component(immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
@@ -41,6 +45,9 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
     @Reference
     ResourceResolverFactory resolverFactory
+
+    @Reference
+    ServiceManager serviceManager
 
     @Activate
     @Modified
@@ -62,7 +69,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
     @Override
     void persistRecordHolder(RecordHolder recordHolder) {
 
-        log.debug("Persiting data for monitor: ${recordHolder.canonicalMonitorName}")
+        log.debug("Persiting data for monitor: ${recordHolder.monitorIdentifier}")
 
         def session
 
@@ -70,7 +77,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
             session = slingRepository.loginAdministrative(null)
 
-            def nodePath = Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + recordHolder.canonicalMonitorName
+            def nodePath = Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + recordHolder.monitorIdentifier
 
             if (session.nodeExists(nodePath)) {
 
@@ -84,7 +91,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
             def rootStorageNode = session.getNode(Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH)
 
             // CREATE A NEW NODE FOR THE MONITOR
-            def recordHolderNode = rootStorageNode.addNode(recordHolder.canonicalMonitorName, Constants.JCR_NODE_TYPE_RECORD_HOLDER)
+            def recordHolderNode = rootStorageNode.addNode(recordHolder.monitorIdentifier, Constants.JCR_NODE_TYPE_RECORD_HOLDER)
 
             recordHolderNode.set('lifetimeAverageProcessTime', 0L)
             recordHolderNode.set('lifetimeNumberOfPolls', recordHolder.lifetimeNumberOfPolls as Long)
@@ -111,7 +118,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
         } catch (Exception e) {
 
-            log.error("An error occurred while attempting to persist the record holder for service ${recordHolder.canonicalMonitorName}", e)
+            log.error("An error occurred while attempting to persist the record holder for service ${recordHolder.monitorIdentifier}", e)
 
         } finally {
 
@@ -120,8 +127,56 @@ class JCRPersistenceManager implements RecordPersistenceService {
     }
 
     @Override
-    Optional<RecordHolder> getRecordHolder(String monitorClass) {
+    Optional<RecordHolder> getRecordHolder(String identifier) {
 
-        Optional.absent()
+        def optionalRecordHolder = Optional.absent()
+        def session
+
+        try {
+
+            session = slingRepository.loginAdministrative(null)
+
+            def nodePath = Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + identifier
+
+            if (session.nodeExists(nodePath)) {
+
+                def node = session.getNode(nodePath)
+
+                MonitoredServiceWrapper wrapper = serviceManager.getMonitoredServices().find { it.identifier == identifier }
+
+                RecordHolder recordHolder = new RecordHolder(monitorIdentifier: identifier,
+                        alarmThreshold: wrapper.definition.alarmThreshold(),
+                        maxNumberOfRecords: wrapper.definition.maxNumberOfRecords(),
+                        lifetimeNumberOfPolls: node.get('lifetimeNumberOfPolls'),
+                        lifetimeNumberOfFailures: node.get('lifetimeNumberOfFailures'))
+
+                node.recurse(Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE) { Node pollResponseNode ->
+
+                    def startTime = pollResponseNode.get('startTime').getTime()
+                    def endTime = pollResponseNode.get('endTime').getTime()
+                    def responseType = pollResponseNode.get('responseType') as PollResponseType
+                    def stackTrace = pollResponseNode.get('stackTrace')
+                    def cleared = pollResponseNode.get('cleared') as Boolean
+
+                    recordHolder.addRecord(new DetailedPollResponse(startTime: startTime,
+                            endTime: endTime,
+                            responseType: responseType,
+                            stackTrace: stackTrace,
+                            cleared: cleared))
+                }
+
+                optionalRecordHolder = Optional.of(recordHolder)
+            }
+
+        } catch (Exception e) {
+
+            log.error("An error occurred while attempting to read records for service ${identifier}", e)
+
+        } finally {
+
+            session?.logout()
+        }
+
+        optionalRecordHolder
     }
 }

@@ -68,7 +68,7 @@ final class MissionControlActor extends DynamicDispatchActor {
     Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
     Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
-    Boolean hasPassedMonitorActorInstantiationTimeout = false
+    Boolean initialInstantiationOfActorsHasOccurred = false
 
     void onMessage(GetStatistics message) {
 
@@ -112,7 +112,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         log.debug("Starting ${monitors.size()} monitors...")
 
-        hasPassedMonitorActorInstantiationTimeout = true
+        initialInstantiationOfActorsHasOccurred = true
 
         monitors.keySet().each { MonitoredServiceWrapper wrapper ->
 
@@ -128,7 +128,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             if (message.isRegistration && !monitors.containsKey(wrapper)) {
 
-                if (hasPassedMonitorActorInstantiationTimeout) {
+                if (initialInstantiationOfActorsHasOccurred) {
                     instantiateMonitoredServiceActor(wrapper)
                 } else {
                     monitors.put(wrapper, null)
@@ -231,7 +231,7 @@ final class MissionControlActor extends DynamicDispatchActor {
         }
 
         // IF THE MONITOR DEFINITION STATES PERSISTENCE WHEN ALARMED, SEND RECORD HOLDERS TO PERSISTENCE SERVICES
-        if (monitors.keySet().find { it.identifier == message.canonicalMonitorName }?.definition?.persistWhenAlarmed()) {
+        if (monitors.keySet().find { it.identifier == message.monitorIdentifier }?.definition?.persistWhenAlarmed()) {
 
             recordPersistenceServices.values().each { RecordPersistenceServiceActor actor ->
 
@@ -257,7 +257,7 @@ final class MissionControlActor extends DynamicDispatchActor {
             MonitoredServiceActor actor
 
             // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
-            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
+            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new RecordHolder(monitorIdentifier: wrapper.identifier, alarmThreshold: wrapper.definition.alarmThreshold(), maxNumberOfRecords: wrapper.definition.maxNumberOfRecords()))
             actor.start()
 
             monitors.put(wrapper, actor)
@@ -286,7 +286,7 @@ final class MissionControlActor extends DynamicDispatchActor {
                     actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
                 } else {
 
-                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new RecordHolder(monitorIdentifier: wrapper.identifier, alarmThreshold: wrapper.definition.alarmThreshold(), maxNumberOfRecords: wrapper.definition.maxNumberOfRecords()))
                 }
 
                 actor.start()
