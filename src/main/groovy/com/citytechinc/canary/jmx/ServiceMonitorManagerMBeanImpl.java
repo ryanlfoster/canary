@@ -26,6 +26,7 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
+import javax.swing.text.html.Option;
 import java.util.Arrays;
 
 /**
@@ -120,25 +121,30 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     autoResume = "--";
                 }
 
-                final RecordHolder record = serviceManager.getRecordHolder(wrapper.getIdentifier()).get();
+                final Optional<RecordHolder> optionalRecord = serviceManager.getRecordHolder(wrapper.getIdentifier());
 
-                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getMonitor().getClass().getCanonicalName(),
-                        wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
-                        wrapper.getDefinition().alarmThreshold(),
-                        wrapper.getDefinition().maxNumberOfRecords(),
-                        wrapper.getDefinition().persistWhenAlarmed(),
-                        wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
-                        autoResume,
-                        record.isAlarmed(),
-                        record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
-                        record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
-                        record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
-                        record.averagePollExecutionTime(),
-                        record.recordNumberOfPolls(),
-                        record.recordNumberOfFailures(),
-                        record.getLifetimeNumberOfPolls(),
-                        record.getLifetimeNumberOfFailures()}));
+                if (optionalRecord.isPresent()) {
+
+                    final RecordHolder record = optionalRecord.get();
+
+                    tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                            wrapper.getMonitor().getClass().getCanonicalName(),
+                            wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
+                            wrapper.getDefinition().alarmThreshold(),
+                            wrapper.getDefinition().maxNumberOfRecords(),
+                            wrapper.getDefinition().persistWhenAlarmed(),
+                            wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
+                            autoResume,
+                            record.isAlarmed(),
+                            record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
+                            record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
+                            record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
+                            record.averagePollExecutionTime(),
+                            record.recordNumberOfPolls(),
+                            record.recordNumberOfFailures(),
+                            record.getLifetimeNumberOfPolls(),
+                            record.getLifetimeNumberOfFailures()}));
+                }
             }
 
         } catch (final Exception exception) {
