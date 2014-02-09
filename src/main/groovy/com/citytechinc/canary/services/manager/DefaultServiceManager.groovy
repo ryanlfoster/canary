@@ -12,7 +12,6 @@ import com.citytechinc.canary.Constants
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
-import com.citytechinc.canary.services.manager.actors.monitor.MonitoredServiceActor
 import com.google.common.base.Optional
 import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
@@ -28,8 +27,6 @@ import org.apache.felix.scr.annotations.Service
 import org.apache.sling.commons.osgi.PropertiesUtil
 import org.apache.sling.commons.scheduler.Scheduler
 import org.osgi.framework.Constants as OsgiConstants
-
-import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -83,7 +80,7 @@ class DefaultServiceManager implements ServiceManager {
     private List<PollResponseHandler> registeredPollResponseHandlers = Lists.newCopyOnWriteArrayList()
 
     @Property(label = "Mission Control Monitor Actor Timeout", longValue = 15L, description = "The number of seconds the activate block of this service will sleep before issuing a message to the Mission Control actor informing it to instantiate monitor actors.")
-    private static final String MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT = 'missionControlMonitorActorTimeout'
+    private static final String MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT = 'instantiateActorMessageTimeout'
     private Long missionControlMonitorActorTimeout;
 
     void bindMonitor(final MonitoredService service) {
@@ -168,13 +165,11 @@ class DefaultServiceManager implements ServiceManager {
     @Activate
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        missionControlMonitorActorTimeout = TimeUnit.MILLISECONDS.convert(PropertiesUtil.toLong(properties.get(MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT), 15), TimeUnit.SECONDS)
+        missionControlMonitorActorTimeout = PropertiesUtil.toLong(properties.get(MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT), 15)
 
-        log.debug('Starting mission control...')
-        missionControl = new MissionControlActor(scheduler: scheduler)
+        missionControl = new MissionControlActor(scheduler: scheduler, instantiateActorMessageTimeout: missionControlMonitorActorTimeout)
         missionControl.start()
 
-        log.debug("Sleeping for ${missionControlMonitorActorTimeout} seconds...")
         sleep(missionControlMonitorActorTimeout)
 
         log.info("Registering ${registeredMonitors.size()} monitors, " +
@@ -186,11 +181,6 @@ class DefaultServiceManager implements ServiceManager {
         registeredMonitors.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
         registeredNotificationAgents.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
         registeredPollResponseHandlers.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
-
-        log.debug('Sending instantiate monitors...')
-        missionControl << new MissionControlActor.InstantiateMonitors()
-
-        log.debug('Mission control started')
     }
 
     @Deactivate

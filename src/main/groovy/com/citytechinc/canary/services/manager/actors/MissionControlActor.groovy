@@ -18,6 +18,8 @@ import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
 
+import java.util.concurrent.TimeUnit
+
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -27,6 +29,8 @@ import org.apache.sling.commons.scheduler.Scheduler
  */
 @Slf4j
 final class MissionControlActor extends DynamicDispatchActor {
+
+    final static String SCHEDULER_KEY = 'canarymisc-'
 
     // MESSAGES
 
@@ -62,6 +66,7 @@ final class MissionControlActor extends DynamicDispatchActor {
     }
 
     Scheduler scheduler
+    Long instantiateActorMessageTimeout
 
     Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
     Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
@@ -69,6 +74,18 @@ final class MissionControlActor extends DynamicDispatchActor {
     Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
     Boolean initialInstantiationOfActorsHasOccurred = false
+
+    void afterStart() {
+
+        log.debug("Adding scheduled job defined under the key: ${schedulerJobKey()}")
+
+        final Date now = new Date()
+        scheduler.fireJobAt(SCHEDULER_KEY, {
+
+            this << new InstantiateMonitors()
+
+        }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(instantiateActorMessageTimeout, TimeUnit.SECONDS)))
+    }
 
     void onMessage(GetStatistics message) {
 

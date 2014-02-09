@@ -18,7 +18,6 @@ import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
-import org.apache.sling.api.resource.ResourceResolverFactory
 import org.apache.sling.jcr.api.SlingRepository
 import org.osgi.framework.Constants as OsgiConstants
 
@@ -42,9 +41,6 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
     @Reference
     SlingRepository slingRepository
-
-    @Reference
-    ResourceResolverFactory resolverFactory
 
     @Reference
     ServiceManager serviceManager
@@ -150,7 +146,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
                         lifetimeNumberOfPolls: node.get('lifetimeNumberOfPolls'),
                         lifetimeNumberOfFailures: node.get('lifetimeNumberOfFailures'))
 
-                node.recurse(Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE) { Node pollResponseNode ->
+                node.recurse(Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE) { pollResponseNode ->
 
                     def startTime = pollResponseNode.get('startTime').getTime()
                     def endTime = pollResponseNode.get('endTime').getTime()
