@@ -1,4 +1,4 @@
-package com.citytechinc.canary.services.manager.actors.persistence
+package com.citytechinc.canary.services.manager.actors
 
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
@@ -47,11 +47,14 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
 
         } catch (Exception e) {
 
-            log.error("An EXCEPTION occurred attempting to retrieve record holder for service: ${message.identifier} via persistence service: ${wrapper.identifier}", e)
+            log.error("An exception occurred attempting to retrieve record holder for service: ${message.identifier} via persistence service: ${wrapper.identifier}", e)
             ++statistics.messageExceptions
         }
 
-        statistics.addAndCalculateAverageProcessTime(stopwatch.stop().elapsed(TimeUnit.MILLISECONDS))
+        Long processTime = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)
+        log.debug("It took ${processTime} ms to retrieve record holder for service ${message.identifier} via persistence service ${wrapper.identifier}")
+
+        statistics.addAndCalculateAverageProcessTime(processTime)
     }
 
     void onMessage(PersistRecord message) {
@@ -67,11 +70,14 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
 
         } catch (Exception e) {
 
-            log.error("An EXCEPTION occurred attempting to persist record holder for service: ${message.recordHolder.monitorIdentifier} via persistence service: ${wrapper.identifier}", e)
+            log.error("An exception occurred attempting to persist record holder for service: ${message.recordHolder.monitorIdentifier} via persistence service: ${wrapper.identifier}", e)
             ++statistics.messageExceptions
         }
 
-        statistics.addAndCalculateAverageProcessTime(stopwatch.stop().elapsed(TimeUnit.MILLISECONDS))
+        Long processTime = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)
+        log.debug("It took ${processTime} ms to persist record holder for service ${message.recordHolder.monitorIdentifier} via persistence service ${wrapper.identifier}")
+
+        statistics.addAndCalculateAverageProcessTime(processTime)
     }
 }
 

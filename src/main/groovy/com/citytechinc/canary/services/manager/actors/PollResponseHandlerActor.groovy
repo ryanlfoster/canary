@@ -1,4 +1,4 @@
-package com.citytechinc.canary.services.manager.actors.responsehandler
+package com.citytechinc.canary.services.manager.actors
 
 import com.citytechinc.canary.api.monitor.DetailedPollResponse
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
@@ -51,11 +51,14 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
 
             } catch (Exception e) {
 
-                log.error("An EXCEPTION occurred calling the poll response handler: ${wrapper.identifier}", e)
+                log.error("An exception occurred calling the poll response handler: ${wrapper.identifier} for monitored service ${message.identifier}", e)
                 ++statistics.messageExceptions
             }
 
-            statistics.addAndCalculateAverageProcessTime(stopwatch.stop().elapsed(TimeUnit.MILLISECONDS))
+            Long processTime = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)
+            log.debug("It took ${processTime} ms to calling the poll response handler: ${wrapper.identifier} for monitored service ${message.identifier}")
+
+            statistics.addAndCalculateAverageProcessTime(processTime)
         }
     }
 }

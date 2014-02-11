@@ -6,10 +6,8 @@ import com.citytechinc.canary.api.monitor.PollResponse
 import com.citytechinc.canary.api.monitor.PollResponseType
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
-import com.citytechinc.canary.services.manager.actors.responsehandler.PollResponseHandlerActor
+import com.citytechinc.canary.services.manager.actors.PollResponseHandlerActor
 import groovy.util.logging.Slf4j
-import groovyx.gpars.GParsPool
-import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
 

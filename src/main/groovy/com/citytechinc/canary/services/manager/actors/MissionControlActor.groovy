@@ -10,9 +10,6 @@ import com.citytechinc.canary.api.responsehandler.PollResponseHandler
 import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.monitor.MonitoredServiceActor
-import com.citytechinc.canary.services.manager.actors.notification.NotificationAgentActor
-import com.citytechinc.canary.services.manager.actors.persistence.RecordPersistenceServiceActor
-import com.citytechinc.canary.services.manager.actors.responsehandler.PollResponseHandlerActor
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
@@ -77,7 +74,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void afterStart() {
 
-        log.debug("Adding scheduled job defined under the key: ${schedulerJobKey()}")
+        log.debug("Adding scheduled job defined under the key: ${SCHEDULER_KEY}")
 
         final Date now = new Date()
         scheduler.fireJobAt(SCHEDULER_KEY, {
