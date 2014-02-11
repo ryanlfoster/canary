@@ -20,23 +20,23 @@ public class PollResponse {
     }
 
     public static PollResponse SUCCESS() {
-        return new PollResponse(PollResponseType.success, "");
+        return new PollResponse(PollResponseType.SUCCESS, "");
     }
 
     public static PollResponse SERVICE_UNAVAILABLE() {
-        return new PollResponse(PollResponseType.service_unavailable, "");
+        return new PollResponse(PollResponseType.SERVICE_UNAVAILABLE, "");
     }
 
     public static PollResponse UNEXPECTED_SERVICE_RESPONSE() {
-        return new PollResponse(PollResponseType.unexpected_service_response, "");
+        return new PollResponse(PollResponseType.UNEXPECTED_SERVICE_RESPONSE, "");
     }
 
     public static PollResponse EXCEPTION(final Exception exception) {
-        return new PollResponse(PollResponseType.exception, ExceptionUtils.getStackTrace(exception));
+        return new PollResponse(PollResponseType.EXCEPTION, ExceptionUtils.getStackTrace(exception));
     }
 
     public static PollResponse INTERRUPTED() {
-        return new PollResponse(PollResponseType.interrupted, "");
+        return new PollResponse(PollResponseType.INTERRUPTED, "");
     }
 
     public PollResponseType getPollResponseType() {

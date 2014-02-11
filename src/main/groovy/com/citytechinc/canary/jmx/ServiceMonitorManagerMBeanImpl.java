@@ -26,7 +26,6 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
-import javax.swing.text.html.Option;
 import java.util.Arrays;
 
 /**
@@ -91,7 +90,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.INTEGER,     // Configured Alarm Threshold
                     SimpleType.INTEGER,     // Configured History Size
                     SimpleType.BOOLEAN,     // Configured to persist when alarmed?
-                    SimpleType.INTEGER,     // Configured Max Execution Time
+                    SimpleType.LONG,     // Configured Max Execution Time
                     SimpleType.STRING,      // Configured to Auto Resume?
 
                     SimpleType.BOOLEAN,     // Alarmed?
@@ -133,7 +132,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                             wrapper.getDefinition().alarmThreshold(),
                             wrapper.getDefinition().maxNumberOfRecords(),
                             wrapper.getDefinition().persistWhenAlarmed(),
-                            wrapper.getDefinition().pollMaxExecutionTimeInSeconds(),
+                            wrapper.getDefinition().maxExecutionTimeInMillseconds(),
                             autoResume,
                             record.isAlarmed(),
                             record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
@@ -149,7 +148,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor States", exception);
+            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Monitor States", exception);
         }
 
         return tabularDataSupport;
@@ -200,7 +199,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Notification Agents", exception);
+            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Notification Agents", exception);
         }
 
         return tabularDataSupport;
@@ -251,7 +250,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Poll Response Handlers", exception);
+            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Poll Response Handlers", exception);
         }
 
         return tabularDataSupport;
@@ -299,7 +298,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Record Persistence Services", exception);
+            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Record Persistence Services", exception);
         }
 
         return tabularDataSupport;
@@ -350,7 +349,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor States", exception);
+            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Monitor States", exception);
         }
 
         return tabularDataSupport;

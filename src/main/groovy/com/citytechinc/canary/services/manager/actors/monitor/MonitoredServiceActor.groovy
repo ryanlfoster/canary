@@ -3,10 +3,13 @@ package com.citytechinc.canary.services.manager.actors.monitor
 import com.citytechinc.canary.api.monitor.DetailedPollResponse
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.monitor.PollResponse
+import com.citytechinc.canary.api.monitor.PollResponseType
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.responsehandler.PollResponseHandlerActor
 import groovy.util.logging.Slf4j
+import groovyx.gpars.GParsPool
+import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.actor.DynamicDispatchActor
 import org.apache.sling.commons.scheduler.Scheduler
 
@@ -34,13 +37,13 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     RecordHolder recordHolder
     Scheduler scheduler
     MissionControlActor missionControl
-    PollingActor pollingActor
+    MonitoredServiceExecutingActor pollingActor
 
     void afterStart() {
 
         schedulePolling()
 
-        pollingActor = new PollingActor(wrapper: wrapper)
+        pollingActor = new MonitoredServiceExecutingActor(wrapper: wrapper)
         pollingActor.start()
     }
 
@@ -73,12 +76,16 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     void onMessage(Poll message) {
 
         final Date startTime = new Date()
-        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.pollMaxExecutionTimeInMillseconds, TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
+        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.definition.maxExecutionTimeInMillseconds(), TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
 
         DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
                 responseType: pollResponse.pollResponseType,
                 stackTrace: pollResponse.exceptionStackTrace)
+
+        if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {
+            log.debug("Response exceeded max execution time, was interrupted: ${pollResponse}")
+        }
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
         recordHolder.addRecord(detailedPollResponse)

@@ -30,7 +30,7 @@ class RecordHolder {
 
         ++lifetimeNumberOfPolls
 
-        if (record.responseType != PollResponseType.success) {
+        if (record.responseType != PollResponseType.SUCCESS) {
             ++lifetimeNumberOfFailures
         }
 
@@ -69,7 +69,7 @@ class RecordHolder {
     }
 
     Integer recordNumberOfFailures() {
-        getRecords().count { it.responseType != PollResponseType.success}
+        getRecords().count { it.responseType != PollResponseType.SUCCESS}
     }
 
     BigDecimal lifetimeFailureRate() {
@@ -112,7 +112,7 @@ class RecordHolder {
                 scrutinizedRecords = getRecords().reverse()
             }
 
-            alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.success }.findAll { !it.cleared }.size() > 0
+            alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.findAll { !it.cleared }.size() > 0
         }
 
         alarmed

@@ -26,4 +26,10 @@ public @interface NotificationAgentDefinition {
      * @return
      */
     String[] specifics() default []
+
+    /**
+     *
+     * @return
+     */
+    long maxExecutionTimeInMilliseconds() default 500L
 }

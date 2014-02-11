@@ -71,10 +71,10 @@ import java.util.concurrent.TimeUnit
     /**
      *
      * This is the maximum time in seconds allowed for an individual poll. If this value is reached, the poll is dropped
-     *   and the response is recorded as interrupted, which is a failure.
+     *   and the response is recorded as INTERRUPTED, which is considered a failure.
      *
      * @return
      */
-    int pollMaxExecutionTimeInSeconds() default 10
+    long maxExecutionTimeInMillseconds() default 1000L
 
 }

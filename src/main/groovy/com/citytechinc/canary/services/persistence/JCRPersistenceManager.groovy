@@ -30,8 +30,7 @@ import javax.jcr.Session
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-//@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
-@Component(immediate = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
@@ -134,7 +133,11 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
             def nodePath = Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + identifier
 
+            log.debug("Loading records for service ${identifier}")
+
             if (session.nodeExists(nodePath)) {
+
+                log.debug("Records found for service ${identifier}")
 
                 def node = session.getNode(nodePath)
 
@@ -160,6 +163,8 @@ class JCRPersistenceManager implements RecordPersistenceService {
                             stackTrace: stackTrace,
                             cleared: cleared))
                 }
+
+                log.debug("Found ${recordHolder.records.size()} poll responses in the JCR for service ${identifier}")
 
                 optionalRecordHolder = Optional.of(recordHolder)
             }

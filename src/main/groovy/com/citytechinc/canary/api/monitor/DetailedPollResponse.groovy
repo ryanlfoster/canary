@@ -1,6 +1,7 @@
 package com.citytechinc.canary.api.monitor
 
 import groovy.transform.AutoClone
+import groovy.transform.Immutable
 import groovy.transform.ToString
 
 /**
@@ -10,7 +11,8 @@ import groovy.transform.ToString
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@ToString(includeNames = true)
+@ToString(includeNames = true, excludes = ['stackTrace'])
+@Immutable
 @AutoClone
 class DetailedPollResponse {
 

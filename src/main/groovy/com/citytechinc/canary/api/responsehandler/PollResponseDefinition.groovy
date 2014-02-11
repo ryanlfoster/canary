@@ -28,4 +28,10 @@ public @interface PollResponseDefinition {
      * @return
      */
     String[] specifics() default []
+
+    /**
+     *
+     * @return
+     */
+    long maxExecutionTimeInMilliseconds() default 500L
 }

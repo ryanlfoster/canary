@@ -20,14 +20,12 @@ public final class MonitoredServiceWrapper {
     final AutoResumingPoller autoResumingPollerDefinition
     final Long autoResumePollIntevalInMilliseconds
     final Long pollIntervalInSeconds
-    final Long pollMaxExecutionTimeInMillseconds
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
         this.monitor = monitor
         identifier = monitor.class.canonicalName
         definition = monitor.class.getAnnotation(MonitoredServiceDefinition)
         pollIntervalInSeconds = TimeUnit.SECONDS.convert(definition.pollInterval(), definition.pollIntervalUnit())
-        pollMaxExecutionTimeInMillseconds = TimeUnit.MILLISECONDS.convert(definition.pollMaxExecutionTimeInSeconds(), TimeUnit.SECONDS)
 
         autoResumingPollerDefinition = monitor.class.getAnnotation(AutoResumingPoller)
 

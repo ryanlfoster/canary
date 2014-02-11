@@ -20,4 +20,22 @@ public @interface RecordPersistenceServiceDefinition {
      * @return
      */
     int ranking() default 100
+
+    /**
+     *
+     * @return
+     */
+    boolean providesReadOperations() default true
+
+    /**
+     *
+     * @return
+     */
+    boolean providesWriteOperations() default true
+
+    /**
+     *
+     * @return
+     */
+    long maxExecutionTimeInMilliseconds() default 500L
 }

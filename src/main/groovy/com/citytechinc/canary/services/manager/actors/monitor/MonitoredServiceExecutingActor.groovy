@@ -13,7 +13,7 @@ import groovyx.gpars.actor.DynamicDispatchActor
  *
  */
 @Slf4j
-class PollingActor extends DynamicDispatchActor {
+class MonitoredServiceExecutingActor extends DynamicDispatchActor {
 
     MonitoredServiceWrapper wrapper
 

@@ -67,7 +67,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         } catch (Exception e) {
 
-            log.error("An exception occurred while flushing the message queue, calling the notification agent", e)
+            log.error("An EXCEPTION occurred while flushing the message queue, calling the notification agent", e)
             ++statistics.messageExceptions
         }
 
@@ -106,7 +106,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             } catch (Exception e) {
 
-                log.error("An exception occurred calling the notification agent", e)
+                log.error("An EXCEPTION occurred calling the notification agent", e)
                 ++statistics.messageExceptions
             }
 
