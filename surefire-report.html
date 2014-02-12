@@ -4,7 +4,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Overview | CITYTECH, Inc. CQ Canary Framework</title>
+		<title>Surefire Report | CITYTECH, Inc. CQ Canary Framework</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -42,7 +42,7 @@
 		</script>
 		</head>
 
-	<body class="page-index project-canary" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-surefire-report project-canary" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -56,8 +56,8 @@
 					<div class="nav-collapse">
 						<ul class="nav pull-right">
 							<li><a href="https://github.com/Citytechinc/canary" title="GitHub" class="externalLink">GitHub </a></li>
-							<li class="active"><a href="" title="Overview">Overview </a></li>
-							<li class="dropdown">
+							<li><a href="index.html" title="Overview">Overview </a></li>
+							<li class="dropdown active">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Project Documentation <b class="caret"></b></a>
 								<ul class="dropdown-menu">
 									<li class="dropdown-submenu">
@@ -70,7 +70,7 @@
 									<li class="dropdown-submenu">
 										<a href="project-reports.html" title="Project Reports">Project Reports </a>
 										<ul class="dropdown-menu">
-											<li><a href="surefire-report.html" title="Surefire Report">Surefire Report </a></li>
+											<li class="active"><a href="" title="Surefire Report">Surefire Report </a></li>
 										</ul>
 									</li>
 								</ul>
@@ -109,26 +109,138 @@
 	<div class="row">
 		<div class="span12">
 			<div class="body-content">
+<script type="text/javascript">
+//<![CDATA[
+function toggleDisplay(elementId) {
+ var elm = document.getElementById(elementId + 'error');
+ if (elm && typeof elm.style != "undefined") {
+ if (elm.style.display == "none") {
+ elm.style.display = "";
+ document.getElementById(elementId + 'off').style.display = "none";
+ document.getElementById(elementId + 'on').style.display = "inline";
+ } else if (elm.style.display == "") { elm.style.display = "none";
+ document.getElementById(elementId + 'off').style.display = "inline";
+ document.getElementById(elementId + 'on').style.display = "none";
+ } 
+ } 
+ }
+//]]>
+</script> 
 <div class="section"> 
- <h2 id="Overview">Overview</h2> 
- <p>Canary is a framework that enables simple monitoring of OSGi components and services. The Canary API provides a set of interfaces and annotations that quickly enable developers and engineers to peer into critical aspects of their system. Canary does this by collecting data from registered, monitored services and distributing that data to notification agents, poll response handlers, and persistence services. Canary also aims to reduce outage response and investigation by escalating log levels for problematic services and informing necessary parties of precisely where an investigation might begin. Lastly, Canary provides a clean, responsive UI for viewing collected data and other metrics, in addition to exposing data via JMX beans.</p> 
- <p><a class="externalLink" href="https://travis-ci.org/Citytechinc/canary"><img src="https://travis-ci.org/Citytechinc/canary.png?branch=develop" alt="Build Status" /></a></p> 
- <p><a class="externalLink" href="http://waffle.io/citytechinc/canary"><img src="https://badge.waffle.io/citytechinc/canary.png?label=ready" alt="Stories in Ready" /></a></p> 
- <p><a class="externalLink" href="https://bitdeli.com/free" title="Bitdeli Badge"><img src="https://d2weczhvl823v0.cloudfront.net/Citytechinc/canary/trend.png" alt="Bitdeli Badge" /></a></p>
+ <h2 id="Surefire_Report">Surefire Report</h2> 
 </div> 
 <div class="section"> 
- <h2 id="Requirements">Requirements</h2> 
- <ul> 
-  <li>Adobe/Day CQ (Adobe AEM) 5.6</li> 
- </ul>
+ <h2 id="Summary">Summary</h2> 
+ <a name="Summary"></a> 
+ <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p> 
+ <br /> 
+ <table border="1" class="bodyTable table table-striped table-hover"> 
+  <thead> 
+   <tr class="a"> 
+    <th>Tests</th> 
+    <th>Errors </th> 
+    <th>Failures</th> 
+    <th>Skipped</th> 
+    <th>Success Rate</th> 
+    <th>Time</th> 
+   </tr> 
+  </thead> 
+  <tbody> 
+   <tr class="b"> 
+    <td>1</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>100%</td> 
+    <td>0.047</td> 
+   </tr> 
+  </tbody> 
+ </table> 
+ <br /> 
+ <p>Note: failures are anticipated and checked for with assertions while errors are unanticipated.</p> 
+ <br /> 
 </div> 
 <div class="section"> 
- <h2 id="Versioning">Versioning</h2> 
- <p>Follows <a class="externalLink" href="http://semver.org/">Semantic Versioning</a> guidelines.</p>
+ <h2 id="Package_List">Package List</h2> 
+ <a name="Package_List"></a> 
+ <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p> 
+ <br /> 
+ <table border="1" class="bodyTable table table-striped table-hover"> 
+  <thead> 
+   <tr class="a"> 
+    <th>Package</th> 
+    <th>Tests</th> 
+    <th>Errors </th> 
+    <th>Failures</th> 
+    <th>Skipped</th> 
+    <th>Success Rate</th> 
+    <th>Time</th> 
+   </tr> 
+  </thead> 
+  <tbody> 
+   <tr class="b"> 
+    <td><a href="#com.citytechinc.canary">com.citytechinc.canary</a></td> 
+    <td>1</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>100%</td> 
+    <td>0.047</td> 
+   </tr> 
+  </tbody> 
+ </table> 
+ <br /> 
+ <p>Note: package statistics are not computed recursively, they only sum up all of its testsuites numbers.</p> 
+ <div class="section"> 
+  <h3 id="com.citytechinc.canary">com.citytechinc.canary</h3> 
+  <a name="com.citytechinc.canary"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <thead> 
+    <tr class="a"> 
+     <th></th> 
+     <th>Class</th> 
+     <th>Tests</th> 
+     <th>Errors </th> 
+     <th>Failures</th> 
+     <th>Skipped</th> 
+     <th>Success Rate</th> 
+     <th>Time</th> 
+    </tr> 
+   </thead> 
+   <tbody> 
+    <tr class="b"> 
+     <td><a href="#com.citytechinc.canaryStartingSpec"><i class="icon-ok"></i></a></td> 
+     <td><a href="#com.citytechinc.canaryStartingSpec">StartingSpec</a></td> 
+     <td>1</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0.047</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <br /> 
 </div> 
 <div class="section"> 
- <h2 id="Issues">Issues</h2> 
- <p>Please contact <a class="externalLink" href="mailto:jdurbin@citytechinc.com">Josh Durbin</a> with any questions; issues can be submitted via <a class="externalLink" href="https://github.com/Citytechinc/canary/issues">GitHub</a> or via <a class="externalLink" href="https://waffle.io/citytechinc/canary">waffle.io</a>.</p>
+ <h2 id="Test_Cases">Test Cases</h2> 
+ <a name="Test_Cases"></a> 
+ <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p> 
+ <div class="section"> 
+  <h3 id="StartingSpec">StartingSpec</h3> 
+  <a name="com.citytechinc.canaryStartingSpec"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td>Run me</td> 
+     <td>0.047</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <br /> 
 </div>
 			</div>
 		</div>
@@ -149,7 +261,12 @@
 							<a href="project-info.html" title="Project Information">Project Information <i class="icon-chevron-right"></i></a>
 						</li>
 						<li>
-							<a href="project-reports.html" title="Project Reports">Project Reports <i class="icon-chevron-right"></i></a>
+							<a href="project-reports.html" title="Project Reports">Project Reports <i class="icon-chevron-down"></i></a>
+							<ul class="nav nav-list">
+						<li class="active">
+							<a href="#" title="Surefire Report">Surefire Report </a>
+						</li>
+							</ul>
 						</li>
 					</ul>
 				</div>
