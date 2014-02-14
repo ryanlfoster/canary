@@ -21,6 +21,7 @@ public interface CanaryMaintenanceMBean {
     @Description("Get records for a specific monitor")
     public TabularDataSupport getRecordsForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
 
+    @Description("Returns a stacktrace for a monitor")
     public String getStacktraceForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService, @Name("startDate") @Description("The start date supplied in the format yyyy-MM-dd HH:mm:ss") String startDate);
 
     @Description("Send poll request to ALL monitors")

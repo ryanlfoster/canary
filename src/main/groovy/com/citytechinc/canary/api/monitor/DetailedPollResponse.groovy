@@ -20,9 +20,9 @@ class DetailedPollResponse {
     Date endTime
     PollResponseType responseType
     String stackTrace
-    Boolean cleared = false
+    Boolean excused = false
 
-    Long runTimeInMilliseconds() {
+    Long executionTimeInMilliseconds() {
 
         endTime.time - startTime.time
     }

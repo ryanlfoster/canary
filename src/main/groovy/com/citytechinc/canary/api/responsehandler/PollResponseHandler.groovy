@@ -13,8 +13,8 @@ public interface PollResponseHandler {
 
     /**
      *
-     * @param identifer
+     * @param identifier
      * @param detailedPollResponse
      */
-    void handleResponse(String identifer, DetailedPollResponse detailedPollResponse)
+    void handleResponse(String identifier, DetailedPollResponse detailedPollResponse)
 }

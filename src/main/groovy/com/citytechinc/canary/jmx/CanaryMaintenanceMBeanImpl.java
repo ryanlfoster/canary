@@ -4,6 +4,7 @@ import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
 import com.citytechinc.canary.Constants;
 import com.citytechinc.canary.api.monitor.DetailedPollResponse;
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper;
+import com.citytechinc.canary.api.monitor.PollResponseType;
 import com.citytechinc.canary.api.monitor.RecordHolder;
 import com.citytechinc.canary.services.manager.ServiceManager;
 import com.google.common.base.Optional;
@@ -21,6 +22,7 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
+import java.util.Date;
 
 /**
  *
@@ -117,9 +119,9 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
                     tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                             Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
                             Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
-                            detailedPollResponse.runTimeInMilliseconds(),
+                            detailedPollResponse.executionTimeInMilliseconds(),
                             detailedPollResponse.getResponseType().toString(),
-                            detailedPollResponse.getCleared() }));
+                            detailedPollResponse.getExcused() }));
                 }
             }
 
@@ -142,11 +144,11 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
 
             for (final DetailedPollResponse detailedPollResponse : record.get().getRecords()) {
 
-//                final Date dateToCompare = new Date(startDate.toLong());
-//
-//                if (detailedPollResponse.getStartTime() == dateToCompare && detailedPollResponse.getResponseType() == PollResponseType.EXCEPTION) {
-//                    stacktrace = detailedPollResponse.getStackTrace();
-//                }
+                final Date dateToCompare = Constants.JMX_DATE_TIME_PARSER.parseDateTime(startDate).toDate();
+
+                if (detailedPollResponse.getStartTime() == dateToCompare && detailedPollResponse.getResponseType() == PollResponseType.EXCEPTION) {
+                    stacktrace = detailedPollResponse.getStackTrace();
+                }
             }
         }
 

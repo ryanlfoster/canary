@@ -170,8 +170,6 @@ class DefaultServiceManager implements ServiceManager {
         missionControl = new MissionControlActor(scheduler: scheduler, instantiateActorMessageTimeout: missionControlMonitorActorTimeout)
         missionControl.start()
 
-        sleep(missionControlMonitorActorTimeout)
-
         log.info("Registering ${registeredMonitors.size()} monitors, " +
                 "${registeredNotificationAgents.size()} notification agents, " +
                 "${registeredPersistenceServices.size()} persistence handlers, and " +

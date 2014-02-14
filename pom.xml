@@ -309,6 +309,10 @@
 
         <!-- inherited -->
         <dependency>
+            <groupId>com.day.commons.osgi.wrapper</groupId>
+            <artifactId>com.day.commons.osgi.wrapper.joda-time</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.adobe.granite</groupId>
             <artifactId>com.adobe.granite.replication.core</artifactId>
         </dependency>

@@ -59,7 +59,8 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     void onMessage(GetRecord message) {
 
-        sender.send(recordHolder.clone())
+//        sender.send(recordHolder.clone())
+        sender.send(recordHolder)
     }
 
     void onMessage(ResetAlarm message) {

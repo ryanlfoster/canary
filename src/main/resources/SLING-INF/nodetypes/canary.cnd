@@ -4,9 +4,6 @@
   + * (canary:RecordHolder)
 
 [canary:RecordHolder]
-  - lifetimeNumberOfPolls (long) mandatory
-  - lifetimeNumberOfFailures (long) mandatory
-  - lifetimeAverageProcessTime (long) mandatory
   + * (canary:DetailedPollResponse)
 
 [canary:DetailedPollResponse]
@@ -14,5 +11,5 @@
   - endTime (date) mandatory
   - responseType (string) mandatory
   - stackTrace (string)
-  - cleared (boolean) mandatory
+  - excused (boolean) mandatory
 

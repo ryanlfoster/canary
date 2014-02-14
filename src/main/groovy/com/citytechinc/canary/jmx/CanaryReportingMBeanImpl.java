@@ -245,26 +245,22 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
                     "Alarmed?",
-                    "1st Poll Date",
                     "Recent Poll Date",
                     "Recent Poll Response",
                     "Avg Exec Time (ms)",
-                    "Record Polls",
-                    "Record Failures",
-                    "Lifetime Polls",
-                    "Lifetime Failures"};
+                    "Failure Rate",
+                    "Total Polls",
+                    "Total Failures"};
 
             final OpenType[] itemTypes = {
-                    SimpleType.STRING,      // Name
-                    SimpleType.BOOLEAN,     // Alarmed?
-                    SimpleType.STRING,      // 1st Poll Date
-                    SimpleType.STRING,      // Recent Poll Date
-                    SimpleType.STRING,      // Recent Poll Response
-                    SimpleType.LONG,        // Avg Exec Time (ms)
-                    SimpleType.INTEGER,     // Record Polls
-                    SimpleType.INTEGER,     // Record Failures
-                    SimpleType.INTEGER,     // Lifetime Polls
-                    SimpleType.INTEGER};    // Lifetime Failures
+                    SimpleType.STRING,
+                    SimpleType.BOOLEAN,
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.LONG,
+                    SimpleType.BIGDECIMAL,
+                    SimpleType.INTEGER,
+                    SimpleType.INTEGER};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
             final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor Results", pageType, itemNamesDescriptionsAndIndexName);
@@ -281,14 +277,12 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                             wrapper.getMonitor().getClass().getCanonicalName(),
                             record.isAlarmed(),
-                            record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
                             record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
                             record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
-                            record.averagePollExecutionTime(),
-                            record.recordNumberOfPolls(),
-                            record.recordNumberOfFailures(),
-                            record.getLifetimeNumberOfPolls(),
-                            record.getLifetimeNumberOfFailures()}));
+                            record.averagePollExecutionTime(false),
+                            record.failureRate(false),
+                            record.numberOfPolls(),
+                            record.numberOfFailures()}));
                 }
             }
 

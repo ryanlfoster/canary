@@ -18,21 +18,36 @@ import groovy.util.logging.Slf4j
 @AutoClone
 class RecordHolder {
 
-    Queue<DetailedPollResponse> records = [] as Queue
-    String monitorIdentifier
-    Integer alarmThreshold
-    Integer maxNumberOfRecords
+    final String monitorIdentifier
+    final Integer maxNumberOfRecords
+    final AlarmCriteria alarmCriteria
+    final Integer alarmThreshold
+    final Queue<DetailedPollResponse> records
 
-    Integer lifetimeNumberOfPolls = 0
-    Integer lifetimeNumberOfFailures = 0
+    private RecordHolder(String monitorIdentifier, Integer maxNumberOfRecords, AlarmCriteria alarmCriteria, Integer alarmThreshold) {
+        this.monitorIdentifier = monitorIdentifier
+        this.maxNumberOfRecords = maxNumberOfRecords
+        this.alarmCriteria = alarmCriteria
+        this.alarmThreshold = alarmThreshold
+
+        records = [] as Queue
+    }
+
+    public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
+
+        return new RecordHolder(wrapper.identifier, wrapper.definition.maxNumberOfRecords(), wrapper.definition.alarmCriteria(), wrapper.definition.alarmThreshold())
+    }
+
+    public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<DetailedPollResponse> detailedPollResponses) {
+
+        RecordHolder recordHolder = new RecordHolder(wrapper.identifier, wrapper.definition.maxNumberOfRecords(), wrapper.definition.alarmCriteria(), wrapper.definition.alarmThreshold())
+
+        detailedPollResponses.each { recordHolder.addRecord(it) }
+
+        recordHolder
+    }
 
     void addRecord(DetailedPollResponse record) {
-
-        ++lifetimeNumberOfPolls
-
-        if (record.responseType != PollResponseType.SUCCESS) {
-            ++lifetimeNumberOfFailures
-        }
 
         if (records.size() == maxNumberOfRecords) {
             records.remove()
@@ -42,16 +57,18 @@ class RecordHolder {
     }
 
     void resetAlarm() {
-        getRecords().last().cleared = true
+
+        if (isAlarmed()) {
+            getRecords().each { it.excused = true }
+        }
     }
 
     List<DetailedPollResponse> getRecords() {
         records as List
     }
 
-    Optional<Date> firstPoll() {
-
-        records.empty ? Optional.absent() : Optional.of(records.peek().startTime)
+    List<DetailedPollResponse> getUnexcusedRecords() {
+        getRecords().findAll { !it.excused }
     }
 
     Optional<Date> mostRecentPollDate() {
@@ -64,30 +81,35 @@ class RecordHolder {
         records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().responseType)
     }
 
-    Integer recordNumberOfPolls() {
+    Integer numberOfPolls() {
         records.size()
     }
 
-    Integer recordNumberOfFailures() {
+    Integer numberOfFailures() {
         getRecords().count { it.responseType != PollResponseType.SUCCESS}
     }
 
-    BigDecimal lifetimeFailureRate() {
+    BigDecimal failureRate(Boolean useUnexcused) {
 
-        BigDecimal failureRate = new BigDecimal(lifetimeNumberOfFailures).divide(new BigDecimal(lifetimeNumberOfPolls))
-        failureRate.movePointRight()
+        def scrutinizedRecords = useUnexcused ? getUnexcusedRecords() : getRecords()
+
+        BigDecimal failureRate = new BigDecimal(scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.size())
+                .divide(new BigDecimal(scrutinizedRecords.size()))
+        failureRate.movePointRight(2)
     }
 
-    Long averagePollExecutionTime() {
+    Long averagePollExecutionTime(Boolean useUnexcused) {
 
         Long averageExecutionTime = 0L
 
+        def scrutinizedRecords = useUnexcused ? getUnexcusedRecords() : getRecords()
+
         if (records.size() > 0) {
 
-            Long numberOfRecords = records.size() as Long
+            Long numberOfRecords = scrutinizedRecords.size() as Long
             Long totalExecutionTime = 0L
 
-            getRecords().each { totalExecutionTime += it.runTimeInMilliseconds()}
+            scrutinizedRecords.each { totalExecutionTime += it.executionTimeInMilliseconds()}
 
             averageExecutionTime = totalExecutionTime / numberOfRecords
         }
@@ -97,22 +119,30 @@ class RecordHolder {
 
     Boolean isAlarmed() {
 
-        final Boolean alarmed
+        Boolean alarmed = false
 
-        if (getRecords().size() < alarmThreshold) {
+        if (alarmCriteria == AlarmCriteria.AVERAGE_FAILURE_RATE) {
 
-            alarmed = false
-        } else {
+            alarmed = failureRate(true) > alarmThreshold
 
-            final List<DetailedPollResponse> scrutinizedRecords
+        } else if (alarmCriteria == AlarmCriteria.AVERAGE_EXECUTION_TIME) {
+
+            alarmed = averagePollExecutionTime(true) > alarmThreshold
+
+        } else if (alarmCriteria == AlarmCriteria.RECENT_POLLS) {
 
             if (getRecords().size() > alarmThreshold) {
-                scrutinizedRecords = Lists.partition(getRecords().reverse(), alarmThreshold).first()
-            } else {
-                scrutinizedRecords = getRecords().reverse()
-            }
 
-            alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.findAll { !it.cleared }.size() > 0
+                final List<DetailedPollResponse> scrutinizedRecords
+
+                if (getRecords().size() > alarmThreshold) {
+                    scrutinizedRecords = Lists.partition(getRecords().reverse(), alarmThreshold).first()
+                } else {
+                    scrutinizedRecords = getRecords().reverse()
+                }
+
+                alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.findAll { !it.excused }.size() > 0
+            }
         }
 
         alarmed

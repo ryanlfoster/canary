@@ -287,7 +287,7 @@ final class MissionControlActor extends DynamicDispatchActor {
             MonitoredServiceActor actor
 
             // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
-            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new RecordHolder(monitorIdentifier: wrapper.identifier, alarmThreshold: wrapper.definition.alarmThreshold(), maxNumberOfRecords: wrapper.definition.maxNumberOfRecords()))
+            actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
             actor.start()
 
             monitors.put(wrapper, actor)
@@ -316,7 +316,7 @@ final class MissionControlActor extends DynamicDispatchActor {
                 } else {
 
                     log.debug("Records absent for service ${wrapper.identifier}, starting a clean actor")
-                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new RecordHolder(monitorIdentifier: wrapper.identifier, alarmThreshold: wrapper.definition.alarmThreshold(), maxNumberOfRecords: wrapper.definition.maxNumberOfRecords()))
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_NEW(wrapper))
                 }
 
                 actor.start()

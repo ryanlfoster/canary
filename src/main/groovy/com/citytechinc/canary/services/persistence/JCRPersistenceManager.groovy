@@ -88,10 +88,6 @@ class JCRPersistenceManager implements RecordPersistenceService {
             // CREATE A NEW NODE FOR THE MONITOR
             def recordHolderNode = rootStorageNode.addNode(recordHolder.monitorIdentifier, Constants.JCR_NODE_TYPE_RECORD_HOLDER)
 
-            recordHolderNode.set('lifetimeAverageProcessTime', 0L)
-            recordHolderNode.set('lifetimeNumberOfPolls', recordHolder.lifetimeNumberOfPolls as Long)
-            recordHolderNode.set('lifetimeNumberOfFailures', recordHolder.lifetimeNumberOfFailures as Long)
-
             recordHolder.records.each { DetailedPollResponse pollResponse ->
 
                 def pollResponseNode = recordHolderNode.addNode(Constants.JCR_POLL_RESPONSE_NODE_STORAGE_FORMATTER.format(pollResponse.startTime), Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE)
@@ -106,7 +102,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
                 pollResponseNode.set('endTime', endCal)
                 pollResponseNode.set('responseType', pollResponse.responseType as String)
                 pollResponseNode.set('stackTrace', pollResponse.stackTrace)
-                pollResponseNode.set('cleared', pollResponse.cleared)
+                pollResponseNode.set('excused', pollResponse.excused)
             }
 
             session.save()
@@ -139,34 +135,29 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
                 log.debug("Records found for service ${identifier}")
 
-                def node = session.getNode(nodePath)
+                def recordHolderNode = session.getNode(nodePath)
 
-                MonitoredServiceWrapper wrapper = serviceManager.getMonitoredServices().find { it.identifier == identifier }
+                List<DetailedPollResponse> detailedPollResponses = []
 
-                RecordHolder recordHolder = new RecordHolder(monitorIdentifier: identifier,
-                        alarmThreshold: wrapper.definition.alarmThreshold(),
-                        maxNumberOfRecords: wrapper.definition.maxNumberOfRecords(),
-                        lifetimeNumberOfPolls: node.get('lifetimeNumberOfPolls'),
-                        lifetimeNumberOfFailures: node.get('lifetimeNumberOfFailures'))
-
-                node.recurse(Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE) { pollResponseNode ->
+                recordHolderNode.recurse(Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE) { pollResponseNode ->
 
                     def startTime = pollResponseNode.get('startTime').getTime()
                     def endTime = pollResponseNode.get('endTime').getTime()
                     def responseType = pollResponseNode.get('responseType') as PollResponseType
                     def stackTrace = pollResponseNode.get('stackTrace')
-                    def cleared = pollResponseNode.get('cleared') as Boolean
+                    def excused = pollResponseNode.get('excused') as Boolean
 
-                    recordHolder.addRecord(new DetailedPollResponse(startTime: startTime,
+                    detailedPollResponses.add(new DetailedPollResponse(startTime: startTime,
                             endTime: endTime,
                             responseType: responseType,
                             stackTrace: stackTrace,
-                            cleared: cleared))
+                            excused: excused))
                 }
 
-                log.debug("Found ${recordHolder.records.size()} poll responses in the JCR for service ${identifier}")
+                log.debug("Found ${detailedPollResponses.size()} poll responses in the JCR for service ${identifier}")
 
-                optionalRecordHolder = Optional.of(recordHolder)
+                MonitoredServiceWrapper wrapper = serviceManager.getMonitoredServicesConfigurations().find { it.identifier == identifier }
+                optionalRecordHolder = Optional.of(RecordHolder.CREATE_FROM_RECORDS(wrapper, detailedPollResponses))
             }
 
         } catch (Exception e) {
