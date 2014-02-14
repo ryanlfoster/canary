@@ -2,8 +2,6 @@ package com.citytechinc.canary.services.manager.actors
 
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
-import com.citytechinc.canary.services.manager.actors.MissionControlActor
-import com.citytechinc.canary.services.manager.actors.Statistics
 import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
@@ -42,7 +40,7 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
 
         try {
 
-            sender.send(wrapper.getRecordHolder(message.identifier))
+            sender.send(wrapper.getPollResponseRecordsForMonitor(message.identifier))
             ++statistics.processedMessages
 
         } catch (Exception e) {

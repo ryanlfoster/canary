@@ -1,13 +1,11 @@
 package com.citytechinc.canary.services.persistence
 
 import com.citytechinc.canary.api.monitor.DetailedPollResponse
-import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.monitor.PollResponseType
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceDefinition
 import com.citytechinc.canary.Constants
-import com.citytechinc.canary.services.manager.ServiceManager
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
@@ -40,9 +38,6 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
     @Reference
     SlingRepository slingRepository
-
-    @Reference
-    ServiceManager serviceManager
 
     @Activate
     @Modified
@@ -118,22 +113,22 @@ class JCRPersistenceManager implements RecordPersistenceService {
     }
 
     @Override
-    Optional<RecordHolder> getRecordHolder(String identifier) {
+    Optional<List<DetailedPollResponse>> getPollResponseRecordsForMonitor(String monitorName) {
 
-        def optionalRecordHolder = Optional.absent()
+        def optionalRecords = Optional.absent()
         def session
 
         try {
 
             session = slingRepository.loginAdministrative(null)
 
-            def nodePath = Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + identifier
+            def nodePath = Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH + '/' + monitorName
 
-            log.debug("Loading records for service ${identifier}")
+            log.debug("Loading records for service ${monitorName}")
 
             if (session.nodeExists(nodePath)) {
 
-                log.debug("Records found for service ${identifier}")
+                log.debug("Records found for service ${monitorName}")
 
                 def recordHolderNode = session.getNode(nodePath)
 
@@ -154,15 +149,14 @@ class JCRPersistenceManager implements RecordPersistenceService {
                             excused: excused))
                 }
 
-                log.debug("Found ${detailedPollResponses.size()} poll responses in the JCR for service ${identifier}")
+                log.debug("Found ${detailedPollResponses.size()} poll responses in the JCR for service ${monitorName}")
 
-                MonitoredServiceWrapper wrapper = serviceManager.getMonitoredServicesConfigurations().find { it.identifier == identifier }
-                optionalRecordHolder = Optional.of(RecordHolder.CREATE_FROM_RECORDS(wrapper, detailedPollResponses))
+                optionalRecords = Optional.of(detailedPollResponses)
             }
 
         } catch (Exception e) {
 
-            log.error("An error occurred while attempting to read records for service ${identifier}", e)
+            log.error("An error occurred while attempting to read records for service ${monitorName}", e)
 
         } finally {
 

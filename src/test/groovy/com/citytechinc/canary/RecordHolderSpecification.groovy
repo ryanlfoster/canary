@@ -1,10 +1,5 @@
 package com.citytechinc.canary
 
-import com.citytechinc.canary.api.monitor.AlarmCriteria
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
-import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
-import com.citytechinc.canary.api.monitor.PollResponseType
-import com.citytechinc.canary.api.monitor.RecordHolder
 import spock.lang.Specification
 
 class RecordHolderSpecification extends Specification {

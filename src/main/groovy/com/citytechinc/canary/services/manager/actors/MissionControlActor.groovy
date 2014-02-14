@@ -1,5 +1,6 @@
 package com.citytechinc.canary.services.manager.actors
 
+import com.citytechinc.canary.api.monitor.DetailedPollResponse
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.notification.NotificationAgent
@@ -305,14 +306,14 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             log.debug("Polling ${persistenceWrapper.service.class} for records")
 
-            persistenceActor.sendAndContinue(new RecordPersistenceServiceActor.GetPersistedRecord(identifier: wrapper.identifier), { Optional<RecordHolder> recordHolder ->
+            persistenceActor.sendAndContinue(new RecordPersistenceServiceActor.GetPersistedRecord(identifier: wrapper.identifier), { Optional<List<DetailedPollResponse>> pollResponses ->
 
                 MonitoredServiceActor actor
 
                 if (recordHolder.present) {
 
                     log.debug("Records present for service ${recordHolder.get().monitorIdentifier}, using records to start actor")
-                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: recordHolder.get())
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_FROM_RECORDS(wrapper, pollResponses.get()))
                 } else {
 
                     log.debug("Records absent for service ${wrapper.identifier}, starting a clean actor")
