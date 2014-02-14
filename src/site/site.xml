@@ -26,15 +26,17 @@
             <toc>false</toc>
             <highlightJs>true</highlightJs>
             <highlightJsTheme>github</highlightJsTheme>
-            <topNav>reports</topNav>
+            <topNav>Basics|Usage</topNav>
             <brand>
                 <name>${project.name}</name>
                 <href>http://code.citytechinc.com/canary</href>
             </brand>
-            <slogan position="bannerRight"></slogan>
+            <slogan>Service monitoring and reporting platform for Adobe AEM!</slogan>
             <body />
-            <bottomNav>
-                <column>reports</column>
+            <bottomNav maxSpan="9">
+                <column>Main</column>
+                <column>Basics</column>
+                <column>Usage</column>
             </bottomNav>
         </reflowSkin>
     </custom>
@@ -42,8 +44,22 @@
     <body>
         <links>
             <item name="GitHub" href="https://github.com/Citytechinc/canary" />
-            <item name="Overview" href="index.html" />
         </links>
-        <menu ref="reports"/>
+        <menu name="Main" inherit="top">
+            <item name="Home" href="index.html" />
+            <item name="GitHub" href="https://github.com/Citytechinc/canary" />
+            <item name="Java Doc" href="apidocs/index.html" />
+            <item name="CITYTECH Inc." href="http://www.citytechinc.com" />
+        </menu>
+        <menu name="Getting Started" inherit="bottom">
+            <item name="Usage" href="usage.html" />
+        </menu>
+        <menu name="Usage" inherit="bottom">
+            <item name="Adding a Monitor" href="adding-a-monitor.html" />
+            <item name="Adding a Response Handler" href="adding-a-response-handler.html" />
+            <item name="Adding a Notification Agent" href="adding-a-notification-agent.html" />
+            <item name="Adding a Persistence Service" href="adding-a-persistence-service.html" />
+        </menu>
+        <footer></footer>
     </body>
 </project>

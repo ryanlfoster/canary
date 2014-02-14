@@ -19,6 +19,6 @@ public final class RecordPersistenceServiceWrapper {
     public RecordPersistenceServiceWrapper(final RecordPersistenceService service) {
         this.service = service
         identifier = service.class.canonicalName
-        this.definition = service.getClass().getAnnotation(RecordPersistenceServiceDefinition.class)
+        this.definition = service.getClass().getAnnotation(RecordPersistenceServiceDefinition)
     }
 }

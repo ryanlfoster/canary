@@ -12,23 +12,16 @@ import javax.management.openmbean.TabularDataSupport;
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Description("CITYTECH OSGi Service Monitor Management and Reporting")
-public interface ServiceMonitorManagerMBean {
+@Description("CITYTECH Canary Framework Maintenance")
+public interface CanaryMaintenanceMBean {
 
-    @Description("Lists poll response handlers and statistics")
+    @Description("Lists monitors")
     public TabularDataSupport getMonitors();
-
-    @Description("Lists notification agents and statistics")
-    public TabularDataSupport getNotificationAgents();
-
-    @Description("Lists poll response handlers and statistics")
-    public TabularDataSupport getPollResponseHandlers();
-
-    @Description("Lists registered poll response handlers and statistics")
-    public TabularDataSupport getRecordPersistenceServices();
 
     @Description("Get records for a specific monitor")
     public TabularDataSupport getRecordsForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService);
+
+    public String getStacktraceForMonitor(@Name("monitoredService") @Description("The fully qualified path of a monitored service") String monitoredService, @Name("startDate") @Description("The start date supplied in the format yyyy-MM-dd HH:mm:ss") String startDate);
 
     @Description("Send poll request to ALL monitors")
     public void requestAllMonitorsPoll();

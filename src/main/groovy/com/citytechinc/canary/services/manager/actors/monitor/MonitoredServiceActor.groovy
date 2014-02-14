@@ -74,7 +74,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     void onMessage(Poll message) {
 
         final Date startTime = new Date()
-        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.definition.maxExecutionTimeInMillseconds(), TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
+        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.definition.maxExecutionTime(), TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
 
         DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
@@ -82,7 +82,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
                 stackTrace: pollResponse.exceptionStackTrace)
 
         if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {
-            log.debug("Response exceeded max execution time, was interrupted: ${pollResponse}")
+            log.debug("Interrupted poll started on ${detailedPollResponse.startTime} and exceeded max execution time of ${wrapper.definition.maxExecutionTime()} ms")
         }
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
@@ -100,13 +100,15 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def schedulePolling = {
 
-        log.debug("Adding scheduled job defined under the key: ${schedulerJobKey()}")
+        Long pollIntervalInSeconds = TimeUnit.SECONDS.convert(wrapper.definition.pollInterval(), wrapper.definition.pollIntervalUnit())
+
+        log.debug("Adding scheduled job defined under the key: ${schedulerJobKey()} will fire every ${pollIntervalInSeconds} seconds")
 
         scheduler.addPeriodicJob(schedulerJobKey(), {
 
             this << new Poll()
 
-        }, [:], wrapper.pollIntervalInSeconds, false)
+        }, [:], pollIntervalInSeconds, false)
     }
 
     def unschedulePolling = {
@@ -122,16 +124,18 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def oneTimeScheduleAutoResume = {
 
-        if (recordHolder.isAlarmed() && wrapper.autoResumePollIntevalInMilliseconds > 0L) {
+        if (recordHolder.isAlarmed() && wrapper.automaticResetMonitorDefinition) {
 
-            log.debug("Adding scheduled auto resume job defined under the key: ${schedulerJobKey()}")
+            Long automaticResetPollInterval = TimeUnit.MILLISECONDS.convert(wrapper.automaticResetMonitorDefinition.interval(), wrapper.automaticResetMonitorDefinition.unit())
+
+            log.debug("Adding scheduled auto resume job defined under the key: ${schedulerJobKey()} will fire in ${automaticResetPollInterval} ms")
 
             final Date now = new Date()
             scheduler.fireJobAt(schedulerJobKey(), {
 
                 this << new AutoResumePolling()
 
-            }, [:], new Date(now.time + wrapper.autoResumePollIntevalInMilliseconds))
+            }, [:], new Date(now.time + automaticResetPollInterval))
         }
     }
 }

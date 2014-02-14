@@ -31,6 +31,9 @@ public @interface PollResponseDefinition {
 
     /**
      *
+     * The maximum execution time allowed for an operation. This is used to protect the inner workings of
+     *   the framework.
+     *
      * @return
      */
     long maxExecutionTimeInMilliseconds() default 500L

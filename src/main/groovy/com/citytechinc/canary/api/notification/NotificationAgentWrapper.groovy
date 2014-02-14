@@ -18,18 +18,11 @@ public final class NotificationAgentWrapper {
     final String identifier
     final NotificationAgentDefinition definition
     final AggregateAlarms aggregateAlarms
-    final Long aggregationWindowInMilliseconds
 
     public NotificationAgentWrapper(NotificationAgent agent) {
         this.agent = agent
         identifier = agent.class.canonicalName
-        definition = agent.getClass().getAnnotation(NotificationAgentDefinition.class)
-        aggregateAlarms = agent.getClass().getAnnotation(AggregateAlarms.class)
-
-        if (aggregateAlarms != null) {
-            aggregationWindowInMilliseconds = TimeUnit.MILLISECONDS.convert(aggregateAlarms.aggregationWindow(), aggregateAlarms.aggregationWindowTimeUnit())
-        } else {
-            aggregationWindowInMilliseconds = 0L
-        }
+        definition = agent.getClass().getAnnotation(NotificationAgentDefinition)
+        aggregateAlarms = agent.getClass().getAnnotation(AggregateAlarms)
     }
 }

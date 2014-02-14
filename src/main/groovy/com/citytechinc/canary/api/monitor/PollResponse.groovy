@@ -20,15 +20,15 @@ public class PollResponse {
     }
 
     public static PollResponse SUCCESS() {
-        return new PollResponse(PollResponseType.SUCCESS, "");
+        return new PollResponse(PollResponseType.SUCCESS, '')
     }
 
     public static PollResponse SERVICE_UNAVAILABLE() {
-        return new PollResponse(PollResponseType.SERVICE_UNAVAILABLE, "");
+        return new PollResponse(PollResponseType.SERVICE_UNAVAILABLE, '');
     }
 
     public static PollResponse UNEXPECTED_SERVICE_RESPONSE() {
-        return new PollResponse(PollResponseType.UNEXPECTED_SERVICE_RESPONSE, "");
+        return new PollResponse(PollResponseType.UNEXPECTED_SERVICE_RESPONSE, '');
     }
 
     public static PollResponse EXCEPTION(final Exception exception) {
@@ -36,7 +36,7 @@ public class PollResponse {
     }
 
     public static PollResponse INTERRUPTED() {
-        return new PollResponse(PollResponseType.INTERRUPTED, "");
+        return new PollResponse(PollResponseType.INTERRUPTED, '');
     }
 
     public PollResponseType getPollResponseType() {

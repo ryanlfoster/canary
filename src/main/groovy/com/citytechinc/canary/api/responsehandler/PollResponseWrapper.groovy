@@ -19,6 +19,6 @@ public class PollResponseWrapper {
     public PollResponseWrapper(PollResponseHandler handler) {
         this.handler = handler
         identifier = handler.class.canonicalName
-        definition = handler.getClass().getAnnotation(PollResponseDefinition.class)
+        definition = handler.getClass().getAnnotation(PollResponseDefinition)
     }
 }

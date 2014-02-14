@@ -1,3 +1,8 @@
+##Introduction
+
+The CITYTECH AEM Canary Framework
+The CQ Component Plugin mitigates the effort required in Adobe CQ component development by generating, at built time, .content.xml, _cq_editConfig.xml, and dialog.xml files for your components, leaving you free to focus on functionality.
+
 ## Overview
 
 Canary is a framework that enables simple monitoring of OSGi components and services. The Canary API provides a
@@ -25,4 +30,4 @@ Follows [Semantic Versioning](http://semver.org/) guidelines.
 ## Issues
 
 Please contact [Josh Durbin](mailto:jdurbin@citytechinc.com) with any questions; issues can be submitted via
-[GitHub](https://github.com/Citytechinc/cq-groovy-console/issues) or via [waffle.io](https://waffle.io/citytechinc/canary).
+[GitHub](https://github.com/Citytechinc/canary/issues) or via [waffle.io](https://waffle.io/citytechinc/canary).

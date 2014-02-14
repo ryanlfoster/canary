@@ -1,14 +1,13 @@
 package com.citytechinc.canary.servlets
 
 import com.citytechinc.canary.Constants
+import groovy.util.logging.Slf4j
 import org.apache.sling.api.SlingHttpServletResponse
 import org.apache.sling.api.servlets.SlingAllMethodsServlet
 import org.codehaus.jackson.JsonFactory
 import org.codehaus.jackson.JsonGenerator
 import org.codehaus.jackson.map.ObjectMapper
 import org.codehaus.jackson.map.SerializationConfig
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import java.text.SimpleDateFormat
 
@@ -19,10 +18,10 @@ import java.text.SimpleDateFormat
  * Copyright 2013 CITYTECH, Inc.
  *
  */
+@Slf4j
 public abstract class AbstractJSONResponseServlet extends SlingAllMethodsServlet {
 
     private static final long serialVersionUID = 1L
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractJSONResponseServlet.class)
     private static final JsonFactory FACTORY = new JsonFactory().disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET)
     private static final ObjectMapper MAPPER = new ObjectMapper()
 
@@ -55,7 +54,7 @@ public abstract class AbstractJSONResponseServlet extends SlingAllMethodsServlet
             MAPPER.writeValue(generator, object)
 
         } catch (final Exception exception) {
-            LOG.error("error writing JSON response", exception)
+            log.error("error writing JSON response", exception)
         }
     }
 }

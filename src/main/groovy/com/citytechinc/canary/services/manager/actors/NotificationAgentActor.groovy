@@ -50,8 +50,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
                 || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(message.monitorIdentifier)))
                 || (wrapper.definition.strategy() == SubscriptionStrategy.ALL)) {
 
-
-            if (wrapper.aggregationWindowInMilliseconds > 0) {
+            if (wrapper.aggregateAlarms) {
 
                 if (queuedMessages.isEmpty()) {
 
@@ -60,7 +59,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
                         this << new FlushQueue()
 
-                    }, [:], new Date(now.time + wrapper.aggregationWindowInMilliseconds))
+                    }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(wrapper.aggregateAlarms.aggregationWindow(), wrapper.aggregateAlarms.aggregationWindowTimeUnit())))
                 }
 
                 log.debug("Adding message to queue with size of ${queuedMessages.size()}")

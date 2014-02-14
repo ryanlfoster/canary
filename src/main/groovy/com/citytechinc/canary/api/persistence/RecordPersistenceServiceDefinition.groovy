@@ -15,7 +15,8 @@ public @interface RecordPersistenceServiceDefinition {
 
     /**
      *
-     * The top ranking service is used to load records on start.
+     * The service ranking is used only at Monitored Service Actor instantiation. The highest ranked Record Persistence
+     *   Service which provides read operations is selected to seed the Record Holder for a newly instantiated monitor.
      *
      * @return
      */
@@ -23,17 +24,24 @@ public @interface RecordPersistenceServiceDefinition {
 
     /**
      *
+     * Indicates that the record persistence service should be used for read operations.
+     *
      * @return
      */
     boolean providesReadOperations() default true
 
     /**
      *
+     * Indicates that the record persistence service should be used for write operations.
+     *
      * @return
      */
     boolean providesWriteOperations() default true
 
     /**
+     *
+     * The maximum execution time allowed for a read or a write operation. This is used to protect the inner workings of
+     *   the framework.
      *
      * @return
      */

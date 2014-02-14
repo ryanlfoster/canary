@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AutoResumingPoller {
+public @interface AutomaticResetMonitor {
 
     /**
      *
@@ -30,4 +30,10 @@ public @interface AutoResumingPoller {
      * @return
      */
     TimeUnit unit()
+
+    /**
+     *
+     * @return
+     */
+    int resetThreshold() default 6
 }

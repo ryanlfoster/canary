@@ -40,21 +40,15 @@ import java.util.concurrent.TimeUnit
 
     /**
      *
-     * @return
-     */
-    TimeUnit pollIntervalUnit()
-
-    /**
-     *
-     * The number of sequential failures required to trigger an alarm and suspend canary.
+     * The poll frequency unit used with the pollInterval()
      *
      * @return
      */
-    int alarmThreshold() default 3
+    TimeUnit pollIntervalUnit() default TimeUnit.SECONDS
 
     /**
      *
-     * The number of poll results to store in memory and in the JCR.
+     * The maximum number of poll records to store in the transient record store.
      *
      * @return
      */
@@ -62,7 +56,23 @@ import java.util.concurrent.TimeUnit
 
     /**
      *
-     * This flag indicates that any identifier that goes into an 'alarmed' state will request persistence.
+     * The alarm criteria used to determine if a monitor is in a healthy or unhealthy state.
+     *
+     * @return
+     */
+    AlarmCriteria alarmCriteria() default AlarmCriteria.RECENT_POLLS
+
+    /**
+     *
+     * The alarm threshold, used with the alarmCriteria(), used to determine if a monitor is in a healthy or unhealthy state.
+     *
+     * @return
+     */
+    int alarmThreshold() default 3
+
+    /**
+     *
+     * Persist when alarmed indicates to the framework that the transient state of the in-memory records be written to any registered, relevant persistence services.
      *
      * @return
      */
@@ -71,10 +81,10 @@ import java.util.concurrent.TimeUnit
     /**
      *
      * This is the maximum time in seconds allowed for an individual poll. If this value is reached, the poll is dropped
-     *   and the response is recorded as INTERRUPTED, which is considered a failure.
+     *   and the response is recorded as INTERRUPTED, which is considered a failure. This is represented in milliseconds.
      *
      * @return
      */
-    long maxExecutionTimeInMillseconds() default 1000L
+    long maxExecutionTime() default 3000L
 
 }

@@ -18,13 +18,13 @@ import com.google.common.base.Optional
  */
 public interface ServiceManager {
 
-    public List<MonitoredServiceWrapper> getMonitoredServices()
+    public List<MonitoredServiceWrapper> getMonitoredServicesConfigurations()
 
-    public List<NotificationAgentWrapper> getNotificationAgents()
+    public List<NotificationAgentWrapper> getNotificationAgentsConfigurations()
 
-    public List<PollResponseWrapper> getPollResponseHandlers()
+    public List<PollResponseWrapper> getPollResponseHandlersConfigurations()
 
-    public List<RecordPersistenceServiceWrapper> getRecordPersistenceServices()
+    public List<RecordPersistenceServiceWrapper> getRecordPersistenceServicesConfigurations()
 
     public Optional<Statistics> getStatistics(String identifier, MissionControlActor.GetStatistics.Type type)
 

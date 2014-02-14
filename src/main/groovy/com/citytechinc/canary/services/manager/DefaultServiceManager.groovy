@@ -218,22 +218,22 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
-    List<MonitoredServiceWrapper> getMonitoredServices() {
+    List<MonitoredServiceWrapper> getMonitoredServicesConfigurations() {
         registeredMonitors.collect { new MonitoredServiceWrapper(it) }
     }
 
     @Override
-    List<NotificationAgentWrapper> getNotificationAgents() {
+    List<NotificationAgentWrapper> getNotificationAgentsConfigurations() {
         registeredNotificationAgents.collect { new NotificationAgentWrapper(it) }
     }
 
     @Override
-    List<PollResponseWrapper> getPollResponseHandlers() {
+    List<PollResponseWrapper> getPollResponseHandlersConfigurations() {
         registeredPollResponseHandlers.collect { new PollResponseWrapper(it) }
     }
 
     @Override
-    List<RecordPersistenceServiceWrapper> getRecordPersistenceServices() {
+    List<RecordPersistenceServiceWrapper> getRecordPersistenceServicesConfigurations() {
         registeredPersistenceServices.collect { new RecordPersistenceServiceWrapper(it) }
     }
 

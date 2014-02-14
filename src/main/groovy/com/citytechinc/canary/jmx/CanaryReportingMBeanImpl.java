@@ -9,7 +9,6 @@ import com.citytechinc.canary.Constants;
 import com.citytechinc.canary.services.manager.ServiceManager;
 import com.citytechinc.canary.services.manager.actors.MissionControlActor;
 import com.citytechinc.canary.services.manager.actors.Statistics;
-import com.citytechinc.canary.api.monitor.DetailedPollResponse;
 import com.citytechinc.canary.api.monitor.RecordHolder;
 import com.google.common.base.Optional;
 import org.apache.felix.scr.annotations.Component;
@@ -36,31 +35,22 @@ import java.util.Arrays;
  *
  */
 @Component(immediate = true)
-@Property(name = "jmx.objectname", value = "com.citytechinc.canary.jmx:type=CITYTECH OSGi Service Monitor Management and Reporting")
+@Property(name = "jmx.objectname", value = "com.citytechinc.canary.jmx:type=CITYTECH Canary Framework Reporting")
 @Service
-public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean implements ServiceMonitorManagerMBean {
+public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean implements CanaryReportingMBean {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceMonitorManagerMBeanImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CanaryReportingMBeanImpl.class);
 
     @Reference
     ServiceManager serviceManager;
 
-    public ServiceMonitorManagerMBeanImpl() throws NotCompliantMBeanException {
-        super(ServiceMonitorManagerMBean.class);
+    public CanaryReportingMBeanImpl() throws NotCompliantMBeanException {
+        super(CanaryReportingMBean.class);
     }
 
     @Override
-    public void requestAllMonitorsPoll() {
-        serviceManager.requestAllMonitorsPoll();
-    }
+    public TabularDataSupport getMonitoredServicesConfigurations() {
 
-    @Override
-    public void requestAllMonitorsPersist() {
-        serviceManager.requestAllMonitorsPersist();
-    }
-
-    @Override
-    public TabularDataSupport getMonitors() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -68,12 +58,192 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
-                    "Configured Poll Interval",
-                    "Configured Alarm Threshold",
-                    "Configured History Size",
-                    "Configured to persist when alarmed?",
-                    "Configured Max Execution Time",
-                    "Configured to Auto Resume?",
+                    "Poll Interval",
+                    "Alarm Criteria",
+                    "Alarm Threshold",
+                    "History Size",
+                    "Persist when alarmed?",
+                    "Max Execution Time (ms)",
+                    "Auto Reset?",
+                    "Log Escalation?"};
+
+            final OpenType[] itemTypes = {
+                    SimpleType.STRING,      // Name
+                    SimpleType.STRING,      // Configured Poll Interval
+                    SimpleType.STRING,      // Alarm Criteria
+                    SimpleType.INTEGER,     // Alarm Threshold
+                    SimpleType.INTEGER,     // Configured History Size
+                    SimpleType.BOOLEAN,     // Configured to persist when alarmed?
+                    SimpleType.LONG,        // Configured Max Execution Time
+                    SimpleType.STRING,      // Configured to Auto Reset?
+                    SimpleType.STRING};     // Log escalation?
+
+            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
+            final TabularType pageTabularType = new TabularType("List of Monitors Configurations", "Monitor Configurations", pageType, itemNamesDescriptionsAndIndexName);
+            tabularDataSupport = new TabularDataSupport(pageTabularType);
+
+            for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServicesConfigurations()) {
+
+                final String autoResume;
+
+                if (wrapper.getAutomaticResetMonitorDefinition() != null) {
+                    autoResume = "Polls every " + wrapper.getAutomaticResetMonitorDefinition().interval() + " " + wrapper.getAutomaticResetMonitorDefinition().unit() + " and resets after ";
+                } else {
+                    autoResume = "N/A";
+                }
+
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getMonitor().getClass().getCanonicalName(),
+                        wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
+                        wrapper.getDefinition().alarmCriteria().toString(),
+                        wrapper.getDefinition().alarmThreshold(),
+                        wrapper.getDefinition().maxNumberOfRecords(),
+                        wrapper.getDefinition().persistWhenAlarmed(),
+                        wrapper.getDefinition().maxExecutionTime(),
+                        autoResume,
+                        wrapper.getLogEscalatingMonitorDefinition() != null ? wrapper.getLogEscalatingMonitorDefinition().prefixPathAndName() : "N/A"}));
+            }
+
+        } catch (final Exception exception) {
+
+            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Monitor States", exception);
+        }
+
+        return tabularDataSupport;
+    }
+
+    @Override
+    public TabularDataSupport getNotificationAgentsConfigurations() {
+
+        TabularDataSupport tabularDataSupport = null;
+
+        try {
+
+            final String[] itemNamesDescriptionsAndIndexName = {
+                    "Name",
+                    "Strategy",
+                    "Specifics",
+                    "Max Execution Time (ms)"};
+
+            final OpenType[] itemTypes = {
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.LONG};
+
+            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
+            final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            tabularDataSupport = new TabularDataSupport(pageTabularType);
+
+            for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgentsConfigurations()) {
+
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getAgent().getClass().getCanonicalName(),
+                        wrapper.getDefinition().strategy().toString(),
+                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
+                        wrapper.getDefinition().maxExecutionTimeInMilliseconds()}));
+            }
+
+        } catch (final Exception exception) {
+
+            LOG.error("An exception occurred building the TabularDataSupport listing the Notification Agents Configurations", exception);
+        }
+
+        return tabularDataSupport;
+    }
+
+    @Override
+    public TabularDataSupport getPollResponseHandlersConfigurations() {
+
+        TabularDataSupport tabularDataSupport = null;
+
+        try {
+
+            final String[] itemNamesDescriptionsAndIndexName = {
+                    "Name",
+                    "Strategy",
+                    "Specifics",
+                    "Max Execution Time (ms)"};
+
+            final OpenType[] itemTypes = {
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.STRING,
+                    SimpleType.LONG};
+
+            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
+            final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            tabularDataSupport = new TabularDataSupport(pageTabularType);
+
+            for (final PollResponseWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
+
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getHandler().getClass().getCanonicalName(),
+                        wrapper.getDefinition().strategy().toString(),
+                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
+                        wrapper.getDefinition().maxExecutionTimeInMilliseconds()}));
+            }
+
+        } catch (final Exception exception) {
+
+            LOG.error("An exception occurred building the TabularDataSupport listing the Poll Response Handlers Configurations", exception);
+        }
+
+        return tabularDataSupport;
+    }
+
+    @Override
+    public TabularDataSupport getRecordPersistenceServicesConfigurations() {
+
+        TabularDataSupport tabularDataSupport = null;
+
+        try {
+
+            final String[] itemNamesDescriptionsAndIndexName = {
+                    "Name",
+                    "Ranking",
+                    "Max Execution Time (ms)",
+                    "Provides Read Operations",
+                    "Provides Write Operations"};
+
+            final OpenType[] itemTypes = {
+                    SimpleType.STRING,
+                    SimpleType.INTEGER,
+                    SimpleType.LONG,
+                    SimpleType.BOOLEAN,
+                    SimpleType.BOOLEAN};
+
+            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
+            final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            tabularDataSupport = new TabularDataSupport(pageTabularType);
+
+            for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServicesConfigurations()) {
+
+                tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
+                        wrapper.getService().getClass().getCanonicalName(),
+                        wrapper.getDefinition().ranking(),
+                        wrapper.getDefinition().maxExecutionTimeInMilliseconds(),
+                        wrapper.getDefinition().providesReadOperations(),
+                        wrapper.getDefinition().providesWriteOperations()}));
+            }
+
+        } catch (final Exception exception) {
+
+            LOG.error("An exception occurred building the TabularDataSupport listing the Record Persistence Services Configurations", exception);
+        }
+
+        return tabularDataSupport;
+    }
+
+    @Override
+    public TabularDataSupport getMonitoredServicesResults() {
+
+        TabularDataSupport tabularDataSupport = null;
+
+        try {
+
+            final String[] itemNamesDescriptionsAndIndexName = {
+                    "Name",
                     "Alarmed?",
                     "1st Poll Date",
                     "Recent Poll Date",
@@ -86,13 +256,6 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,      // Name
-                    SimpleType.STRING,      // Configured Poll Interval
-                    SimpleType.INTEGER,     // Configured Alarm Threshold
-                    SimpleType.INTEGER,     // Configured History Size
-                    SimpleType.BOOLEAN,     // Configured to persist when alarmed?
-                    SimpleType.LONG,     // Configured Max Execution Time
-                    SimpleType.STRING,      // Configured to Auto Resume?
-
                     SimpleType.BOOLEAN,     // Alarmed?
                     SimpleType.STRING,      // 1st Poll Date
                     SimpleType.STRING,      // Recent Poll Date
@@ -104,21 +267,10 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.INTEGER};    // Lifetime Failures
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor States", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor Results", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServices()) {
-
-                final String autoResume;
-
-                if (wrapper.getAutoResumingPollerDefinition() != null) {
-
-                    autoResume = wrapper.getAutoResumingPollerDefinition().interval() + " " + wrapper.getAutoResumingPollerDefinition().unit();
-
-                } else {
-
-                    autoResume = "--";
-                }
+            for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServicesConfigurations()) {
 
                 final Optional<RecordHolder> optionalRecord = serviceManager.getRecordHolder(wrapper.getIdentifier());
 
@@ -128,12 +280,6 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
                     tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                             wrapper.getMonitor().getClass().getCanonicalName(),
-                            wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
-                            wrapper.getDefinition().alarmThreshold(),
-                            wrapper.getDefinition().maxNumberOfRecords(),
-                            wrapper.getDefinition().persistWhenAlarmed(),
-                            wrapper.getDefinition().maxExecutionTimeInMillseconds(),
-                            autoResume,
                             record.isAlarmed(),
                             record.firstPoll().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.firstPoll().get()) : "--",
                             record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
@@ -155,7 +301,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public TabularDataSupport getNotificationAgents() {
+    public TabularDataSupport getNotificationAgentsResults() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -163,16 +309,12 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
-                    "Strategy",
-                    "Specifics",
                     "Number of Delivered Messages",
                     "Number of Processed Messages",
                     "Number of Message Exceptions",
                     "Avg Message Process Time (ms)"};
 
             final OpenType[] itemTypes = {
-                    SimpleType.STRING,
-                    SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.INTEGER,
                     SimpleType.INTEGER,
@@ -183,14 +325,12 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
             final TabularType pageTabularType = new TabularType("List of Notification Agents", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgents()) {
+            for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgentsConfigurations()) {
 
                 final Statistics statistics = serviceManager.getStatistics(wrapper.getAgent().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.NOTIFICATION_AGENT).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getAgent().getClass().getCanonicalName(),
-                        wrapper.getDefinition().strategy().toString(),
-                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
                         statistics.getDeliveredMessages(),
                         statistics.getProcessedMessages(),
                         statistics.getMessageExceptions(),
@@ -206,7 +346,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public TabularDataSupport getPollResponseHandlers() {
+    public TabularDataSupport getPollResponseHandlersResults() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -214,16 +354,12 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
-                    "Strategy",
-                    "Specifics",
                     "Number of Delivered Messages",
                     "Number of Processed Messages",
                     "Number of Message Exceptions",
                     "Avg Message Process Time (ms)"};
 
             final OpenType[] itemTypes = {
-                    SimpleType.STRING,
-                    SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.INTEGER,
                     SimpleType.INTEGER,
@@ -234,14 +370,12 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
             final TabularType pageTabularType = new TabularType("List of Poll Response Handlers", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final PollResponseWrapper wrapper : serviceManager.getPollResponseHandlers()) {
+            for (final PollResponseWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
 
                 final Statistics statistics = serviceManager.getStatistics(wrapper.getHandler().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.POLL_RESPONSE_HANDLER).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
-                        wrapper.getDefinition().strategy().toString(),
-                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
                         statistics.getDeliveredMessages(),
                         statistics.getProcessedMessages(),
                         statistics.getMessageExceptions(),
@@ -257,7 +391,7 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
     }
 
     @Override
-    public TabularDataSupport getRecordPersistenceServices() {
+    public TabularDataSupport getRecordPersistenceServicesResults() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -265,7 +399,6 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
-                    "Ranking",
                     "Number of Delivered Messages",
                     "Number of Processed Messages",
                     "Number of Message Exceptions",
@@ -276,20 +409,18 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
                     SimpleType.INTEGER,
                     SimpleType.INTEGER,
                     SimpleType.INTEGER,
-                    SimpleType.INTEGER,
                     SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
             final TabularType pageTabularType = new TabularType("List of Record Persistence Services", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServices()) {
+            for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServicesConfigurations()) {
 
                 final Statistics statistics = serviceManager.getStatistics(wrapper.getService().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.RECORD_PERSISTENCE_SERVICE).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getService().getClass().getCanonicalName(),
-                        wrapper.getDefinition().ranking(),
                         statistics.getDeliveredMessages(),
                         statistics.getProcessedMessages(),
                         statistics.getMessageExceptions(),
@@ -303,66 +434,4 @@ public final class ServiceMonitorManagerMBeanImpl extends AnnotatedStandardMBean
 
         return tabularDataSupport;
     }
-
-    @Override
-    public TabularDataSupport getRecordsForMonitor(String monitoredService) {
-
-        TabularDataSupport tabularDataSupport = null;
-
-        try {
-
-            final String[] itemNamesDescriptionsAndIndexName = {
-                    "Start Time",
-                    "End Time",
-                    "Runtime (ms)",
-                    "Response",
-                    "Stacktrace",
-                    "Cleared"};
-
-            final OpenType[] itemTypes = {
-                    SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.LONG,
-                    SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.BOOLEAN};
-
-            final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("Records for Monitored Service", "asdf", pageType, itemNamesDescriptionsAndIndexName);
-            tabularDataSupport = new TabularDataSupport(pageTabularType);
-
-            Optional<RecordHolder> record = serviceManager.getRecordHolder(monitoredService);
-
-            if (record.isPresent()) {
-
-                for (final DetailedPollResponse detailedPollResponse : record.get().getRecords()) {
-
-                    tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                            Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
-                            Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
-                            detailedPollResponse.runTimeInMilliseconds(),
-                            detailedPollResponse.getResponseType().toString(),
-                            detailedPollResponse.getStackTrace(),
-                            detailedPollResponse.getCleared() }));
-                }
-            }
-
-        } catch (final Exception exception) {
-
-            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Monitor States", exception);
-        }
-
-        return tabularDataSupport;
-    }
-
-    @Override
-    public void resetAllAlarms() {
-        serviceManager.resetAllAlarms();
-    }
-
-    @Override
-    public void resetAlarm(final String fullyQualifiedMonitorPath) {
-        serviceManager.resetAlarm(fullyQualifiedMonitorPath);
-    }
-
 }
