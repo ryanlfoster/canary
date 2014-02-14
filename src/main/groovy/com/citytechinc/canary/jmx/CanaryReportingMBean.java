@@ -1,7 +1,6 @@
 package com.citytechinc.canary.jmx;
 
 import com.adobe.granite.jmx.annotation.Description;
-import com.adobe.granite.jmx.annotation.Name;
 
 import javax.management.openmbean.TabularDataSupport;
 
@@ -27,16 +26,16 @@ public interface CanaryReportingMBean {
     @Description("Lists record persistence services and their configurations")
     public TabularDataSupport getRecordPersistenceServicesConfigurations();
 
-    @Description("Lists monitors and their results")
-    public TabularDataSupport getMonitoredServicesResults();
+    @Description("Lists monitors and their overall poll results")
+    public TabularDataSupport getMonitoredServicesPollResults();
 
     @Description("Lists notification agents and their statistics")
-    public TabularDataSupport getNotificationAgentsResults();
+    public TabularDataSupport getNotificationAgentsStatistics();
 
     @Description("Lists poll response handlers and their statistics")
-    public TabularDataSupport getPollResponseHandlersResults();
+    public TabularDataSupport getPollResponseHandlersStatistics();
 
     @Description("Lists poll response handlers and their statistics")
-    public TabularDataSupport getRecordPersistenceServicesResults();
+    public TabularDataSupport getRecordPersistenceServicesStatistics();
 
 }

@@ -236,7 +236,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
     }
 
     @Override
-    public TabularDataSupport getMonitoredServicesResults() {
+    public TabularDataSupport getMonitoredServicesPollResults() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -295,7 +295,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
     }
 
     @Override
-    public TabularDataSupport getNotificationAgentsResults() {
+    public TabularDataSupport getNotificationAgentsStatistics() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -333,14 +333,14 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
         } catch (final Exception exception) {
 
-            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Notification Agents", exception);
+            LOG.error("An exception occurred building the TabularDataSupport listing the Notification Agents statistics", exception);
         }
 
         return tabularDataSupport;
     }
 
     @Override
-    public TabularDataSupport getPollResponseHandlersResults() {
+    public TabularDataSupport getPollResponseHandlersStatistics() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -378,14 +378,14 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
         } catch (final Exception exception) {
 
-            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Poll Response Handlers", exception);
+            LOG.error("An exception has occurred building the TabularDataSupport listing the Poll Response Handlers statistics", exception);
         }
 
         return tabularDataSupport;
     }
 
     @Override
-    public TabularDataSupport getRecordPersistenceServicesResults() {
+    public TabularDataSupport getRecordPersistenceServicesStatistics() {
 
         TabularDataSupport tabularDataSupport = null;
 
@@ -423,7 +423,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
         } catch (final Exception exception) {
 
-            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Record Persistence Services", exception);
+            LOG.error("An exception has occurred building the TabularDataSupport while listing the Record Persistence Services statistics", exception);
         }
 
         return tabularDataSupport;
