@@ -1,5 +1,8 @@
 package com.citytechinc.canary.api.monitor
 
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2014
@@ -7,6 +10,7 @@ package com.citytechinc.canary.api.monitor
  * Copyright 2014 CITYTECH, Inc.
  *
  */
+@Retention(RetentionPolicy.RUNTIME)
 public @interface LogEscalatingMonitor {
 
     /**
