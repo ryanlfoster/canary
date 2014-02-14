@@ -27,4 +27,6 @@ public final class Constants {
     public static final String JCR_NODE_TYPE_MONITORED_SERVICE_STORAGE = 'canary:MonitorServiceStorage'
     public static final String JCR_NODE_TYPE_DETAILED_POLL_RESPONSE = 'canary:DetailedPollResponse'
     public static final String JCR_NODE_TYPE_RECORD_HOLDER = 'canary:RecordHolder'
+
+    public static final String LOG_ESCALATION_ROOT_LOGGER_PATH = 'canary/'
 }

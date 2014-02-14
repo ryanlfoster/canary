@@ -93,9 +93,16 @@ class RecordHolder {
 
         def scrutinizedRecords = useUnexcused ? getUnexcusedRecords() : getRecords()
 
-        BigDecimal failureRate = new BigDecimal(scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.size())
-                .divide(new BigDecimal(scrutinizedRecords.size()), 2, RoundingMode.HALF_DOWN)
-        failureRate.movePointRight(2)
+        if (!scrutinizedRecords.empty) {
+
+            BigDecimal failureRate = new BigDecimal(scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.size())
+                    .divide(new BigDecimal(scrutinizedRecords.size()), 2, RoundingMode.HALF_DOWN)
+            failureRate.movePointRight(2)
+        } else {
+
+            BigDecimal.ZERO
+        }
+
     }
 
     Long averagePollExecutionTime(Boolean useUnexcused) {
