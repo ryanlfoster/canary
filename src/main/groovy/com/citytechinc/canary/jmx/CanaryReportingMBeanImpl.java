@@ -101,7 +101,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                         wrapper.getDefinition().persistWhenAlarmed(),
                         wrapper.getDefinition().maxExecutionTime(),
                         autoResume,
-                        wrapper.getLogEscalatingMonitorDefinition() != null ? wrapper.getLogEscalatingMonitorDefinition().prefixPathAndName() : "N/A"}));
+                        wrapper.getLogEscalatingMonitorDefinition() != null ? wrapper.getLogEscalatingMonitorDefinition().logFilePrefix() : "N/A"}));
             }
 
         } catch (final Exception exception) {

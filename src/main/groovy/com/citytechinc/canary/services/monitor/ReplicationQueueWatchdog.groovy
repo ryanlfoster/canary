@@ -16,6 +16,13 @@ import org.osgi.framework.Constants as OsgiConstants
 
 import java.util.concurrent.TimeUnit
 
+/**
+ *
+ * @author Josh Durbin, CITYTECH, Inc. 2014
+ *
+ * Copyright 2014 CITYTECH, Inc.
+ *
+ */
 @Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
 @Service
 @Properties(value = [

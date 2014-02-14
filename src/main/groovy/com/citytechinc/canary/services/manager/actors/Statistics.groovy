@@ -3,6 +3,13 @@ package com.citytechinc.canary.services.manager.actors
 import groovy.transform.AutoClone
 import groovy.transform.ToString
 
+/**
+ *
+ * @author Josh Durbin, CITYTECH, Inc. 2014
+ *
+ * Copyright 2014 CITYTECH, Inc.
+ *
+ */
 @ToString(includeNames = true)
 @AutoClone
 class Statistics {

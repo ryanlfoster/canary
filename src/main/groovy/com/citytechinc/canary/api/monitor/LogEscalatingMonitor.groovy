@@ -13,6 +13,6 @@ public @interface LogEscalatingMonitor {
      *
      * @return
      */
-    String prefixPathAndName()
+    String logFilePrefix()
 
 }

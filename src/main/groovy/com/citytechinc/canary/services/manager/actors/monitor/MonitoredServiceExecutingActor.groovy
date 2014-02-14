@@ -1,7 +1,6 @@
 package com.citytechinc.canary.services.manager.actors.monitor
 
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
-import com.citytechinc.canary.api.monitor.PollResponse
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
 
@@ -24,7 +23,7 @@ class MonitoredServiceExecutingActor extends DynamicDispatchActor {
         } catch (Exception e) {
 
             log.debug("An exception occurred while calling the monitored service: ${wrapper.identifier}. Recording exception...", e)
-            sender.send(PollResponse.EXCEPTION(e))
+            sender.send(InternalPollResponse.EXCEPTION(e))
         }
     }
 }

@@ -74,7 +74,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     void onMessage(Poll message) {
 
         final Date startTime = new Date()
-        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.definition.maxExecutionTime(), TimeUnit.MILLISECONDS) ?: PollResponse.INTERRUPTED()
+        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.definition.maxExecutionTime(), TimeUnit.MILLISECONDS) ?: InternalPollResponse.INTERRUPTED()
 
         DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
@@ -82,7 +82,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
                 stackTrace: pollResponse.exceptionStackTrace)
 
         if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {
-            log.debug("Interrupted poll started on ${detailedPollResponse.startTime} and exceeded max execution time of ${wrapper.definition.maxExecutionTime()} ms")
+            log.debug("Interrupted a poll which started on ${detailedPollResponse.startTime} and exceeded the max execution time of ${wrapper.definition.maxExecutionTime()} ms")
         }
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
