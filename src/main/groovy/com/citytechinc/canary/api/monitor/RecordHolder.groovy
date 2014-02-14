@@ -2,9 +2,10 @@ package com.citytechinc.canary.api.monitor
 
 import com.google.common.base.Optional
 import com.google.common.collect.Lists
-import groovy.transform.AutoClone
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
+
+import java.math.RoundingMode
 
 /**
  *
@@ -15,7 +16,6 @@ import groovy.util.logging.Slf4j
  */
 @ToString(includeFields = true, includeNames = true)
 @Slf4j
-@AutoClone
 class RecordHolder {
 
     final String monitorIdentifier
@@ -94,7 +94,7 @@ class RecordHolder {
         def scrutinizedRecords = useUnexcused ? getUnexcusedRecords() : getRecords()
 
         BigDecimal failureRate = new BigDecimal(scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.size())
-                .divide(new BigDecimal(scrutinizedRecords.size()))
+                .divide(new BigDecimal(scrutinizedRecords.size()), 2, RoundingMode.HALF_DOWN)
         failureRate.movePointRight(2)
     }
 

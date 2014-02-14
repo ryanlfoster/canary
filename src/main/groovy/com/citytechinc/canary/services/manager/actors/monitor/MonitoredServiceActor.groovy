@@ -93,7 +93,8 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
         if (recordHolder.isAlarmed()) {
 
-            missionControl << recordHolder.clone()
+//            missionControl << recordHolder.clone()
+            missionControl << recordHolder
             unschedulePolling()
             oneTimeScheduleAutoResume()
         }
