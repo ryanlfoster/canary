@@ -64,7 +64,7 @@ class RecordHolder {
     }
 
     List<DetailedPollResponse> getRecords() {
-        records as List
+        (records as List).reverse()
     }
 
     List<DetailedPollResponse> getUnexcusedRecords() {
@@ -73,12 +73,12 @@ class RecordHolder {
 
     Optional<Date> mostRecentPollDate() {
 
-        records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().startTime)
+        records.empty ? Optional.absent() : Optional.of(getRecords().first().startTime)
     }
 
     Optional<PollResponseType> mostRecentPollResponse() {
 
-        records.empty ? Optional.absent() : Optional.of(getRecords().reverse().first().responseType)
+        records.empty ? Optional.absent() : Optional.of(getRecords().first().responseType)
     }
 
     Integer numberOfPolls() {
@@ -143,9 +143,9 @@ class RecordHolder {
                 final List<DetailedPollResponse> scrutinizedRecords
 
                 if (getRecords().size() > alarmThreshold) {
-                    scrutinizedRecords = Lists.partition(getRecords().reverse(), alarmThreshold).first()
+                    scrutinizedRecords = Lists.partition(getRecords(), alarmThreshold).first()
                 } else {
-                    scrutinizedRecords = getRecords().reverse()
+                    scrutinizedRecords = getRecords()
                 }
 
                 alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.findAll { !it.excused }.size() > 0
