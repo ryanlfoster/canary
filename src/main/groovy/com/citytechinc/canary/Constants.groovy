@@ -29,4 +29,10 @@ public final class Constants {
     public static final String JCR_NODE_TYPE_RECORD_HOLDER = 'canary:RecordHolder'
 
     public static final String LOG_ESCALATION_ROOT_LOGGER_PATH = 'canary/'
+
+    public static final String LOG_ESCALATION_TARGET_FACTORY_PID = 'org.apache.sling.commons.log.LogManager.factory.config'
+    public static final String LOG_LOGGERS = 'org.apache.sling.commons.log.names'
+    public static final String LOG_FILE = 'org.apache.sling.commons.log.file'
+    public static final String LOG_LEVEL = 'org.apache.sling.commons.log.level'
+
 }
