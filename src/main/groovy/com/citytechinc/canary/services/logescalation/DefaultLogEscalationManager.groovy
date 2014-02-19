@@ -31,29 +31,6 @@ class DefaultLogEscalationManager implements LogEscalationManager {
     @Override
     void escalateLogForService(String servicename) {
 
-//        final List<String> configsMatchingServiceName = configurationAdmin.listConfigurations().findAll { it.factoryPid == Constants.LOG_ESCALATION_TARGET_FACTORY_PID }
-//            .findAll { it.properties.get(Constants.LOG_LOGGERS).contains(servicename) }
-//            .collect { it.pid }
-//
-//        configsMatchingServiceName.each {
-//
-//            Configuration config = configurationAdmin.getConfiguration(it)
-//
-//            def properties = config.properties
-//
-//            List<String> listOfNames = properties.get(Constants.LOG_LOGGERS) as List
-//            listOfNames.remove(servicename)
-//            properties.put(Constants.LOG_LOGGERS, listOfNames)
-//
-//            List<String> canaryRemovedNames = properties.hasProperty('canary.removed.names') ? properties.get('canary.removed.names') as List : []
-//            canaryRemovedNames.add(servicename)
-//            properties.put('canary.removed.names', canaryRemovedNames)
-//
-//            config.update(properties)
-//
-//            log.info("Updating config for ${config.pid}, removing references for ${servicename}")
-//        }
-
         Configuration newConfiguration = configurationAdmin.createFactoryConfiguration(Constants.LOG_ESCALATION_TARGET_FACTORY_PID, null)
 
         Dictionary<String, Object> properties = new Hashtable<String, Object>()
