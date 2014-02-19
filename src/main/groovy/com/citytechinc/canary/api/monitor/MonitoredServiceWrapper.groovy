@@ -16,7 +16,6 @@ public final class MonitoredServiceWrapper {
     final String identifier
     final MonitoredServiceDefinition definition
     final AutomaticResetMonitor automaticResetMonitorDefinition
-    final LogEscalatingMonitor logEscalatingMonitorDefinition
 
     public MonitoredServiceWrapper(final MonitoredService monitor) {
 
@@ -25,6 +24,5 @@ public final class MonitoredServiceWrapper {
 
         definition = monitor.class.getAnnotation(MonitoredServiceDefinition)
         automaticResetMonitorDefinition = monitor.class.getAnnotation(AutomaticResetMonitor)
-        logEscalatingMonitorDefinition = monitor.class.getAnnotation(LogEscalatingMonitor)
     }
 }

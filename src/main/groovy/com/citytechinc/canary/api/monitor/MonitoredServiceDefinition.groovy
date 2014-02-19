@@ -87,4 +87,15 @@ import java.util.concurrent.TimeUnit
      */
     long maxExecutionTime() default 3000L
 
+    /**
+     *
+     * If enabled, the framework checks the status of a monitor as it goes offline. If its service status is unsatisfied or otherwise
+     *   indicates that something else took the service offline and this is set to true, an alarm is immediately thrown.
+     *
+     * @return
+     */
+    boolean monitorForUnintendedShutdowns() default true
+
+    boolean logEscalation() default true
+
 }
