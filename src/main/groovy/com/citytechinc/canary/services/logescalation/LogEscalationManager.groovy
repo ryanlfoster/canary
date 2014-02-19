@@ -12,12 +12,12 @@ public interface LogEscalationManager {
     /**
      *
      * @param servicename
-     * @return
      */
-    void escalateLogForService(String servicename)
+    String escalate(String servicename)
 
     /**
      *
+     * @param servicename
      */
-    void deescalateLogForService(String servicename)
+    void deescalate(String servicename)
 }

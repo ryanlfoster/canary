@@ -29,7 +29,7 @@ class DefaultLogEscalationManager implements LogEscalationManager {
     ConfigurationAdmin configurationAdmin
 
     @Override
-    void escalateLogForService(String servicename) {
+    String escalate(String servicename) {
 
         Configuration newConfiguration = configurationAdmin.createFactoryConfiguration(Constants.LOG_ESCALATION_TARGET_FACTORY_PID, null)
 
@@ -45,10 +45,11 @@ class DefaultLogEscalationManager implements LogEscalationManager {
 
         newConfiguration.update(properties)
 
+        Constants.LOG_ESCALATION_ROOT_LOGGER_PATH + servicename
     }
 
     @Override
-    void deescalateLogForService(String servicename) {
+    void deescalate(String servicename) {
 
         configurationAdmin.listConfigurations().findAll { it.factoryPid == Constants.LOG_ESCALATION_TARGET_FACTORY_PID }
             .findAll { it.properties.get('canary.created.date') && it.properties.get('pid') == servicename }

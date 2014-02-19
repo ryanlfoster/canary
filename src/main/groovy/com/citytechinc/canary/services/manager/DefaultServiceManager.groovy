@@ -10,6 +10,7 @@ import com.citytechinc.canary.api.responsehandler.PollResponseHandler
 import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
 import com.citytechinc.canary.Constants
 import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.services.logescalation.LogEscalationManager
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
 import com.google.common.base.Optional
@@ -50,6 +51,9 @@ class DefaultServiceManager implements ServiceManager {
 
     @Reference
     Scheduler scheduler
+
+    @Reference
+    LogEscalationManager logEscalationManager
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
             policy = ReferencePolicy.DYNAMIC,
@@ -167,7 +171,7 @@ class DefaultServiceManager implements ServiceManager {
 
         missionControlMonitorActorTimeout = PropertiesUtil.toLong(properties.get(MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT), 15)
 
-        missionControl = new MissionControlActor(scheduler: scheduler, instantiateActorMessageTimeout: missionControlMonitorActorTimeout)
+        missionControl = new MissionControlActor(scheduler: scheduler, logEscalationManager: logEscalationManager, instantiateActorMessageTimeout: missionControlMonitorActorTimeout)
         missionControl.start()
 
         log.info("Registering ${registeredMonitors.size()} monitors, " +
