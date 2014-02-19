@@ -5,6 +5,7 @@ import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Property
+import org.apache.felix.scr.annotations.PropertyOption
 import org.apache.felix.scr.annotations.Service
 import org.apache.sling.commons.osgi.PropertiesUtil
 
@@ -22,7 +23,13 @@ class DefaultMonitoredBundleStateConfig implements MonitoredBundleStateConfig {
     @Property(name = 'monitoredBundleName', label = 'Name', value = '', description = 'The bundle name that should be monitored')
     private String monitoredBundleName
 
-    @Property(name = 'monitoredBundleAlarmTimeout', label = 'Alarm Timeout', intValue = 30, description = 'The alarm timeout value for a bundle in seconds')
+    @Property(name = "monitoredBundleAlarmTimeout", label = 'Alarm Timeout', description = 'The alarm timeout value for a bundle in seconds',
+        options = [
+            @PropertyOption(name = "15 seconds", value = "15"),
+            @PropertyOption(name = "30 seconds", value = "30"),
+            @PropertyOption(name = "45 seconds", value = "45"),
+            @PropertyOption(name = "60 seconds", value = "60")
+        ])
     private Integer monitoredBundleAlarmTimeout
 
     @Activate

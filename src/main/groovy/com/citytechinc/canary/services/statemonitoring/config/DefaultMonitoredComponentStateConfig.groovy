@@ -5,6 +5,7 @@ import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Property
+import org.apache.felix.scr.annotations.PropertyOption
 import org.apache.felix.scr.annotations.Service
 import org.apache.sling.commons.osgi.PropertiesUtil
 
@@ -22,7 +23,13 @@ class DefaultMonitoredComponentStateConfig implements MonitoredComponentStateCon
     @Property(name = 'monitoredComponentName', label = 'Name', value = '', description = 'The component name that should be monitored')
     private String monitoredComponentName
 
-    @Property(name = 'monitoredComponentAlarmTimeout', label = 'Alarm Timeout', intValue = 30, description = 'The alarm timeout value for a component in seconds')
+    @Property(name = 'monitoredComponentAlarmTimeout', label = 'Alarm Timeout', intValue = 30, description = 'The alarm timeout value for a component in seconds',
+        options = [
+            @PropertyOption(name = "15 seconds", value = "15"),
+            @PropertyOption(name = "30 seconds", value = "30"),
+            @PropertyOption(name = "45 seconds", value = "45"),
+            @PropertyOption(name = "60 seconds", value = "60")
+        ])
     private Integer monitoredComponentAlarmTimeout
 
     @Activate
