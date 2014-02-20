@@ -41,13 +41,13 @@
 
     <scm>
         <connection>scm:git:git@github.com:Citytechinc/canary.git</connection>
-        <url>https://github.com/Citytechinc/canary</url>
         <developerConnection>scm:git:git@github.com:Citytechinc/canary.git</developerConnection>
+        <url>https://github.com/Citytechinc/canary</url>
     </scm>
 
     <issueManagement>
-        <system>waffle.io github issues</system>
-        <url>https://waffle.io/citytechinc/canary</url>
+        <system>GitHub</system>
+        <url>https://github.com/Citytechinc/canary/issues</url>
     </issueManagement>
 
     <repositories>
@@ -61,6 +61,10 @@
         <pluginRepository>
             <id>citytech-public</id>
             <url>http://nexus.citytech.ctmsp.com/content/groups/public</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven-central</id>
+            <url>http://repo1.maven.org/maven2</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -91,7 +95,7 @@
                     <plugin>
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>
-                        <version>0.8</version>
+                        <version>0.9</version>
                         <configuration>
                             <message>site for ${project.version}</message>
                             <server>github</server>
@@ -103,6 +107,44 @@
                                     <goal>site</goal>
                                 </goals>
                                 <phase>site</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>groovydoc</id>
+                                <phase>site</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <taskdef name="groovydoc"
+                                                 classname="org.codehaus.groovy.ant.Groovydoc"
+                                                 classpathref="maven.compile.classpath"
+                                                />
+                                        <groovydoc destdir="${project.reporting.outputDirectory}/groovydoc"
+                                                   sourcepath="${basedir}/src/main/groovy" use="true"
+                                                   windowtitle="${project.name}"
+                                                   doctitle="${project.name}"
+                                                >
+                                            <link packages="java.,org.xml.,javax.,org.xml."
+                                                  href="http://download.oracle.com/javase/6/docs/api" />
+                                            <link packages="org.apache.tools.ant."
+                                                  href="http://evgeny-goldin.org/javadoc/ant/api" />
+                                            <link packages="org.junit.,junit.framework."
+                                                  href="http://kentbeck.github.com/junit/javadoc/latest" />
+                                            <link packages="groovy.,org.codehaus.groovy."
+                                                  href="http://groovy.codehaus.org/api/" />
+                                            <link packages="org.codehaus.gmaven."
+                                                  href="http://evgeny-goldin.org/javadoc/gmaven" />
+                                        </groovydoc>
+                                    </target>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -289,6 +331,14 @@
         <excludeDefaults>true</excludeDefaults>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>codenarc-maven-plugin</artifactId>
+                <version>0.18-1</version>
+                <configuration>
+                    <codeNarcVersion>0.20</codeNarcVersion>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>2.7</version>
                 <reportSets>
@@ -301,7 +351,7 @@
                 </reportSets>
             </plugin>
             <plugin>
-                    <artifactId>maven-surefire-report-plugin</artifactId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
                 <version>2.16</version>
             </plugin>
             <plugin>
@@ -309,7 +359,7 @@
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.9</version>
                 <configuration>
-                    <includeOpenIssues>false</includeOpenIssues>
+                    <includeOpenIssues>true</includeOpenIssues>
                 </configuration>
                 <reportSets>
                     <reportSet>
