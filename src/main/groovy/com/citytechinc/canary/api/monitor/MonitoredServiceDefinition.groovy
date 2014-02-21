@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
      *
      * @return
      */
-    String name()
+    String name() default ''
 
     /**
      *
