@@ -38,12 +38,4 @@ public @interface RecordPersistenceServiceDefinition {
      */
     boolean providesWriteOperations() default true
 
-    /**
-     *
-     * The maximum execution time allowed for a read or a write operation. This is used to protect the inner workings of
-     *   the framework.
-     *
-     * @return
-     */
-    long maxExecutionTimeInMilliseconds() default 500L
 }

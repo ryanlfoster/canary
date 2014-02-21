@@ -268,7 +268,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             recordPersistenceServices.values().each { RecordPersistenceServiceActor actor ->
 
-                actor << new RecordPersistenceServiceActor.PersistRecord(recordHolder: message)
+                actor << new RecordPersistenceServiceActor.PersistRecord(recordHolder: message.recordHolder)
             }
         }
     }

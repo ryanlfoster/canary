@@ -122,14 +122,12 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
                     "Strategy",
-                    "Specifics",
-                    "Max Execution Time (ms)"};
+                    "Specifics"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,
                     SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.LONG};
+                    SimpleType.STRING};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
             final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "Notification Agent Configurations", pageType, itemNamesDescriptionsAndIndexName);
@@ -140,8 +138,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getAgent().getClass().getCanonicalName(),
                         wrapper.getDefinition().strategy().toString(),
-                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
-                        wrapper.getDefinition().maxExecutionTimeInMilliseconds()}));
+                        Arrays.asList(wrapper.getDefinition().specifics()).toString()}));
             }
 
         } catch (final Exception exception) {
@@ -162,14 +159,12 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
                     "Strategy",
-                    "Specifics",
-                    "Max Execution Time (ms)"};
+                    "Specifics"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,
                     SimpleType.STRING,
-                    SimpleType.STRING,
-                    SimpleType.LONG};
+                    SimpleType.STRING};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
             final TabularType pageTabularType = new TabularType("List of Poll Response Handler Configurations", "Poll Response Handler Configurations", pageType, itemNamesDescriptionsAndIndexName);
@@ -180,8 +175,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
                         wrapper.getDefinition().strategy().toString(),
-                        Arrays.asList(wrapper.getDefinition().specifics()).toString(),
-                        wrapper.getDefinition().maxExecutionTimeInMilliseconds()}));
+                        Arrays.asList(wrapper.getDefinition().specifics()).toString()}));
             }
 
         } catch (final Exception exception) {
@@ -202,14 +196,12 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             final String[] itemNamesDescriptionsAndIndexName = {
                     "Name",
                     "Ranking",
-                    "Max Execution Time (ms)",
                     "Provides Read Operations",
                     "Provides Write Operations"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,
                     SimpleType.INTEGER,
-                    SimpleType.LONG,
                     SimpleType.BOOLEAN,
                     SimpleType.BOOLEAN};
 
@@ -222,7 +214,6 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getService().getClass().getCanonicalName(),
                         wrapper.getDefinition().ranking(),
-                        wrapper.getDefinition().maxExecutionTimeInMilliseconds(),
                         wrapper.getDefinition().providesReadOperations(),
                         wrapper.getDefinition().providesWriteOperations()}));
             }

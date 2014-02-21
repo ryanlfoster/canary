@@ -29,12 +29,4 @@ public @interface PollResponseHandlerDefinition {
      */
     String[] specifics() default []
 
-    /**
-     *
-     * The maximum execution time allowed for an operation. This is used to protect the inner workings of
-     *   the framework.
-     *
-     * @return
-     */
-    long maxExecutionTimeInMilliseconds() default 500L
 }
