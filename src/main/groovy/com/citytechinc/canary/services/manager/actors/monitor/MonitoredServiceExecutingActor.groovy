@@ -18,6 +18,8 @@ class MonitoredServiceExecutingActor extends DynamicDispatchActor {
 
     void onMessage(MonitoredServiceActor.Poll message) {
 
+        log.debug("Polling for monitored service: ${wrapper.identifier}")
+
         try {
             sender.send(wrapper.poll())
         } catch (Exception e) {
