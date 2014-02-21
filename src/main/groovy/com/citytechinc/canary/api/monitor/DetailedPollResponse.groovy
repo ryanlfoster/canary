@@ -1,7 +1,7 @@
 package com.citytechinc.canary.api.monitor
 
 import groovy.transform.AutoClone
-import groovy.transform.Immutable
+import groovy.transform.Canonical
 import groovy.transform.ToString
 
 /**
@@ -12,8 +12,8 @@ import groovy.transform.ToString
  *
  */
 @ToString(includeNames = true, excludes = ['stackTrace'])
-@Immutable
 @AutoClone
+@Canonical
 class DetailedPollResponse {
 
     Date startTime

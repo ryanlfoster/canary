@@ -90,11 +90,11 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         }
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
-        recordHolder.addRecord(detailedPollResponse)
+        Boolean isAlarmed = recordHolder.addRecord(detailedPollResponse)
 
         missionControl << new PollResponseHandlerActor.PollResponseReceipt(identifier: recordHolder.monitorIdentifier, response: detailedPollResponse)
 
-        if (recordHolder.isAlarmed()) {
+        if (isAlarmed) {
 
             // todo clone the record holder
             missionControl << new AlarmNotification(monitorDefinition: wrapper.definition, recordHolder: recordHolder)

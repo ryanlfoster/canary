@@ -47,19 +47,21 @@ class RecordHolder {
         recordHolder
     }
 
-    void addRecord(DetailedPollResponse record) {
+    Boolean addRecord(DetailedPollResponse record) {
 
         if (records.size() == maxNumberOfRecords) {
             records.remove()
         }
 
         records.offer(record)
+
+        isAlarmed()
     }
 
     void resetAlarm() {
 
         if (isAlarmed()) {
-            getRecords().each { it.excused = true }
+            getUnexcusedRecords().each { it.excused = true }
         }
     }
 
@@ -138,17 +140,17 @@ class RecordHolder {
 
         } else if (alarmCriteria == AlarmCriteria.RECENT_POLLS) {
 
-            if (getRecords().size() > alarmThreshold) {
+            if (getUnexcusedRecords().size() > alarmThreshold) {
 
                 final List<DetailedPollResponse> scrutinizedRecords
 
                 if (getRecords().size() > alarmThreshold) {
                     scrutinizedRecords = Lists.partition(getRecords(), alarmThreshold).first()
                 } else {
-                    scrutinizedRecords = getRecords()
+                    scrutinizedRecords = getUnexcusedRecords()
                 }
 
-                alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.findAll { !it.excused }.size() > 0
+                alarmed = scrutinizedRecords.findAll { it.responseType != PollResponseType.SUCCESS }.size() == alarmThreshold
             }
         }
 
