@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
-@MonitoredServiceDefinition(name = 'Replication Queue Watchdog', description = 'Keeps runtime statistics regarding your instances replication queues. This should probably only be used in author.', pollInterval = 5, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 10)
+@MonitoredServiceDefinition(description = 'Keeps runtime statistics regarding your instances replication queues.', pollInterval = 5, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 10)
 class ReplicationQueueWatchdog implements MonitoredService {
 
     @Reference
