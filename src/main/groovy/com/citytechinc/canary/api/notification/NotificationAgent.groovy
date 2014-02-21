@@ -6,8 +6,9 @@ package com.citytechinc.canary.api.notification
  *
  * Copyright 2013 CITYTECH, Inc.
  *
- * A notification agent is passed the entire data set for a identifier when a condition is met. The service framework
- *   garauntees that
+ * Notification agents receive the entire record set, the record holder, for a monitor that has transitioned to an
+ *   alarmed state or been cleared of its alarm state. Also necessary for downstream processing is the monitor
+ *   definition, which is also passed as part of the AlarmNotification or AlarmResetNotification.
  *
  */
 public interface NotificationAgent {
