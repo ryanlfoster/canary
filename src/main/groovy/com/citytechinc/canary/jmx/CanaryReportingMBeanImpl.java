@@ -57,7 +57,9 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
         try {
 
             final String[] itemNamesDescriptionsAndIndexName = {
+                    "Classname",
                     "Name",
+                    "Description",
                     "Poll Interval",
                     "Alarm Criteria",
                     "Alarm Threshold",
@@ -68,7 +70,9 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     "Log Escalation?"};
 
             final OpenType[] itemTypes = {
+                    SimpleType.STRING,      // Classname
                     SimpleType.STRING,      // Name
+                    SimpleType.STRING,      // Description
                     SimpleType.STRING,      // Configured Poll Interval
                     SimpleType.STRING,      // Alarm Criteria
                     SimpleType.INTEGER,     // Alarm Threshold
@@ -94,6 +98,8 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getMonitor().getClass().getCanonicalName(),
+                        wrapper.getName(),
+                        wrapper.getDefinition().description(),
                         wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
                         wrapper.getDefinition().alarmCriteria().toString(),
                         wrapper.getDefinition().alarmThreshold(),
