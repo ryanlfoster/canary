@@ -15,7 +15,7 @@ import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
-import org.apache.sling.commons.osgi.OsgiUtil
+import org.apache.sling.commons.osgi.PropertiesUtil
 import org.osgi.framework.Constants as OsgiConstants
 
 /**
@@ -48,8 +48,8 @@ class EmailNotification implements NotificationAgent {
     @Modified
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        fromEmail = OsgiUtil.toString(properties.get(FROM_EMAIL_PROPERTY), '')
-        toEmailAddresses = Arrays.asList(OsgiUtil.toStringArray(properties.get(TO_EMAIL_ADDRESSES_PROPERTY)))
+        fromEmail = PropertiesUtil.toString(properties.get(FROM_EMAIL_PROPERTY), '')
+        toEmailAddresses = PropertiesUtil.toStringArray(properties.get(TO_EMAIL_ADDRESSES_PROPERTY)) as List
     }
 
     @Override

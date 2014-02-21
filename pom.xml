@@ -31,6 +31,21 @@
         <url>http://www.citytechinc.com</url>
     </organization>
 
+    <developers>
+        <developer>
+            <id>jdurbin</id>
+            <name>Josh Durbin</name>
+            <email>jdurbin@citytechinc.com</email>
+            <url>http://www.joshdurbin.net</url>
+            <organization>CITYTECH, Inc.</organization>
+            <organizationUrl>http://www.citytechinc.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>-8</timezone>
+        </developer>
+    </developers>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -92,24 +107,24 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <version>0.9</version>
-                        <configuration>
-                            <message>site for ${project.version}</message>
-                            <server>github</server>
-                            <merge>true</merge>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>site</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--<plugin>-->
+                        <!--<groupId>com.github.github</groupId>-->
+                        <!--<artifactId>site-maven-plugin</artifactId>-->
+                        <!--<version>0.9</version>-->
+                        <!--<configuration>-->
+                            <!--<message>site for ${project.version}</message>-->
+                            <!--<server>github</server>-->
+                            <!--<merge>true</merge>-->
+                        <!--</configuration>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<goals>-->
+                                    <!--<goal>site</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>site</phase>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -345,7 +360,9 @@
                     <reportSet>
                         <reports>
                             <report>summary</report>
+                            <report>project-team</report>
                             <report>license</report>
+                            <report>issue-tracking</report>
                         </reports>
                     </reportSet>
                 </reportSets>

@@ -10,7 +10,6 @@ import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandler
 import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
-import com.citytechinc.canary.services.logescalation.LogEscalationManager
 import com.citytechinc.canary.services.manager.actors.monitor.MonitoredServiceActor
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
@@ -65,7 +64,6 @@ final class MissionControlActor extends DynamicDispatchActor {
     }
 
     Scheduler scheduler
-    LogEscalationManager logEscalationManager
     Long instantiateActorMessageTimeout
 
     Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]

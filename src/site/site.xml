@@ -13,7 +13,7 @@
         <href>http://code.citytechinc.com/canary</href>
     </bannerRight>
 
-    <googleAnalyticsAccountId>UA-928005-4</googleAnalyticsAccountId>
+    <googleAnalyticsAccountId></googleAnalyticsAccountId>
 
     <custom>
         <reflowSkin>
@@ -26,7 +26,7 @@
             <toc>false</toc>
             <highlightJs>true</highlightJs>
             <highlightJsTheme>github</highlightJsTheme>
-            <topNav>Basics|Usage</topNav>
+            <topNav>Basics|Overview|Usage|reports</topNav>
             <brand>
                 <name>${project.name}</name>
                 <href>http://code.citytechinc.com/canary</href>
@@ -35,8 +35,7 @@
             <body />
             <bottomNav maxSpan="9">
                 <column>Main</column>
-                <column>Basics</column>
-                <column>Usage</column>
+                <column>Overview</column>
             </bottomNav>
         </reflowSkin>
     </custom>
@@ -48,18 +47,24 @@
         <menu name="Main" inherit="top">
             <item name="Home" href="index.html" />
             <item name="GitHub" href="https://github.com/Citytechinc/canary" />
-            <item name="Java Doc" href="apidocs/index.html" />
+            <item name="Issues" href="https://waffle.io/Citytechinc/canary" />
+            <item name="Groovy Doc" href="groovydoc/index.html" />
             <item name="CITYTECH Inc." href="http://www.citytechinc.com" />
         </menu>
-        <menu name="Getting Started" inherit="bottom">
-            <item name="Usage" href="usage.html" />
+        <menu name="Overview">
+            <item name="Introduction" href="index.html"/>
+            <item name="History" href="history.html"/>
+            <item name="Installation" href="obtaining-installation.html"/>
+            <item name="Out-of-the-Box Features" href="ootb-features.html"/>
         </menu>
         <menu name="Usage" inherit="bottom">
-            <item name="Adding a Monitor" href="adding-a-monitor.html" />
-            <item name="Adding a Response Handler" href="adding-a-response-handler.html" />
-            <item name="Adding a Notification Agent" href="adding-a-notification-agent.html" />
-            <item name="Adding a Persistence Service" href="adding-a-persistence-service.html" />
+            <item name="Monitors" href="adding-a-monitor.html" />
+            <item name="Response Handlers" href="adding-a-response-handler.html" />
+            <item name="Notification Agents" href="adding-a-notification-agent.html" />
+            <item name="Persistence Services" href="adding-a-persistence-service.html" />
+            <item name="Bundle/Component State Monitoring" href="howto-bundle-component-state-monitoring.html" />
         </menu>
+        <menu ref="reports"/>
         <footer></footer>
     </body>
 </project>

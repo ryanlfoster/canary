@@ -2,8 +2,6 @@ package com.citytechinc.canary.api.notification
 
 import groovy.transform.EqualsAndHashCode
 
-import java.util.concurrent.TimeUnit
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
