@@ -24,7 +24,7 @@ import org.osgi.service.cm.ConfigurationAdmin
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(policy = ConfigurationPolicy.REQUIRE, label = 'CITYTECH Log Escalation Notification Agent', description = 'Creates log entries when it receives an alarm if the service is configured to do so.', immediate = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
