@@ -1,0 +1,14 @@
+com.citytechinc.canary
+com.citytechinc.canary.api.monitor
+com.citytechinc.canary.api.notification
+com.citytechinc.canary.api.persistence
+com.citytechinc.canary.api.responsehandler
+com.citytechinc.canary.jmx
+com.citytechinc.canary.services.manager
+com.citytechinc.canary.services.manager.actors
+com.citytechinc.canary.services.manager.actors.monitor
+com.citytechinc.canary.services.monitor
+com.citytechinc.canary.services.notification
+com.citytechinc.canary.services.persistence
+com.citytechinc.canary.services.statemonitoring
+com.citytechinc.canary.services.statemonitoring.config
