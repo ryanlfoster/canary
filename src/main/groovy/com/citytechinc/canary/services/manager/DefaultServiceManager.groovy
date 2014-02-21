@@ -167,10 +167,10 @@ class DefaultServiceManager implements ServiceManager {
 
         missionControlMonitorActorTimeout = PropertiesUtil.toLong(properties.get(MISSION_CONTROL_MONITOR_ACTOR_TIMEOUT), 15)
 
-        missionControl = new MissionControlActor(scheduler: scheduler, logEscalationManager: logEscalationManager, instantiateActorMessageTimeout: missionControlMonitorActorTimeout)
+        missionControl = new MissionControlActor(scheduler: scheduler, instantiateActorMessageTimeout: missionControlMonitorActorTimeout)
         missionControl.start()
 
-        log.info("Registering ${registeredMonitors.size()} monitors, " +
+        log.debug("Registering ${registeredMonitors.size()} monitors, " +
                 "${registeredNotificationAgents.size()} notification agents, " +
                 "${registeredPersistenceServices.size()} persistence handlers, and " +
                 "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")

@@ -3,6 +3,8 @@ package com.citytechinc.canary.services.manager.actors
 import com.citytechinc.canary.api.monitor.DetailedPollResponse
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
+import com.citytechinc.canary.api.notification.AlarmNotification
+import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.api.notification.NotificationAgent
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
@@ -251,7 +253,7 @@ final class MissionControlActor extends DynamicDispatchActor {
         monitors.values().each { it << new MonitoredServiceActor.ResetAlarm()}
     }
 
-    void onMessage(RecordHolder message) {
+    void onMessage(AlarmNotification message) {
 
         notificationAgents.values().each { NotificationAgentActor actor ->
 
@@ -259,15 +261,22 @@ final class MissionControlActor extends DynamicDispatchActor {
         }
 
         // IF THE MONITOR DEFINITION STATES PERSISTENCE WHEN ALARMED, SEND RECORD HOLDERS TO PERSISTENCE SERVICES
-        if (monitors.keySet().find { it.identifier == message.monitorIdentifier }?.definition?.persistWhenAlarmed()) {
+        if (monitors.keySet().find { it.identifier == message.recordHolder.monitorIdentifier }?.definition?.persistWhenAlarmed()) {
 
-            log.debug("Service monitor ${message.monitorIdentifier} is configured to persist when alarmed. Sending" +
+            log.debug("Service monitor ${message.recordHolder.monitorIdentifier} is configured to persist when alarmed. Sending" +
                     " persist message to ${recordPersistenceServices.size()} record persistence services")
 
             recordPersistenceServices.values().each { RecordPersistenceServiceActor actor ->
 
                 actor << new RecordPersistenceServiceActor.PersistRecord(recordHolder: message)
             }
+        }
+    }
+
+    void onMessage(AlarmResetNotification message) {
+
+        notificationAgents.values().each {
+            it << message
         }
     }
 
@@ -310,9 +319,9 @@ final class MissionControlActor extends DynamicDispatchActor {
 
                 MonitoredServiceActor actor
 
-                if (recordHolder.present) {
+                if (pollResponses.present) {
 
-                    log.debug("Records present for service ${recordHolder.get().monitorIdentifier}, using records to start actor")
+                    log.debug("Records present for service ${wrapper.identifier}, using records to start actor")
                     actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: RecordHolder.CREATE_FROM_RECORDS(wrapper, pollResponses.get()))
                 } else {
 

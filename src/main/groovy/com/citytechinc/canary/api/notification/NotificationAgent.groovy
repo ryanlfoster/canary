@@ -1,7 +1,5 @@
 package com.citytechinc.canary.api.notification
 
-import com.citytechinc.canary.api.monitor.RecordHolder
-
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2013
@@ -16,7 +14,13 @@ public interface NotificationAgent {
 
     /**
      *
-     * @param record
+     * @param alarmNotifications
      */
-    public void notify(List<RecordHolder> recordHolders)
+    public void handleAlarm(List<AlarmNotification> alarmNotifications)
+
+    /**
+     *
+     * @param alarmResetNotifications
+     */
+    public void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications)
 }

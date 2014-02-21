@@ -1,7 +1,8 @@
 package com.citytechinc.canary.services.manager.actors
 
+import com.citytechinc.canary.api.notification.AlarmNotification
+import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper
-import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
@@ -34,23 +35,22 @@ final class NotificationAgentActor extends DynamicDispatchActor {
         scheduler.removeJob(jobprefix + wrapper.identifier)
     }
 
-    Map<String, RecordHolder> queuedMessages = [:]
+    Map<String, AlarmNotification> queuedAlarmNotifications = [:]
+    Map<String, AlarmResetNotification> queuedAlarmResetNotifications = [:]
 
     void onMessage(MissionControlActor.GetStatistics message) {
         sender.send(statistics.clone())
     }
 
-    void onMessage(RecordHolder message) {
+    void onMessage(AlarmNotification message) {
 
         ++statistics.deliveredMessages
 
-        if (((wrapper.definition.strategy() == SubscriptionStrategy.OPT_INTO) && (wrapper.definition.specifics().contains(message.monitorIdentifier)))
-                || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(message.monitorIdentifier)))
-                || (wrapper.definition.strategy() == SubscriptionStrategy.ALL)) {
+        if (processMessage(message.recordHolder.monitorIdentifier)) {
 
             if (wrapper.aggregateAlarms) {
 
-                if (queuedMessages.isEmpty()) {
+                if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
 
                     Date now = new Date()
                     scheduler.fireJobAt(jobprefix + wrapper.identifier, {
@@ -60,55 +60,114 @@ final class NotificationAgentActor extends DynamicDispatchActor {
                     }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(wrapper.aggregateAlarms.aggregationWindow(), wrapper.aggregateAlarms.aggregationWindowTimeUnit())))
                 }
 
-                log.debug("Adding message to queue with size of ${queuedMessages.size()}")
-                queuedMessages.put(message.monitorIdentifier, message)
+                log.debug("Adding alarm message to queue with size of ${queuedAlarmNotifications.size()}")
+                queuedAlarmNotifications.put(message.recordHolder.monitorIdentifier, message)
 
             } else {
 
-                log.debug("Aggregation undefined, sending message without delay...")
+                log.debug("Aggregation undefined, sending alarm message without delay...")
 
                 Stopwatch stopwatch = Stopwatch.createStarted()
 
                 try {
 
-                    wrapper.notify([message])
+                    wrapper.handleAlarm([message])
                     ++statistics.processedMessages
 
                 } catch (Exception e) {
 
-                    log.error("An exception occurred calling the notification agent: ${wrapper.identifier} for service: ${message.monitorIdentifier}", e)
+                    log.error("An exception occurred calling the notification agent: ${wrapper.identifier} for service: ${message.recordHolder.monitorIdentifier}", e)
                     ++statistics.messageExceptions
                 }
 
                 Long processTime = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)
-                log.debug("It took ${processTime} ms to call the notification agent: ${wrapper.identifier} for service: ${message.monitorIdentifier}")
+                log.debug("It took ${processTime} ms to call the notification agent: ${wrapper.identifier} for service: ${message.recordHolder.monitorIdentifier}")
 
                 statistics.addAndCalculateAverageProcessTime(processTime)
             }
         }
     }
 
+    void onMessage(AlarmResetNotification message) {
+
+        ++statistics.deliveredMessages
+
+        if (processMessage(message.recordHolder.monitorIdentifier)) {
+
+
+            if (wrapper.aggregateAlarms) {
+
+                if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
+
+                    Date now = new Date()
+                    scheduler.fireJobAt(jobprefix + wrapper.identifier, {
+
+                        this << new FlushQueue()
+
+                    }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(wrapper.aggregateAlarms.aggregationWindow(), wrapper.aggregateAlarms.aggregationWindowTimeUnit())))
+                }
+
+                log.debug("Adding alarm reset message to queue with size of ${queuedAlarmResetNotifications.size()}")
+                queuedAlarmResetNotifications.put(message.recordHolder.monitorIdentifier, message)
+
+            } else {
+
+                log.debug("Aggregation undefined, sending alarm reset message without delay...")
+
+                Stopwatch stopwatch = Stopwatch.createStarted()
+
+                try {
+
+                    wrapper.handleAlarm([message])
+                    ++statistics.processedMessages
+
+                } catch (Exception e) {
+
+                    log.error("An exception occurred calling the notification agent: ${wrapper.identifier} for service: ${message.recordHolder.monitorIdentifier}", e)
+                    ++statistics.messageExceptions
+                }
+
+                Long processTime = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)
+                log.debug("It took ${processTime} ms to call the notification agent: ${wrapper.identifier} for service: ${message.recordHolder.monitorIdentifier}")
+
+                statistics.addAndCalculateAverageProcessTime(processTime)
+            }
+        }
+    }
+
+    Boolean processMessage(String identifier) {
+        (((wrapper.definition.strategy() == SubscriptionStrategy.OPT_INTO) && (wrapper.definition.specifics().contains(identifier)))
+            || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(identifier)))
+            || (wrapper.definition.strategy() == SubscriptionStrategy.ALL))
+    }
+
     void onMessage(FlushQueue message) {
 
-        log.debug("Flushing queue of size ${queuedMessages.size()}")
+        log.debug("Flushing queues alarms: ${queuedAlarmNotifications.size()} and alarm resets: ${queuedAlarmResetNotifications.size()}")
 
         Stopwatch stopwatch = Stopwatch.createStarted()
 
         try {
 
-            wrapper.notify(queuedMessages.values() as List<RecordHolder>)
+            wrapper.handleAlarm(queuedAlarmNotifications.values() as List<AlarmNotification>)
+            wrapper.handleAlarmReset(queuedAlarmResetNotifications.values() as List<AlarmResetNotification>)
             ++statistics.processedMessages
 
         } catch (Exception e) {
 
-            log.error("An exception occurred while flushing the message queue, calling the notification agent: ${wrapper.identifier} for services: ${queuedMessages.values().collect { it.monitorIdentifier }}", e)
+            log.error("An exception occurred while flushing the message queues, calling the notification agent: ${wrapper.identifier}" +
+                    " sending alarm notifications for services: ${queuedAlarmNotifications.values().collect { it.recordHolder.monitorIdentifier }}" +
+                    " and alarm reset notifications for services: ${queuedAlarmResetNotifications.values().collect { it.recordHolder.monitorIdentifier }}", e)
             ++statistics.messageExceptions
         }
 
-        queuedMessages.clear()
+        queuedAlarmNotifications.clear()
+        queuedAlarmResetNotifications.clear()
 
         Long processTime = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)
-        log.debug("It took ${processTime} ms to flush the message queue, call the notification agent: ${wrapper.identifier} for services: ${queuedMessages.values().collect { it.monitorIdentifier }}")
+        log.debug("It took ${processTime} ms to flush the message queues, call the notification agent: ${wrapper.identifier}" +
+                " sending alarm notifications for services: ${queuedAlarmNotifications.values().collect { it.recordHolder.monitorIdentifier }}" +
+                " and alarm reset notifications for services: ${queuedAlarmResetNotifications.values().collect { it.recordHolder.monitorIdentifier }}")
 
         statistics.addAndCalculateAverageProcessTime(processTime)
     }

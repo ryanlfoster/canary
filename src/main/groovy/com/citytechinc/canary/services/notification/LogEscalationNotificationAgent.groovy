@@ -1,7 +1,8 @@
 package com.citytechinc.canary.services.notification
 
 import com.citytechinc.canary.Constants
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.notification.AlarmNotification
+import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.api.notification.NotificationAgent
 import com.citytechinc.canary.api.notification.NotificationAgentDefinition
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
@@ -42,23 +43,38 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     ConfigurationAdmin configurationAdmin
 
     @Override
-    void notify(List<RecordHolder> recordHolders) {
+    void handleAlarm(List<AlarmNotification> alarmNotifications) {
 
-        recordHolders.each {
+        alarmNotifications.each {
 
             Configuration newConfiguration = configurationAdmin.createFactoryConfiguration(LOG_FACTORY_PID, null)
 
             Dictionary<String, Object> properties = new Hashtable<String, Object>()
 
-            properties.put('pid', it.monitorIdentifier)
+            properties.put('pid', it.recordHolder.monitorIdentifier)
             properties.put('canary.created.date', Constants.JCR_POLL_RESPONSE_NODE_STORAGE_FORMATTER.format(new Date()))
-            properties.put(LOG_LOGGERS, [it.monitorIdentifier])
-            properties.put(LOG_FILE, ROOT_LOGGER_PATH + it.monitorIdentifier)
+            properties.put(LOG_LOGGERS, [it.recordHolder.monitorIdentifier])
+            properties.put(LOG_FILE, ROOT_LOGGER_PATH + it.recordHolder.monitorIdentifier)
             properties.put(LOG_LEVEL, 'debug')
 
             log.info("Creating configuration ${newConfiguration.pid} for service ${properties.get('pid')}")
 
             newConfiguration.update(properties)
+        }
+    }
+
+    @Override
+    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
+
+        alarmResetNotifications.each { AlarmResetNotification notification ->
+
+            configurationAdmin.listConfigurations().findAll { it.factoryPid == LOG_FACTORY_PID }
+                    .findAll { it.properties.get('canary.created.date') && it.properties.get('pid') == notification.recordHolder.monitorIdentifier }
+                    .each {
+
+                log.info("Deleting configuration ${it.pid} for service ${it.properties.get('pid')}")
+                it.delete()
+            }
         }
     }
 }

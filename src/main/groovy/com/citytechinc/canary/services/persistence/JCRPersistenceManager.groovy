@@ -163,6 +163,6 @@ class JCRPersistenceManager implements RecordPersistenceService {
             session?.logout()
         }
 
-        optionalRecordHolder
+        optionalRecords
     }
 }

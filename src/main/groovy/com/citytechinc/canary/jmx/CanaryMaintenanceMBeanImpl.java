@@ -69,7 +69,7 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
                     SimpleType.STRING};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors Configurations", "Monitor Configurations", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Monitor Names", "Monitor Names", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServicesConfigurations()) {

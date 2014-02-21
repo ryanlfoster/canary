@@ -79,7 +79,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.BOOLEAN};    // Log escalation?
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors Configurations", "Monitor Configurations", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Monitor Service Configurations", "Monitor Configurations", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServicesConfigurations()) {
@@ -106,7 +106,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
         } catch (final Exception exception) {
 
-            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Monitor States", exception);
+            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor Service Configurations", exception);
         }
 
         return tabularDataSupport;
@@ -132,7 +132,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "Notification Agent Configurations", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgentsConfigurations()) {
@@ -172,7 +172,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Poll Response Handler Configurations", "Poll Response Handler Configurations", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final PollResponseHandlerWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
@@ -214,7 +214,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.BOOLEAN};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Record Persistence Service Configurations", "Record Persistence Service Configurations", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServicesConfigurations()) {
@@ -263,7 +263,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.INTEGER};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Monitors", "Monitor Results", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Monitor Results", "Monitor Results", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServicesConfigurations()) {
@@ -288,7 +288,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
         } catch (final Exception exception) {
 
-            LOG.error("An EXCEPTION occurred building the TabularDataSupport listing the Monitor States", exception);
+            LOG.error("An exception occurred building the TabularDataSupport listing the Monitor Results", exception);
         }
 
         return tabularDataSupport;
@@ -316,7 +316,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Notification Agents", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Notification Agent Statistics", "Notification Agent Statistics", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgentsConfigurations()) {
@@ -333,7 +333,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception occurred building the TabularDataSupport listing the Notification Agents statistics", exception);
+            LOG.error("An exception occurred building the TabularDataSupport listing the Notification Agent statistics", exception);
         }
 
         return tabularDataSupport;
@@ -361,7 +361,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Poll Response Handlers", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Poll Response Handler Statistics", "Poll Response Handler Statistics", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final PollResponseHandlerWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
@@ -378,7 +378,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
         } catch (final Exception exception) {
 
-            LOG.error("An exception has occurred building the TabularDataSupport listing the Poll Response Handlers statistics", exception);
+            LOG.error("An exception has occurred building the TabularDataSupport listing the Poll Response Handler statistics", exception);
         }
 
         return tabularDataSupport;
@@ -406,7 +406,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.LONG};
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
-            final TabularType pageTabularType = new TabularType("List of Record Persistence Services", "asdf", pageType, itemNamesDescriptionsAndIndexName);
+            final TabularType pageTabularType = new TabularType("List of Record Persistence Services Statistics", "Record Persistence Services Statistics", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
             for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServicesConfigurations()) {

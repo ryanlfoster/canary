@@ -5,6 +5,8 @@ import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.citytechinc.canary.api.monitor.PollResponseType
 import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.notification.AlarmNotification
+import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.PollResponseHandlerActor
 import groovy.util.logging.Slf4j
@@ -59,7 +61,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     void onMessage(GetRecord message) {
 
-//        sender.send(recordHolder.clone())
+        // todo clone the record holder
         sender.send(recordHolder)
     }
 
@@ -69,6 +71,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
             recordHolder.resetAlarm()
             schedulePolling()
+            missionControl << new AlarmResetNotification(monitorDefinition: wrapper.definition, recordHolder: recordHolder)
         }
     }
 
@@ -93,8 +96,8 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
         if (recordHolder.isAlarmed()) {
 
-//            missionControl << recordHolder.clone()
-            missionControl << recordHolder
+            // todo clone the record holder
+            missionControl << new AlarmNotification(monitorDefinition: wrapper.definition, recordHolder: recordHolder)
             unschedulePolling()
             oneTimeScheduleAutoResume()
         }
