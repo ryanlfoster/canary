@@ -4,7 +4,7 @@ import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper;
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper;
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper;
-import com.citytechinc.canary.api.responsehandler.PollResponseWrapper;
+import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper;
 import com.citytechinc.canary.Constants;
 import com.citytechinc.canary.services.manager.ServiceManager;
 import com.citytechinc.canary.services.manager.actors.MissionControlActor;
@@ -175,7 +175,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             final TabularType pageTabularType = new TabularType("List of Notification Agents Configurations", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final PollResponseWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
+            for (final PollResponseHandlerWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
@@ -364,7 +364,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             final TabularType pageTabularType = new TabularType("List of Poll Response Handlers", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            for (final PollResponseWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
+            for (final PollResponseHandlerWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
 
                 final Statistics statistics = serviceManager.getStatistics(wrapper.getHandler().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.POLL_RESPONSE_HANDLER).get();
 

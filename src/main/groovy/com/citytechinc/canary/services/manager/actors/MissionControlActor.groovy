@@ -8,7 +8,7 @@ import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandler
-import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
+import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.monitor.MonitoredServiceActor
 import com.google.common.base.Optional
@@ -68,7 +68,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     Map<MonitoredServiceWrapper, MonitoredServiceActor> monitors = [:]
     Map<NotificationAgentWrapper, NotificationAgentActor> notificationAgents = [:]
-    Map<PollResponseWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
+    Map<PollResponseHandlerWrapper, PollResponseHandlerActor> pollResponseHandlers = [:]
     Map<RecordPersistenceServiceWrapper, RecordPersistenceServiceActor> recordPersistenceServices = [:]
 
     Boolean initialInstantiationOfActorsHasOccurred = false
@@ -199,7 +199,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         } else if (message.service instanceof PollResponseHandler) {
 
-            PollResponseWrapper wrapper = new PollResponseWrapper(message.service)
+            PollResponseHandlerWrapper wrapper = new PollResponseHandlerWrapper(message.service)
 
             if (message.isRegistration && !pollResponseHandlers.containsKey(wrapper)) {
 

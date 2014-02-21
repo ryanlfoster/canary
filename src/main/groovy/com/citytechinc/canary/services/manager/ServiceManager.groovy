@@ -3,7 +3,7 @@ package com.citytechinc.canary.services.manager
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
-import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
+import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
@@ -22,7 +22,7 @@ public interface ServiceManager {
 
     public List<NotificationAgentWrapper> getNotificationAgentsConfigurations()
 
-    public List<PollResponseWrapper> getPollResponseHandlersConfigurations()
+    public List<PollResponseHandlerWrapper> getPollResponseHandlersConfigurations()
 
     public List<RecordPersistenceServiceWrapper> getRecordPersistenceServicesConfigurations()
 

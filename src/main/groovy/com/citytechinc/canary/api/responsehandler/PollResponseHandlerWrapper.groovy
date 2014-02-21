@@ -10,15 +10,15 @@ import groovy.transform.EqualsAndHashCode
  *
  */
 @EqualsAndHashCode
-public class PollResponseWrapper {
+public class PollResponseHandlerWrapper {
 
     @Delegate final PollResponseHandler handler
     final String identifier
-    final PollResponseDefinition definition
+    final PollResponseHandlerDefinition definition
 
-    public PollResponseWrapper(PollResponseHandler handler) {
+    public PollResponseHandlerWrapper(PollResponseHandler handler) {
         this.handler = handler
         identifier = handler.class.canonicalName
-        definition = handler.getClass().getAnnotation(PollResponseDefinition)
+        definition = handler.getClass().getAnnotation(PollResponseHandlerDefinition)
     }
 }

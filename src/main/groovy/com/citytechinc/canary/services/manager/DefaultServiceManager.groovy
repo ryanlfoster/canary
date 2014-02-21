@@ -7,7 +7,7 @@ import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandler
-import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
+import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
 import com.citytechinc.canary.Constants
 import com.citytechinc.canary.api.monitor.RecordHolder
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
@@ -226,8 +226,8 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
-    List<PollResponseWrapper> getPollResponseHandlersConfigurations() {
-        registeredPollResponseHandlers.collect { new PollResponseWrapper(it) }
+    List<PollResponseHandlerWrapper> getPollResponseHandlersConfigurations() {
+        registeredPollResponseHandlers.collect { new PollResponseHandlerWrapper(it) }
     }
 
     @Override

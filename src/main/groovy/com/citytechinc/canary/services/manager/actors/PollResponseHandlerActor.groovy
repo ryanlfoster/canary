@@ -2,7 +2,7 @@ package com.citytechinc.canary.services.manager.actors
 
 import com.citytechinc.canary.api.monitor.DetailedPollResponse
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
-import com.citytechinc.canary.api.responsehandler.PollResponseWrapper
+import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
 import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
@@ -25,7 +25,7 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
         DetailedPollResponse response
     }
 
-    PollResponseWrapper wrapper
+    PollResponseHandlerWrapper wrapper
     Statistics statistics = new Statistics()
 
     void onMessage(MissionControlActor.GetStatistics message) {

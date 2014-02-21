@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PollResponseDefinition {
+public @interface PollResponseHandlerDefinition {
 
     /**
      *
