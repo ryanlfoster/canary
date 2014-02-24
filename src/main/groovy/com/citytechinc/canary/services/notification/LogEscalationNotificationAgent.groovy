@@ -45,21 +45,29 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     @Override
     void handleAlarm(List<AlarmNotification> alarmNotifications) {
 
-        alarmNotifications.each {
+        alarmNotifications.each { AlarmNotification alarmNotification ->
 
-            Configuration newConfiguration = configurationAdmin.createFactoryConfiguration(LOG_FACTORY_PID, null)
+            if (configurationAdmin.listConfigurations()
+                    .findAll { it.factoryPid == LOG_FACTORY_PID }
+                    .findAll { it.properties.get('pid') == alarmNotification.recordHolder.monitorIdentifier }.isEmpty()) {
 
-            Dictionary<String, Object> properties = new Hashtable<String, Object>()
+                Configuration newConfiguration = configurationAdmin.createFactoryConfiguration(LOG_FACTORY_PID, null)
 
-            properties.put('pid', it.recordHolder.monitorIdentifier)
-            properties.put('canary.created.date', Constants.JCR_POLL_RESPONSE_NODE_STORAGE_FORMATTER.format(new Date()))
-            properties.put(LOG_LOGGERS, [it.recordHolder.monitorIdentifier])
-            properties.put(LOG_FILE, ROOT_LOGGER_PATH + it.recordHolder.monitorIdentifier)
-            properties.put(LOG_LEVEL, 'debug')
+                Dictionary<String, Object> properties = new Hashtable<String, Object>()
 
-            log.info("Creating configuration ${newConfiguration.pid} for service ${properties.get('pid')}")
+                properties.put('pid', alarmNotification.recordHolder.monitorIdentifier)
+                properties.put('canary.created.date', Constants.JCR_POLL_RESPONSE_NODE_STORAGE_FORMATTER.format(new Date()))
+                properties.put(LOG_LOGGERS, [alarmNotification.recordHolder.monitorIdentifier])
+                properties.put(LOG_FILE, ROOT_LOGGER_PATH + alarmNotification.recordHolder.monitorIdentifier)
+                properties.put(LOG_LEVEL, 'debug')
 
-            newConfiguration.update(properties)
+                log.info("Creating configuration ${newConfiguration.pid} for service ${properties.get('pid')}")
+
+                newConfiguration.update(properties)
+            } else {
+
+                log.debug("A log configuration already exists for service ${alarmNotification.recordHolder.monitorIdentifier}")
+            }
         }
     }
 
