@@ -8,6 +8,8 @@ import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import com.citytechinc.canary.Constants
 import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
+//import org.apache.commons.mail.ByteArrayDataSource
+//import org.apache.commons.mail.HtmlEmail
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
@@ -18,6 +20,8 @@ import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
 import org.apache.sling.commons.osgi.PropertiesUtil
 import org.osgi.framework.Constants as OsgiConstants
+
+//import javax.mail.internet.InternetAddress
 
 /**
  *
@@ -56,6 +60,22 @@ class EmailNotification implements NotificationAgent {
     @Override
     void handleAlarm(List<AlarmNotification> alarmNotifications) {
 
+//        if (!toEmailAddresses.empty) {
+//
+//            HtmlEmail email = new HtmlEmail()
+//
+//            email.setFrom(fromEmail)
+//            email.setTo(toEmailAddresses.collect { new InternetAddress(it) })
+//            email.setSubject(subject)
+//            email.setMsg(body)
+//            email.attach(new ByteArrayDataSource(
+//                    MarhsallUtil.marshallToJSON(trafficControllerService.getTrafficControlDefinition()).getBytes("UTF-8"), "application/json"),
+//                    String.format(ATTACHMENT_FILENAME, Constants.DATE_ONLY_WITH_DASHES_FORMATTER.format(processTime)),
+//                    StringUtils.EMPTY,
+//                    Part.ATTACHMENT)
+//
+//            mailService.send(email);
+//        }
     }
 
     @Override
