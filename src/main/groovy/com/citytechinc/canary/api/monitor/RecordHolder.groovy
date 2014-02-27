@@ -1,6 +1,7 @@
 package com.citytechinc.canary.api.monitor
 
 import com.google.common.base.Optional
+import com.google.common.collect.EvictingQueue
 import com.google.common.collect.Lists
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
@@ -30,7 +31,7 @@ class RecordHolder {
         this.alarmCriteria = alarmCriteria
         this.alarmThreshold = alarmThreshold
 
-        records = [] as Queue
+        records = new EvictingQueue<DetailedPollResponse>(maxNumberOfRecords)
     }
 
     public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
@@ -49,12 +50,7 @@ class RecordHolder {
 
     Boolean addRecord(DetailedPollResponse record) {
 
-        if (records.size() == maxNumberOfRecords) {
-            records.remove()
-        }
-
         records.offer(record)
-
         isAlarmed()
     }
 
