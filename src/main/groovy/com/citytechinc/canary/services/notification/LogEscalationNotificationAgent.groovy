@@ -66,7 +66,7 @@ class LogEscalationNotificationAgent implements NotificationAgent {
                 newConfiguration.update(properties)
             } else {
 
-                log.debug("A log configuration already exists for service ${alarmNotification.recordHolder.monitorIdentifier}")
+                log.debug("A log configuration already exists for service ${alarmNotification.recordHolder.monitorIdentifier}, skipping configuration creation")
             }
         }
     }
