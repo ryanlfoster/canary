@@ -5,12 +5,15 @@ import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.day.cq.replication.AgentManager
+import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
+import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
+import org.apache.sling.commons.osgi.PropertiesUtil
 import org.osgi.framework.Constants as OsgiConstants
 
 import java.util.concurrent.TimeUnit
@@ -29,6 +32,15 @@ import java.util.concurrent.TimeUnit
 @MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 3, pollIntervalUnit = TimeUnit.MINUTES, alarmThreshold = 10)
 class BlockedAgentQueueMonitor implements MonitoredService {
 
+    @Property(name = 'agentIds', label = 'Agent IDs', value = ['publish', ''], description = 'Agent IDs to examine for blocked replication queues')
+    private List<String> agentIds
+
+    @Activate
+    @Modified
+    protected void activate(Map<String, Object> properties) throws Exception {
+        agentIds = PropertiesUtil.toStringArray(properties.get('agentIds')) as List
+    }
+
     @Reference
     AgentManager agentManager
 
@@ -38,8 +50,7 @@ class BlockedAgentQueueMonitor implements MonitoredService {
         StringBuilder message = new StringBuilder()
 
         agentManager.agents.values().findAll { it.enabled }
-                .findAll { it.configuration.serializationType == 'durbo' }
-                .findAll { !it.configuration.usedForReverseReplication() }
+                .findAll { agentNames.contains(it.configuration.agentId) }
                 .each {
 
             if (it.queue.status.nextRetryTime > 0) {
