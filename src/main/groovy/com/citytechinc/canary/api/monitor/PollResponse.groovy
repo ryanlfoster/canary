@@ -11,10 +11,12 @@ public class PollResponse {
 
     private final PollResponseType pollResponseType
     private final String exceptionStackTrace
+    private String message
 
-    private PollResponse(final PollResponseType pollResponseType, final String exceptionStackTrace) {
+    private PollResponse(PollResponseType pollResponseType, String exceptionStackTrace, String message) {
         this.pollResponseType = pollResponseType
         this.exceptionStackTrace = exceptionStackTrace
+        this.message = message
     }
 
     /**
@@ -25,7 +27,7 @@ public class PollResponse {
      * @return
      */
     public static PollResponse SUCCESS() {
-        return new PollResponse(PollResponseType.SUCCESS, '')
+        return new PollResponse(PollResponseType.SUCCESS, '', '')
     }
 
     /**
@@ -55,5 +57,14 @@ public class PollResponse {
 
     public String getExceptionStackTrace() {
         return exceptionStackTrace
+    }
+
+    String getMessage() {
+        return message
+    }
+
+    public PollResponse addMessage(String message) {
+        this.message = message
+        this
     }
 }

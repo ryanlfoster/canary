@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 final class NotificationAgentActor extends DynamicDispatchActor {
 
-    static String jobprefix = 'canaryna-'
+    static String JOB_PREFIX = 'canaryna-'
 
     // MESSAGES
     static class FlushQueue { }
@@ -32,7 +32,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
     void afterStop() {
 
-        scheduler.removeJob(jobprefix + wrapper.identifier)
+        scheduler.removeJob(JOB_PREFIX + wrapper.identifier)
     }
 
     Map<String, AlarmNotification> queuedAlarmNotifications = [:]
@@ -53,7 +53,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
                 if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
 
                     Date now = new Date()
-                    scheduler.fireJobAt(jobprefix + wrapper.identifier, {
+                    scheduler.fireJobAt(JOB_PREFIX + wrapper.identifier, {
 
                         this << new FlushQueue()
 
@@ -100,7 +100,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
                 if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
 
                     Date now = new Date()
-                    scheduler.fireJobAt(jobprefix + wrapper.identifier, {
+                    scheduler.fireJobAt(JOB_PREFIX + wrapper.identifier, {
 
                         this << new FlushQueue()
 

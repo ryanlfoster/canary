@@ -8,8 +8,8 @@ import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import com.citytechinc.canary.Constants
 import com.day.cq.mailer.MailService
 import groovy.util.logging.Slf4j
-//import org.apache.commons.mail.ByteArrayDataSource
-//import org.apache.commons.mail.HtmlEmail
+import org.apache.commons.mail.HtmlEmail
+
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
@@ -19,9 +19,10 @@ import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
 import org.apache.sling.commons.osgi.PropertiesUtil
+import org.apache.sling.settings.SlingSettingsService
 import org.osgi.framework.Constants as OsgiConstants
 
-//import javax.mail.internet.InternetAddress
+import javax.mail.internet.InternetAddress
 
 /**
  *
@@ -40,6 +41,9 @@ class EmailNotification implements NotificationAgent {
 
     @Reference
     MailService mailService
+
+    @Reference
+    SlingSettingsService slingSettingsService
 
     @Property(label = 'From email', value = [''], description = 'The from e-mail address when sending an alarm notification')
     private static final String FROM_EMAIL_PROPERTY = 'fromEmail'
@@ -60,22 +64,24 @@ class EmailNotification implements NotificationAgent {
     @Override
     void handleAlarm(List<AlarmNotification> alarmNotifications) {
 
-//        if (!toEmailAddresses.empty) {
-//
-//            HtmlEmail email = new HtmlEmail()
-//
-//            email.setFrom(fromEmail)
-//            email.setTo(toEmailAddresses.collect { new InternetAddress(it) })
-//            email.setSubject(subject)
-//            email.setMsg(body)
+        slingSettingsService.getSlingHomePath()
+
+        if (fromEmail && !toEmailAddresses.empty) {
+
+            HtmlEmail email = new HtmlEmail()
+
+            email.setFrom(fromEmail)
+            email.setTo(toEmailAddresses.collect { new InternetAddress(it) })
+            email.setSubject('')
+            email.setMsg('')
 //            email.attach(new ByteArrayDataSource(
 //                    MarhsallUtil.marshallToJSON(trafficControllerService.getTrafficControlDefinition()).getBytes("UTF-8"), "application/json"),
 //                    String.format(ATTACHMENT_FILENAME, Constants.DATE_ONLY_WITH_DASHES_FORMATTER.format(processTime)),
-//                    StringUtils.EMPTY,
+//                    '',
 //                    Part.ATTACHMENT)
-//
-//            mailService.send(email);
-//        }
+
+            mailService.send(email);
+        }
     }
 
     @Override

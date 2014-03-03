@@ -5,11 +5,10 @@ import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.day.cq.replication.AgentManager
-import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
-import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Properties
+import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
 import org.osgi.framework.Constants as OsgiConstants
@@ -27,9 +26,8 @@ import java.util.concurrent.TimeUnit
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
-@Slf4j
-@MonitoredServiceDefinition(description = 'Keeps runtime statistics regarding your instances replication queues.', pollInterval = 5, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 10)
-class ReplicationQueueWatchdog implements MonitoredService {
+@MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 3, pollIntervalUnit = TimeUnit.MINUTES, alarmThreshold = 10)
+class BlockedAgentQueueMonitor implements MonitoredService {
 
     @Reference
     AgentManager agentManager
@@ -37,6 +35,19 @@ class ReplicationQueueWatchdog implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        agentManager.agents.get('publish').queue.entries().size() > 0 ? PollResponse.UNEXPECTED_SERVICE_RESPONSE() : PollResponse.SUCCESS()
+        StringBuilder message = new StringBuilder()
+
+        agentManager.agents.values().findAll { it.enabled }
+                .findAll { it.configuration.serializationType == 'durbo' }
+                .findAll { !it.configuration.usedForReverseReplication() }
+                .each {
+
+            if (it.queue.status.nextRetryTime > 0) {
+
+                message.append("The replication queue for ${it.configuration.agentId} is blocked. ")
+            }
+        }
+
+        message.size() > 0 ? PollResponse.SUCCESS() : PollResponse.UNEXPECTED_SERVICE_RESPONSE().addMessage(message)
     }
 }

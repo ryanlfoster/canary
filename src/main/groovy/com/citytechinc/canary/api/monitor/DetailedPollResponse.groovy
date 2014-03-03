@@ -20,6 +20,7 @@ class DetailedPollResponse {
     Date endTime
     PollResponseType responseType
     String stackTrace
+    String message
     Boolean excused = false
 
     Long executionTimeInMilliseconds() {

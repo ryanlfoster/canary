@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 final class MonitoredServiceActor extends DynamicDispatchActor {
 
-    static String jobprefix = 'canarymon-'
+    static String JOB_PREFIX = 'canarymon-'
 
     // MESSAGES
     static class Poll {}
@@ -83,6 +83,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
                 responseType: pollResponse.pollResponseType,
+                message: pollResponse.message,
                 stackTrace: pollResponse.exceptionStackTrace)
 
         if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {
@@ -124,7 +125,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def schedulerJobKey = {
 
-        jobprefix + wrapper.identifier
+        JOB_PREFIX + wrapper.identifier
     }
 
     def oneTimeScheduleAutoResume = {
