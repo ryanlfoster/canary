@@ -97,12 +97,14 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
                     "End Time",
                     "Runtime (ms)",
                     "Response",
+                    "Message",
                     "Cleared"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.LONG,
+                    SimpleType.STRING,
                     SimpleType.STRING,
                     SimpleType.BOOLEAN};
 
@@ -121,6 +123,7 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
                             Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
                             detailedPollResponse.executionTimeInMilliseconds(),
                             detailedPollResponse.getResponseType().toString(),
+                            detailedPollResponse.getMessage(),
                             detailedPollResponse.getExcused() }));
                 }
             }
