@@ -1,5 +1,6 @@
 package com.citytechinc.canary.api.responsehandler
 
+import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import groovy.transform.EqualsAndHashCode
 import org.codehaus.jackson.annotate.JsonIgnore
 
@@ -14,13 +15,21 @@ import org.codehaus.jackson.annotate.JsonIgnore
 public class PollResponseHandlerWrapper {
 
     @JsonIgnore
-    @Delegate final PollResponseHandler handler
+    @Delegate
+    final PollResponseHandler handler
+
     final String identifier
-    final PollResponseHandlerDefinition definition
+    final SubscriptionStrategy strategy
+    final List<String> specifics
 
     public PollResponseHandlerWrapper(PollResponseHandler handler) {
+
         this.handler = handler
+
+        def definition = handler.getClass().getAnnotation(PollResponseHandlerDefinition)
+
         identifier = handler.class.canonicalName
-        definition = handler.getClass().getAnnotation(PollResponseHandlerDefinition)
+        strategy = definition.strategy()
+        specifics = definition.specifics()
     }
 }

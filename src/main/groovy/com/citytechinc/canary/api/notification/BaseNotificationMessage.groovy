@@ -1,7 +1,5 @@
 package com.citytechinc.canary.api.notification
 
-import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
-import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.RecordHolder
 import groovy.transform.ToString
 
@@ -15,7 +13,7 @@ import groovy.transform.ToString
 @ToString
 class BaseNotificationMessage {
 
-    MonitoredServiceDefinition monitorDefinition
-    AutomaticResetMonitor automaticResetMonitor
+    String monitorName
+    String monitorDescription
     RecordHolder recordHolder
 }

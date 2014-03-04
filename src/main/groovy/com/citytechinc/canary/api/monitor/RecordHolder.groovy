@@ -36,12 +36,12 @@ class RecordHolder {
 
     public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
 
-        return new RecordHolder(wrapper.identifier, wrapper.definition.maxNumberOfRecords(), wrapper.definition.alarmCriteria(), wrapper.definition.alarmThreshold())
+        return new RecordHolder(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold)
     }
 
     public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<DetailedPollResponse> detailedPollResponses) {
 
-        RecordHolder recordHolder = new RecordHolder(wrapper.identifier, wrapper.definition.maxNumberOfRecords(), wrapper.definition.alarmCriteria(), wrapper.definition.alarmThreshold())
+        RecordHolder recordHolder = new RecordHolder(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold)
 
         detailedPollResponses.each { recordHolder.addRecord(it) }
 

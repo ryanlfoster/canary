@@ -48,7 +48,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         if (processMessage(message.recordHolder.monitorIdentifier)) {
 
-            if (wrapper.aggregateAlarms) {
+            if (wrapper.aggregationCriteriaDefined) {
 
                 if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
 
@@ -57,7 +57,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
                         this << new FlushQueue()
 
-                    }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(wrapper.aggregateAlarms.aggregationWindow(), wrapper.aggregateAlarms.aggregationWindowTimeUnit())))
+                    }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(wrapper.aggregationWindow, wrapper.aggregationWindowTimeUnit)))
                 }
 
                 log.debug("Adding alarm message to queue with size of ${queuedAlarmNotifications.size()}")
@@ -94,8 +94,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         if (processMessage(message.recordHolder.monitorIdentifier)) {
 
-
-            if (wrapper.aggregateAlarms) {
+            if (wrapper.aggregationCriteriaDefined) {
 
                 if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
 
@@ -104,7 +103,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
                         this << new FlushQueue()
 
-                    }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(wrapper.aggregateAlarms.aggregationWindow(), wrapper.aggregateAlarms.aggregationWindowTimeUnit())))
+                    }, [:], new Date(now.time + TimeUnit.MILLISECONDS.convert(wrapper.aggregationWindow, wrapper.aggregationWindowTimeUnit)))
                 }
 
                 log.debug("Adding alarm reset message to queue with size of ${queuedAlarmResetNotifications.size()}")
@@ -136,9 +135,9 @@ final class NotificationAgentActor extends DynamicDispatchActor {
     }
 
     Boolean processMessage(String identifier) {
-        (((wrapper.definition.strategy() == SubscriptionStrategy.OPT_INTO) && (wrapper.definition.specifics().contains(identifier)))
-            || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(identifier)))
-            || (wrapper.definition.strategy() == SubscriptionStrategy.ALL))
+        (((wrapper.strategy == SubscriptionStrategy.OPT_INTO) && (wrapper.specifics.contains(identifier)))
+            || ((wrapper.strategy == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.specifics.contains(identifier)))
+            || (wrapper.strategy == SubscriptionStrategy.ALL))
     }
 
     void onMessage(FlushQueue message) {

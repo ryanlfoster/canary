@@ -25,7 +25,6 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
-import java.util.Arrays;
 
 /**
  *
@@ -90,8 +89,8 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
                 final String autoResume;
 
-                if (wrapper.getAutomaticResetMonitorDefinition() != null) {
-                    autoResume = "Polls every " + wrapper.getAutomaticResetMonitorDefinition().interval() + " " + wrapper.getAutomaticResetMonitorDefinition().unit() + " and resets after ";
+                if (wrapper.getResetCriteriaDefined()) {
+                    autoResume = "Polls every " + wrapper.getResetInterval() + " " + wrapper.getResetIntervalUnit() + " and resets after ";
                 } else {
                     autoResume = "N/A";
                 }
@@ -99,15 +98,15 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getMonitor().getClass().getCanonicalName(),
                         wrapper.getName(),
-                        wrapper.getDefinition().description(),
-                        wrapper.getDefinition().pollInterval() + " " + wrapper.getDefinition().pollIntervalUnit(),
-                        wrapper.getDefinition().alarmCriteria().toString(),
-                        wrapper.getDefinition().alarmThreshold(),
-                        wrapper.getDefinition().maxNumberOfRecords(),
-                        wrapper.getDefinition().persistWhenAlarmed(),
-                        wrapper.getDefinition().maxExecutionTime(),
+                        wrapper.getDescription(),
+                        wrapper.getPollInterval() + " " + wrapper.getPollIntervalUnit(),
+                        wrapper.getAlarmCriteria().toString(),
+                        wrapper.getAlarmThreshold(),
+                        wrapper.getMaxNumberOfRecords(),
+                        wrapper.getPersistWhenAlarmed(),
+                        wrapper.getMaxExecutionTime(),
                         autoResume,
-                        wrapper.getDefinition().logEscalation() }));
+                        wrapper.getEscalateLogs()}));
             }
 
         } catch (final Exception exception) {
@@ -143,8 +142,8 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getAgent().getClass().getCanonicalName(),
-                        wrapper.getDefinition().strategy().toString(),
-                        Arrays.asList(wrapper.getDefinition().specifics()).toString()}));
+                        wrapper.getStrategy().toString(),
+                        wrapper.getSpecifics().toString() }));
             }
 
         } catch (final Exception exception) {
@@ -180,8 +179,8 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
-                        wrapper.getDefinition().strategy().toString(),
-                        Arrays.asList(wrapper.getDefinition().specifics()).toString()}));
+                        wrapper.getStrategy().toString(),
+                        wrapper.getSpecifics().toString()}));
             }
 
         } catch (final Exception exception) {
@@ -219,9 +218,9 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getService().getClass().getCanonicalName(),
-                        wrapper.getDefinition().ranking(),
-                        wrapper.getDefinition().providesReadOperations(),
-                        wrapper.getDefinition().providesWriteOperations()}));
+                        wrapper.getRanking(),
+                        wrapper.getProvidesReadOperations(),
+                        wrapper.getProvidesWriteOperations()}));
             }
 
         } catch (final Exception exception) {

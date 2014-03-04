@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit
 
     /**
      *
-     * The poll frequency unit used with the pollInterval()
+     * The poll frequency resetIntervalUnit used with the pollInterval()
      *
      * @return
      */

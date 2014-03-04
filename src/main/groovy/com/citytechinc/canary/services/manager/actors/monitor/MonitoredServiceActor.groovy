@@ -71,14 +71,14 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
             recordHolder.resetAlarm()
             schedulePolling()
-            missionControl << new AlarmResetNotification(monitorDefinition: wrapper.definition, recordHolder: recordHolder)
+            missionControl << new AlarmResetNotification(monitorName: wrapper.name, monitorDescription: wrapper.description, recordHolder: recordHolder)
         }
     }
 
     void onMessage(Poll message) {
 
         final Date startTime = new Date()
-        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.definition.maxExecutionTime(), TimeUnit.MILLISECONDS) ?: InternalPollResponse.INTERRUPTED()
+        final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.maxExecutionTime, TimeUnit.MILLISECONDS) ?: InternalPollResponse.INTERRUPTED()
 
         DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
@@ -87,7 +87,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
                 stackTrace: pollResponse.exceptionStackTrace)
 
         if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {
-            log.debug("Interrupted a poll which started on ${detailedPollResponse.startTime} and exceeded the max execution time of ${wrapper.definition.maxExecutionTime()} ms")
+            log.debug("Interrupted a poll which started on ${detailedPollResponse.startTime} and exceeded the max execution time of ${wrapper.maxExecutionTime} ms")
         }
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
@@ -98,7 +98,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         if (isAlarmed) {
 
             // todo clone the record holder
-            missionControl << new AlarmNotification(monitorDefinition: wrapper.definition, recordHolder: recordHolder)
+            missionControl << new AlarmNotification(monitorName: wrapper.name, monitorDescription: wrapper.description, recordHolder: recordHolder)
             unschedulePolling()
             oneTimeScheduleAutoResume()
         }
@@ -106,7 +106,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def schedulePolling = {
 
-        Long pollIntervalInSeconds = TimeUnit.SECONDS.convert(wrapper.definition.pollInterval(), wrapper.definition.pollIntervalUnit())
+        Long pollIntervalInSeconds = TimeUnit.SECONDS.convert(wrapper.pollInterval, wrapper.pollIntervalUnit)
 
         log.debug("Adding scheduled job defined under the key: ${schedulerJobKey()} will fire every ${pollIntervalInSeconds} seconds")
 
@@ -130,9 +130,9 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
 
     def oneTimeScheduleAutoResume = {
 
-        if (recordHolder.isAlarmed() && wrapper.automaticResetMonitorDefinition) {
+        if (recordHolder.isAlarmed() && wrapper.resetCriteriaDefined) {
 
-            Long automaticResetPollInterval = TimeUnit.MILLISECONDS.convert(wrapper.automaticResetMonitorDefinition.interval(), wrapper.automaticResetMonitorDefinition.unit())
+            Long automaticResetPollInterval = TimeUnit.MILLISECONDS.convert(wrapper.getResetInterval(), wrapper.getResetIntervalUnit())
 
             log.debug("Adding scheduled auto resume job defined under the key: ${schedulerJobKey()} will fire in ${automaticResetPollInterval} ms")
 

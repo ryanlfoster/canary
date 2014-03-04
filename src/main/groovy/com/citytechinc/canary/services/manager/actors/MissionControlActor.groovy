@@ -181,7 +181,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             if (message.isRegistration && !recordPersistenceServices.containsKey(wrapper)) {
 
-                if (wrapper.definition.providesReadOperations() || wrapper.definition.providesWriteOperations()) {
+                if (wrapper.providesReadOperations || wrapper.providesWriteOperations) {
 
                     log.debug("Starting actor for persistence service ${wrapper.identifier}")
                     RecordPersistenceServiceActor actor = new RecordPersistenceServiceActor(wrapper: wrapper)
@@ -261,7 +261,7 @@ final class MissionControlActor extends DynamicDispatchActor {
         }
 
         // IF THE MONITOR DEFINITION STATES PERSISTENCE WHEN ALARMED, SEND RECORD HOLDERS TO PERSISTENCE SERVICES
-        if (monitors.keySet().find { it.identifier == message.recordHolder.monitorIdentifier }?.definition?.persistWhenAlarmed()) {
+        if (monitors.keySet().find { it.identifier == message.recordHolder.monitorIdentifier }?.persistWhenAlarmed()) {
 
             log.debug("Service monitor ${message.recordHolder.monitorIdentifier} is configured to persist when alarmed. Sending" +
                     " persist message to ${recordPersistenceServices.size()} record persistence services")
@@ -310,7 +310,7 @@ final class MissionControlActor extends DynamicDispatchActor {
              *   transmission is non-blocking. Its response will invoke the closure, providing the record holder from
              *   the persistence service, and start the actor with history.
              */
-            RecordPersistenceServiceWrapper persistenceWrapper = recordPersistenceServices.keySet().findAll { it.definition.providesReadOperations() }.sort { it.definition.ranking() }.first()
+            RecordPersistenceServiceWrapper persistenceWrapper = recordPersistenceServices.keySet().findAll { it.providesReadOperations }.sort { it.ranking }.first()
             RecordPersistenceServiceActor persistenceActor = recordPersistenceServices.get(persistenceWrapper)
 
             log.debug("Polling ${persistenceWrapper.service.class} for records")

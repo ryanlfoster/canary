@@ -21,7 +21,7 @@ public @interface AutomaticResetMonitor {
      *
      * @return
      */
-    int interval()
+    int resetInterval()
 
     /**
      *
@@ -29,6 +29,6 @@ public @interface AutomaticResetMonitor {
      *
      * @return
      */
-    TimeUnit unit()
+    TimeUnit resetIntervalUnit()
 
 }

@@ -14,13 +14,22 @@ import org.codehaus.jackson.annotate.JsonIgnore
 public final class RecordPersistenceServiceWrapper {
 
     @JsonIgnore
-    @Delegate final RecordPersistenceService service
+    @Delegate
+    final RecordPersistenceService service
+
     final String identifier
-    final RecordPersistenceServiceDefinition definition
+    final Integer ranking
+    final Boolean providesReadOperations
+    final Boolean providesWriteOperations
 
     public RecordPersistenceServiceWrapper(final RecordPersistenceService service) {
         this.service = service
+
+        def definition = service.getClass().getAnnotation(RecordPersistenceServiceDefinition)
+
         identifier = service.class.canonicalName
-        this.definition = service.getClass().getAnnotation(RecordPersistenceServiceDefinition)
+        ranking = definition.ranking()
+        providesReadOperations = definition.providesReadOperations()
+        providesWriteOperations = definition.providesWriteOperations()
     }
 }

@@ -26,7 +26,7 @@ public class PollResponse {
      * @return
      */
     public static PollResponse SUCCESS() {
-        return new PollResponse(PollResponseType.SUCCESS, '', '')
+        return new PollResponse(PollResponseType.SUCCESS, '')
     }
 
     /**

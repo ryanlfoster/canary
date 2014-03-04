@@ -36,9 +36,9 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
 
         ++statistics.deliveredMessages
 
-        if (((wrapper.definition.strategy() == SubscriptionStrategy.OPT_INTO) && (wrapper.definition.specifics().contains(message.identifier)))
-            || ((wrapper.definition.strategy() == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.definition.specifics().contains(message.identifier)))
-            || (wrapper.definition.strategy() == SubscriptionStrategy.ALL)) {
+        if (((wrapper.strategy == SubscriptionStrategy.OPT_INTO) && (wrapper.specifics.contains(message.identifier)))
+            || ((wrapper.strategy == SubscriptionStrategy.OPT_OUT_OF) && (!wrapper.specifics.contains(message.identifier)))
+            || (wrapper.strategy == SubscriptionStrategy.ALL)) {
 
             Stopwatch stopwatch = Stopwatch.createStarted()
 

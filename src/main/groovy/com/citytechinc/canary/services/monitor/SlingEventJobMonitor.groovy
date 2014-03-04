@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @MonitoredServiceDefinition(description = 'Polls the sling job manager examining average wait and process times', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)
-@AutomaticResetMonitor(interval = 30, unit = TimeUnit.SECONDS)
+@AutomaticResetMonitor(resetInterval = 30, resetIntervalUnit = TimeUnit.SECONDS)
 class SlingEventJobMonitor implements MonitoredService {
 
     @Reference
