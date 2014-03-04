@@ -1,6 +1,7 @@
 package com.citytechinc.canary.api.notification
 
 import groovy.transform.EqualsAndHashCode
+import org.codehaus.jackson.annotate.JsonIgnore
 
 /**
  *
@@ -12,6 +13,7 @@ import groovy.transform.EqualsAndHashCode
 @EqualsAndHashCode
 public final class NotificationAgentWrapper {
 
+    @JsonIgnore
     @Delegate final NotificationAgent agent
     final String identifier
     final NotificationAgentDefinition definition

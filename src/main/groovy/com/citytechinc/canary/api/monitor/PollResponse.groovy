@@ -13,10 +13,9 @@ public class PollResponse {
     private final String exceptionStackTrace
     private String message
 
-    private PollResponse(PollResponseType pollResponseType, String exceptionStackTrace, String message) {
+    private PollResponse(PollResponseType pollResponseType, String exceptionStackTrace) {
         this.pollResponseType = pollResponseType
         this.exceptionStackTrace = exceptionStackTrace
-        this.message = message
     }
 
     /**

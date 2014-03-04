@@ -1,6 +1,7 @@
 package com.citytechinc.canary.api.responsehandler
 
 import groovy.transform.EqualsAndHashCode
+import org.codehaus.jackson.annotate.JsonIgnore
 
 /**
  *
@@ -12,6 +13,7 @@ import groovy.transform.EqualsAndHashCode
 @EqualsAndHashCode
 public class PollResponseHandlerWrapper {
 
+    @JsonIgnore
     @Delegate final PollResponseHandler handler
     final String identifier
     final PollResponseHandlerDefinition definition

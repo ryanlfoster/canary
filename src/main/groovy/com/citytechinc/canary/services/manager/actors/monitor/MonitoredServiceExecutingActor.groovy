@@ -21,7 +21,9 @@ class MonitoredServiceExecutingActor extends DynamicDispatchActor {
         log.debug("Polling for monitored service: ${wrapper.identifier}")
 
         try {
+
             sender.send(wrapper.poll())
+
         } catch (Exception e) {
 
             log.debug("An exception occurred while calling the monitored service: ${wrapper.identifier}. Recording exception...", e)

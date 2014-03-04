@@ -50,7 +50,7 @@ class BlockedAgentQueueMonitor implements MonitoredService {
         StringBuilder message = new StringBuilder()
 
         agentManager.agents.values().findAll { it.enabled }
-                .findAll { agentNames.contains(it.configuration.agentId) }
+                .findAll { agentIds.contains(it.configuration.agentId) }
                 .each {
 
             if (it.queue.status.nextRetryTime > 0) {

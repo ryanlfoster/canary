@@ -3,7 +3,10 @@
     <filter root="/apps/canary">
         <exclude pattern="/apps/canary/install(/.*)?"/>
     </filter>
-    <filter root="/etc/designs/canary" >
+    <filter root="/etc/designs/canary">
         <exclude pattern="/etc/designs/canary/jcr:content(/.*)?"/>
+    </filter>
+    <filter root="/etc/canarydashboard">
+        <exclude pattern="/etc/canarydashboard/jcr:content(/.*)?"/>
     </filter>
 </workspaceFilter>

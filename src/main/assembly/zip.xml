@@ -16,7 +16,6 @@
                 <exclude>**/.vlt</exclude>
                 <exclude>**/.vltignore</exclude>
                 <exclude>**/.DS_Store</exclude>
-                <exclude>**/docroot/**</exclude>
                 <exclude>/etc/designs/canary/**</exclude>
             </excludes>
             <filtered>true</filtered>
@@ -28,7 +27,16 @@
                 <exclude>**/.vlt</exclude>
                 <exclude>**/.vltignore</exclude>
                 <exclude>**/.DS_Store</exclude>
+                <exclude>.content.xml</exclude>
             </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/src/main/content/jcr_root/etc/designs/canary</directory>
+            <outputDirectory>jcr_root/etc/designs/canary</outputDirectory>
+            <includes>
+                <include>.content.xml</include>
+            </includes>
+            <filtered>true</filtered>
         </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/content/META-INF</directory>
@@ -52,7 +60,6 @@
                 <include>com.citytechinc.cq:cq-groovy-extension</include>
                 <include>org.codehaus.jackson</include>
                 <include>com.google.guava</include>
-                <include>org.codehaus.jsr166-mirror</include>
                 <include>org.codehaus.gpars</include>
                 <include>org.codehaus.groovy</include>
             </includes>

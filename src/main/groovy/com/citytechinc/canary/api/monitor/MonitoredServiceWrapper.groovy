@@ -2,6 +2,7 @@ package com.citytechinc.canary.api.monitor
 
 import groovy.transform.EqualsAndHashCode
 import org.apache.commons.lang.StringUtils
+import org.codehaus.jackson.annotate.JsonIgnore
 
 /**
  *
@@ -13,6 +14,7 @@ import org.apache.commons.lang.StringUtils
 @EqualsAndHashCode
 public final class MonitoredServiceWrapper {
 
+    @JsonIgnore
     @Delegate final MonitoredService monitor
     final String identifier
     final String name

@@ -196,13 +196,12 @@
     <properties>
 
         <!-- dependencies -->
-        <felix.scr.annotations>1.9.4</felix.scr.annotations>
+        <felix.scr.annotations>1.9.6</felix.scr.annotations>
         <groovy.version>2.2.2</groovy.version>
         <slf4j.nop.version>1.6.4</slf4j.nop.version>
         <gpars.version>1.1.0</gpars.version>
         <guava.version>16.0.1</guava.version>
         <jackson.version>1.9.13</jackson.version>
-        <jsr166y.version>1.7.0</jsr166y.version>
         <spock.version>0.7-groovy-2.0</spock.version>
 
     </properties>
@@ -296,7 +295,7 @@
                 </executions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.name}</Bundle-Name>
                         <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
                         <Bundle-DocURL>${project.url}</Bundle-DocURL>
@@ -545,12 +544,6 @@
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>${jackson.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jsr166-mirror</groupId>
-            <artifactId>jsr166y</artifactId>
-            <version>${jsr166y.version}</version>
             <scope>provided</scope>
         </dependency>
 

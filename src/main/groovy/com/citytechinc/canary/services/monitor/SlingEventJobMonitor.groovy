@@ -39,7 +39,7 @@ class SlingEventJobMonitor implements MonitoredService {
     private Long averageProcessingTimeThreshold
 
     @Property(name = 'averageWaitingTimeThreshold', label = 'Average Waiting Time Failure Threshold', longValue = 100L, description = 'The average waiting time threshold limit in ms. If the actual measurement exceeds this value, the response indicates a failed or unhealthy poll.')
-    private String averageWaitingTimeThreshold
+    private Long averageWaitingTimeThreshold
 
     @Activate
     @Modified
@@ -52,12 +52,16 @@ class SlingEventJobMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
+        PollResponse response
+
         if (jobManager.statistics.averageProcessingTime > averageProcessingTimeThreshold ||
                 jobManager.statistics.averageWaitingTime > averageWaitingTimeThreshold) {
 
-            PollResponse.UNEXPECTED_SERVICE_RESPONSE()
+            response = PollResponse.UNEXPECTED_SERVICE_RESPONSE()
         } else {
-            PollResponse.SUCCESS()
+            response = PollResponse.SUCCESS()
         }
+
+        response
     }
 }

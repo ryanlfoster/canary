@@ -9,10 +9,12 @@ import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
 import org.apache.felix.scr.annotations.Deactivate
+import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
+import org.apache.sling.commons.osgi.PropertiesUtil
 import org.osgi.framework.Constants as OsgiConstants
 import org.osgi.service.log.LogEntry
 import org.osgi.service.log.LogListener
@@ -39,10 +41,24 @@ class LogListenerExceptionCollectingMonitor implements MonitoredService, LogList
     @Reference
     LogReaderService logReaderService
 
+    @Property(name = 'scrutinizedPackagePaths', label = 'Scrutinized Packaged Paths', value = ['', ''], description = 'Package paths that should be scrutinized and reported backed to the framework')
+    private List<String> scrutinizedPackagePaths
+
+    @Property(name = 'exceptionReportingThreshold', label = 'Exception Reporting Threshold', intValue =  3, description = 'The threshold indicator used in combination with the scrutinized package paths')
+    private Integer exceptionReportingThreshold
+
     @Activate
-    void activate() {
+    protected void activate(Map<String, Object> properties) throws Exception {
 
         logReaderService.addLogListener(this)
+        modified(properties)
+    }
+
+    @Modified
+    protected void modified(Map<String, Object> properties) throws Exception {
+
+        scrutinizedPackagePaths = PropertiesUtil.toStringArray(properties.get('scrutinizedPackagePaths')) as List
+        exceptionReportingThreshold = PropertiesUtil.toInteger(properties.get('exceptionReportingThreshold'), 3)
     }
 
     @Deactivate
