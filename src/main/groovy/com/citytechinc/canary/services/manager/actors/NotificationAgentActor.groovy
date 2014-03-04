@@ -155,8 +155,8 @@ final class NotificationAgentActor extends DynamicDispatchActor {
         } catch (Exception e) {
 
             log.error("An exception occurred while flushing the message queues, calling the notification agent: ${wrapper.identifier}" +
-                    " sending alarm notifications for services: ${queuedAlarmNotifications.values().collect { it.recordHolder.monitorIdentifier }}" +
-                    " and alarm reset notifications for services: ${queuedAlarmResetNotifications.values().collect { it.recordHolder.monitorIdentifier }}", e)
+                    " sending alarm notifications for services: ${queuedAlarmNotifications.values()*.recordHolder.monitorIdentifier}" +
+                    " and alarm reset notifications for services: ${queuedAlarmResetNotifications.values()*.recordHolder.monitorIdentifier}", e)
             ++statistics.messageExceptions
         }
 
@@ -165,8 +165,8 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         Long processTime = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)
         log.debug("It took ${processTime} ms to flush the message queues, call the notification agent: ${wrapper.identifier}" +
-                " sending alarm notifications for services: ${queuedAlarmNotifications.values().collect { it.recordHolder.monitorIdentifier }}" +
-                " and alarm reset notifications for services: ${queuedAlarmResetNotifications.values().collect { it.recordHolder.monitorIdentifier }}")
+                " sending alarm notifications for services: ${queuedAlarmNotifications.values()*.recordHolder.monitorIdentifier}" +
+                " and alarm reset notifications for services: ${queuedAlarmResetNotifications.values()*.recordHolder.monitorIdentifier}")
 
         statistics.addAndCalculateAverageProcessTime(processTime)
     }
