@@ -1,6 +1,7 @@
 package com.citytechinc.canary.services.monitor
 
 import com.citytechinc.canary.Constants
+import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 3, pollIntervalUnit = TimeUnit.MINUTES, alarmThreshold = 10)
+@AutomaticResetMonitor(interval = 3, unit = TimeUnit.MINUTES)
 class BlockedAgentQueueMonitor implements MonitoredService {
 
     @Property(name = 'agentIds', label = 'Agent IDs', value = ['publish', ''], description = 'Agent IDs to examine for blocked replication queues')

@@ -18,24 +18,64 @@ import com.google.common.base.Optional
  */
 public interface ServiceManager {
 
+    /**
+     *
+     * @return
+     */
     public List<MonitoredServiceWrapper> getMonitoredServicesConfigurations()
 
+    /**
+     *
+     * @return
+     */
     public List<NotificationAgentWrapper> getNotificationAgentsConfigurations()
 
+    /**
+     *
+     * @return
+     */
     public List<PollResponseHandlerWrapper> getPollResponseHandlersConfigurations()
 
+    /**
+     *
+     * @return
+     */
     public List<RecordPersistenceServiceWrapper> getRecordPersistenceServicesConfigurations()
 
+    /**
+     *
+     * @param identifier
+     * @param type
+     * @return
+     */
     public Optional<Statistics> getStatistics(String identifier, MissionControlActor.GetStatistics.Type type)
 
+    /**
+     *
+     * @param identifier
+     * @return
+     */
     public Optional<RecordHolder> getRecordHolder(String identifier)
 
+    /**
+     *
+     */
     public void requestAllMonitorsPoll()
 
+    /**
+     *
+     */
     public void requestAllMonitorsPersist()
 
+    /**
+     *
+     * @param identifier
+     */
     public void resetAlarm(String identifier)
 
+    /**
+     *
+     */
     public void resetAllAlarms()
 
 }

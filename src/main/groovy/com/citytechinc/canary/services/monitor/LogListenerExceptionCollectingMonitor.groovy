@@ -1,6 +1,7 @@
 package com.citytechinc.canary.services.monitor
 
 import com.citytechinc.canary.Constants
+import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @MonitoredServiceDefinition(description = 'Collects logged exceptions, reports aggregate data back when polled', pollInterval = 3, pollIntervalUnit = TimeUnit.MINUTES, alarmThreshold = 10)
+@AutomaticResetMonitor(interval = 3, unit = TimeUnit.MINUTES)
 class LogListenerExceptionCollectingMonitor implements MonitoredService, LogListener {
 
     List<LogEntry> entries = Lists.newCopyOnWriteArrayList()

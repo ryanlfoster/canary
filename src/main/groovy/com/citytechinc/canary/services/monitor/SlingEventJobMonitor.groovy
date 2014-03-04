@@ -1,6 +1,7 @@
 package com.citytechinc.canary.services.monitor
 
 import com.citytechinc.canary.Constants
+import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
@@ -29,7 +30,8 @@ import java.util.concurrent.TimeUnit
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
-@MonitoredServiceDefinition(description = 'Polls the sling job manager examining average wait and process times', pollInterval = 5, pollIntervalUnit = TimeUnit.SECONDS)
+@MonitoredServiceDefinition(description = 'Polls the sling job manager examining average wait and process times', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)
+@AutomaticResetMonitor(interval = 30, unit = TimeUnit.SECONDS)
 class SlingEventJobMonitor implements MonitoredService {
 
     @Reference
@@ -52,16 +54,12 @@ class SlingEventJobMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        PollResponse response
-
         if (jobManager.statistics.averageProcessingTime > averageProcessingTimeThreshold ||
                 jobManager.statistics.averageWaitingTime > averageWaitingTimeThreshold) {
 
-            response = PollResponse.UNEXPECTED_SERVICE_RESPONSE()
+            PollResponse.UNEXPECTED_SERVICE_RESPONSE()
         } else {
-            response = PollResponse.SUCCESS()
+            PollResponse.SUCCESS()
         }
-
-        response
     }
 }

@@ -31,9 +31,4 @@ public @interface AutomaticResetMonitor {
      */
     TimeUnit unit()
 
-    /**
-     *
-     * @return
-     */
-    int resetThreshold() default 6
 }
