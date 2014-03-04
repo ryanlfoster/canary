@@ -40,21 +40,17 @@
             <email>jdurbin@citytechinc.com</email>
             <url>http://www.joshdurbin.net</url>
             <organization>CITYTECH, Inc.</organization>
-            <organizationUrl>http://www.citytechinc.com</organizationUrl>
             <roles>
                 <role>Groovy, API Development, Lead</role>
             </roles>
-            <timezone>America/Los_Angeles</timezone>
         </developer>
         <developer>
             <name>Michael Paull</name>
             <email>mpaull@citytechinc.com</email>
             <organization>CITYTECH, Inc.</organization>
-            <organizationUrl>http://www.citytechinc.com</organizationUrl>
             <roles>
                 <role>Front end application development</role>
             </roles>
-            <timezone>America/New_York</timezone>
         </developer>
     </developers>
 
@@ -63,11 +59,9 @@
             <name>Ben Westrate</name>
             <email>bwestrate@citytechinc.com</email>
             <organization>CITYTECH, Inc.</organization>
-            <organizationUrl>http://www.citytechinc.com</organizationUrl>
             <roles>
                 <role>Front end application design</role>
             </roles>
-            <timezone>America/Chicago</timezone>
         </contributor>
     </contributors>
 
@@ -387,6 +381,7 @@
                             <report>project-team</report>
                             <report>license</report>
                             <report>issue-tracking</report>
+                            <report>scm</report>
                         </reports>
                     </reportSet>
                 </reportSets>
