@@ -38,7 +38,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<a class="brand" href="./">CITYTECH, Inc. CQ Canary Framework</a>
+					<a class="brand" href="./">AEM Canary Framework</a>
 					<div class="nav-collapse">
 						<ul class="nav pull-right">
 							<li><a href="https://github.com/Citytechinc/canary" title="GitHub" class="externalLink">GitHub </a></li>
@@ -46,9 +46,8 @@
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Overview <b class="caret"></b></a>
 								<ul class="dropdown-menu">
 									<li><a href="index.html" title="Introduction">Introduction </a></li>
-									<li><a href="history.html" title="History">History </a></li>
-									<li><a href="obtaining-installation.html" title="Installation">Installation </a></li>
-									<li><a href="ootb-features.html" title="Out-of-the-Box Features">Out-of-the-Box Features </a></li>
+									<li><a href="installation.html" title="Installation">Installation </a></li>
+									<li><a href="standard-features.html" title="Standard Features">Standard Features </a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -58,7 +57,7 @@
 									<li><a href="adding-a-response-handler.html" title="Response Handlers">Response Handlers </a></li>
 									<li><a href="adding-a-notification-agent.html" title="Notification Agents">Notification Agents </a></li>
 									<li><a href="adding-a-persistence-service.html" title="Persistence Services">Persistence Services </a></li>
-									<li><a href="howto-bundle-component-state-monitoring.html" title="Bundle/Component State Monitoring">Bundle/Component State Monitoring </a></li>
+									<li><a href="exposed-jmx-beans.html" title="JMX Beans">JMX Beans </a></li>
 								</ul>
 							</li>
 							<li class="dropdown active">
@@ -71,6 +70,7 @@
 											<li><a href="team-list.html" title="Project Team">Project Team </a></li>
 											<li class="active"><a href="" title="Project License">Project License </a></li>
 											<li><a href="issue-tracking.html" title="Issue Tracking">Issue Tracking </a></li>
+											<li><a href="source-repository.html" title="Source Repository">Source Repository </a></li>
 										</ul>
 									</li>
 									<li class="dropdown-submenu">
@@ -103,8 +103,8 @@
 					<a href="http://www.citytechinc.com" id="bannerLeft"><img src="images/logo.png" alt="CITYTECH, Inc."></a>
 				</div>
 				<div class="pull-right">
-										<a href="./" id="bannerRight"><h1>CITYTECH, Inc. CQ Canary Framework</h1></a>
-					<p class="lead">Service monitoring and reporting platform for Adobe AEM!</p>
+										<a href="./" id="bannerRight"><h1>AEM Canary Framework</h1></a>
+					<p class="lead">Monitoring, profiling, and reporting framework for Adobe AEM</p>
 				</div>
 			</div>
 		</div>
@@ -249,6 +249,7 @@ limitations under the License.
       <li><a href="http://cxf.apache.org/" title="Service Framework">CXF</a></li> 
       <li><a href="http://db.apache.org/" title="Database access">DB</a></li> 
       <li><a href="http://deltacloud.apache.org/" title="RESTful cloud management interface">Deltacloud</a></li> 
+      <li><a href="http://deltaspike.apache.org/" title="Portable CDI extensions that provide useful features for Java application developers">DeltaSpike</a></li> 
       <li><a href="http://directmemory.apache.org/" title="An off-heap cache for the Java Virtual Machine">DirectMemory</a></li> 
       <li><a href="http://directory.apache.org/" title="Apache Directory Server">Directory</a></li> 
       <li><a href="http://empire-db.apache.org/" title="Relational Data Persistence">Empire-db</a></li> 
@@ -264,6 +265,7 @@ limitations under the License.
       <li><a href="http://hadoop.apache.org/" title="Distributed computing platform">Hadoop</a></li> 
       <li><a href="http://hama.apache.org/" title="a Bulk Synchronous Parallel computing framework on top of Hadoop">Hama</a></li> 
       <li><a href="http://hbase.apache.org/" title="Hadoop Database">HBase</a></li> 
+      <li><a href="http://helix.apache.org/" title="A cluster management framework for partitioned and replicated distributed resources">Helix</a></li> 
       <li><a href="http://hive.apache.org/" title="Data warehouse infrastructure using the Hadoop Database">Hive</a></li> 
       <li><a href="http://hc.apache.org/" title="Java toolset of low level HTTP components">HttpComponents</a></li> 
       <li><a href="http://isis.apache.org/" title="Framework for rapidly developing domain-driven apps in Java">Isis</a></li> 
@@ -319,6 +321,7 @@ limitations under the License.
       <li><a href="http://sis.apache.org/" title="Spatial Information System">SIS</a></li> 
       <li><a href="http://sling.apache.org/" title="Web Framework for JCR Content Repositories">Sling</a></li> 
       <li><a href="http://spamassassin.apache.org/" title="Mail filter to identify spam">SpamAssassin</a></li> 
+      <li><a href="http://spark.apache.org/" title="Fast and general engine for large-scale data processing">Spark</a></li> 
       <li><a href="http://sqoop.apache.org/" title="Bulk Data Transfer for Hadoop and Structured Datastores">Sqoop</a></li> 
       <li><a href="http://stanbol.apache.org/" title="Reusable components for semantic content management">Stanbol</a></li> 
       <li><a href="http://steve.apache.org/" title="Apache's Python based single transferable vote software system">STeVe</a></li> 
@@ -455,13 +458,10 @@ limitations under the License.
 							<a href="index.html" title="Introduction">Introduction </a>
 						</li>
 						<li>
-							<a href="history.html" title="History">History </a>
+							<a href="installation.html" title="Installation">Installation </a>
 						</li>
 						<li>
-							<a href="obtaining-installation.html" title="Installation">Installation </a>
-						</li>
-						<li>
-							<a href="ootb-features.html" title="Out-of-the-Box Features">Out-of-the-Box Features </a>
+							<a href="standard-features.html" title="Standard Features">Standard Features </a>
 						</li>
 					</ul>
 				</div>

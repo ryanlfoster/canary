@@ -38,7 +38,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<a class="brand" href="./">CITYTECH, Inc. CQ Canary Framework</a>
+					<a class="brand" href="./">AEM Canary Framework</a>
 					<div class="nav-collapse">
 						<ul class="nav pull-right">
 							<li><a href="https://github.com/Citytechinc/canary" title="GitHub" class="externalLink">GitHub </a></li>
@@ -46,9 +46,8 @@
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Overview <b class="caret"></b></a>
 								<ul class="dropdown-menu">
 									<li><a href="index.html" title="Introduction">Introduction </a></li>
-									<li><a href="history.html" title="History">History </a></li>
-									<li><a href="obtaining-installation.html" title="Installation">Installation </a></li>
-									<li><a href="ootb-features.html" title="Out-of-the-Box Features">Out-of-the-Box Features </a></li>
+									<li><a href="installation.html" title="Installation">Installation </a></li>
+									<li><a href="standard-features.html" title="Standard Features">Standard Features </a></li>
 								</ul>
 							</li>
 							<li class="dropdown active">
@@ -58,7 +57,7 @@
 									<li><a href="adding-a-response-handler.html" title="Response Handlers">Response Handlers </a></li>
 									<li><a href="adding-a-notification-agent.html" title="Notification Agents">Notification Agents </a></li>
 									<li><a href="adding-a-persistence-service.html" title="Persistence Services">Persistence Services </a></li>
-									<li><a href="howto-bundle-component-state-monitoring.html" title="Bundle/Component State Monitoring">Bundle/Component State Monitoring </a></li>
+									<li><a href="exposed-jmx-beans.html" title="JMX Beans">JMX Beans </a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
@@ -71,6 +70,7 @@
 											<li><a href="team-list.html" title="Project Team">Project Team </a></li>
 											<li><a href="license.html" title="Project License">Project License </a></li>
 											<li><a href="issue-tracking.html" title="Issue Tracking">Issue Tracking </a></li>
+											<li><a href="source-repository.html" title="Source Repository">Source Repository </a></li>
 										</ul>
 									</li>
 									<li class="dropdown-submenu">
@@ -103,8 +103,8 @@
 					<a href="http://www.citytechinc.com" id="bannerLeft"><img src="images/logo.png" alt="CITYTECH, Inc."></a>
 				</div>
 				<div class="pull-right">
-										<a href="./" id="bannerRight"><h1>CITYTECH, Inc. CQ Canary Framework</h1></a>
-					<p class="lead">Service monitoring and reporting platform for Adobe AEM!</p>
+										<a href="./" id="bannerRight"><h1>AEM Canary Framework</h1></a>
+					<p class="lead">Monitoring, profiling, and reporting framework for Adobe AEM</p>
 				</div>
 			</div>
 		</div>
@@ -119,86 +119,38 @@
 			<div class="body-content">
 <div class="section"> 
  <h2 id="Adding_a_monitor">Adding a monitor</h2> 
- <p>Monitors are used in the polling process within the framework. This functionality can implemented for existing services or it can be created for the sole purpose of monitoring and reporting.</p> 
- <p>The minimum requirements for adding a monitor are:</p> 
- <ul> 
-  <li>Implement the <a href="apidocs/com/citytechinc/canary/api/monitor/MonitoredService.html">MonitoredService</a> interface. This interface is what the Apache Felix OSGi container will use to bind your monitor to the ServiceManager. The implemtnation is rather straight forward, with a single <tt>poll()</tt> method that returns a <a href="apidocs/com/citytechinc/canary/api/monitor/PollResponse.html">PollResponse</a></li> 
-  <li>Provide registration details via the <a href="apidocs/com/citytechinc/canary/api/monitor/MonitoredServiceDefinition.html">MonitoredServiceDefinition</a> annotation. There are a number of configurable options, three of which are required… 
+ <p>As mentioned in the <a href="index.html">Overview</a>, Monitors are the source of data for the Canary Framework. Monitors are polled by the framework based on their specific configurations – an interval and a time unit (seconds, minutes, etc…). Monitors can poll up to once per second. Any configuration unit smaller than a single second will be rounded up to a second. If a poll exceeds the maximum execution time, it will be interrupted and a failure will be recorded indicting the interruption. Poll responses are recorded in-memory and routed to Mission Control for distribution to all <a href="adding-a-response-handler.html">Poll Response Handlers</a>.</p> 
+ <p>In order to detect an alarm state, poll data is analyzed each time a poll is pushed into the in-memory record storage. The configured alarm threshold and criteria are used to determine and flag an alarm state. Monitors support alarm criteria: <tt>Recent Polls</tt>, <tt>Average Execution Time</tt>, or <tt>Average Failure Rate</tt>. Note: The averaged alarm criteria are affected by the max number of records configured for the monitor.</p> 
+ <p>If an alarm state is detected, the entire in-memory set of records is routed to Mission Control for distribution to all <a href="adding-a-notification-agent.html">Notification Agents</a>. If the monitor is configured to persist when alarmed, the same record set sent to the <a href="adding-a-notification-agent.html">Notification Agents</a> is additionally routed to all <a href="adding-a-persistence-service.html">Persistence Services</a>.</p> 
+ <div class="section"> 
+  <div class="section"> 
+   <h4 id="Basic_minimum_configuration">Basic, minimum configuration</h4> 
+   <ol style="list-style-type: decimal"> 
+    <li>It implements <a href="groovydoc/com/citytechinc/canary/api/monitor/MonitoredService.html"><tt>MonitoredService</tt></a> interface. The <tt>MonitoredService</tt> interface defines a single, zero argument method, <tt>poll()</tt> which has a return type of <a href="groovydoc/com/citytechinc/canary/api/monitor/PollResponse.html"><tt>PollResponse</tt></a></li> 
+    <li> <p>It defines or has the <a href="groovydoc/com/citytechinc/canary/api/monitor/MonitoredServiceDefinition.html">MonitoredServiceDefinition</a> annotation (with required values). The annotation is used to define all aspects of the monitor within the Canary Framework, which include…</p> 
+     <ul> 
+      <li><tt>name</tt> a String (required)</li> 
+      <li><tt>description</tt> a String</li> 
+      <li><tt>pollInterval</tt> an int (required)</li> 
+      <li><a class="externalLink" href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/TimeUnit.html"><tt>pollIntervalUnit</tt></a></li> 
+      <li><a href="groovydoc/com/citytechinc/canary/api/monitor/AlarmCriteria.html"><tt>alarmCriteria</tt></a></li> 
+      <li><tt>alarmThreshold</tt> an int</li> 
+      <li><tt>maxNumberOfRecords</tt> an int</li> 
+      <li><tt>persistWhenAlarmed</tt> a boolean</li> 
+      <li><tt>maxExecutionTime</tt> - The maximum allowed execution time before for a given poll in milliseconds</li> 
+      <li><tt>logEscalation</tt> - Will</li> 
+     </ul></li> 
+   </ol>
+  </div> 
+  <div class="section"> 
+   <h4 id="Additional_configuration_annotations">Additional configuration annotations</h4> 
    <ul> 
-    <li><tt>name</tt> a String (required)</li> 
-    <li><tt>description</tt> a String</li> 
-    <li><tt>pollInterval</tt> an int (required)</li> 
-    <li><tt>pollIntervalUnit</tt> a TimeUnit (required)</li> 
-    <li><tt>alarmThreshold</tt> an int</li> 
-    <li><tt>maxNumberOfRecords</tt> an int</li> 
-    <li><tt>persistWhenAlarmed</tt> a boolean</li> 
-    <li><tt>maxExecutionTimeInMillseconds</tt></li> 
-   </ul></li> 
- </ul> 
- <div class="section"> 
-  <div class="section"> 
-   <h4 id="Example_monitor_that_polls_once_a_second">Example monitor that polls once a second</h4> 
-   <div class="source"> 
-    <pre>package com.citytechinc.canary.samples.monitor
-
-import com.citytechinc.canary.api.monitor.MonitoredService
-import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
-import com.citytechinc.canary.api.monitor.PollResponse
-import org.apache.felix.scr.annotations.Component
-import org.apache.felix.scr.annotations.Service
-
-import java.util.concurrent.TimeUnit
-
-@Component(immediate = true)
-@Service
-@MonitoredServiceDefinition(name = 'Example Monitor', pollInterval = 1, pollIntervalUnit = TimeUnit.SECONDS)
-class ExampleMonitor implements MonitoredService {
-
-@Override
-PollResponse poll() {
-PollResponse.SUCCESS()
-}
-}
-</pre>
-   </div>
-  </div>
- </div> 
- <div class="section"> 
-  <h3 id="Defining_Automatic_Reset_Monitor">Defining Automatic Reset Monitor</h3> 
-  <p><a href="apidocs/com/citytechinc/canary/api/AutomaticResetMonitor.html">AutomaticResetMonitor</a> is a feature intended to aid in a situation where an engineer might be unable to tend to an alarmed monitor for an extended period of time. Normally, once alarmed, a monitor can only be reset by an explicit call. This optional annotation allows for the definition of a secondary polling period and required number of <i>healthy</i> polls before resetting the alarm and resuming normal polling.</p>
- </div> 
- <div class="section"> 
-  <h3 id="Defining_Log_Escalation">Defining Log Escalation</h3> 
-  <p><a href="apidocs/com/citytechinc/canary/api/EscalatingLogMonitor.html">EscalatingLogMonitor</a> instructs the framework to generate an elevated logger confiruation explicitly for the alarmed service. If a custom logger configuration exists for the monitored service, it will be modified and set to the elevated level. If no logger confirations are found, a new one will be explicitly created based on the <tt>prefix</tt> defined in the annotation.</p> 
-  <div class="section"> 
-   <h4 id="Example_monitor_that_polls_once_a_second_auto_resets_after_6_successful_1_minute_interval_polls_and_enables_log_escalation">Example monitor that polls once a second, auto resets after 6 successful, 1 minute interval polls, and enables log escalation</h4> 
-   <div class="source"> 
-    <pre>package com.citytechinc.canary.samples.monitor
-
-import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
-import com.citytechinc.canary.api.monitor.LogEscalatingMonitor
-import com.citytechinc.canary.api.monitor.MonitoredService
-import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
-import com.citytechinc.canary.api.monitor.PollResponse
-import org.apache.felix.scr.annotations.Component
-import org.apache.felix.scr.annotations.Service
-
-import java.util.concurrent.TimeUnit
-
-@Component(immediate = true)
-@Service
-@MonitoredServiceDefinition(name = 'Example Monitor', pollInterval = 1, pollIntervalUnit = TimeUnit.SECONDS)
-@AutomaticResetMonitor(interval = 1, unit = TimeUnit.MINUTES)
-@LogEscalatingMonitor(prefixPathAndName = 'monitorlogs/examplemonitor-')
-class ExampleMonitor implements MonitoredService {
-
-@Override
-PollResponse poll() {
-PollResponse.SUCCESS()
-}
-}
-</pre>
-   </div>
+    <li> <p>There is an additional annotation, <a href="groovydoc/com/citytechinc/canary/api/monitor/AutomaticResetMonitor.html"><tt>AutomaticResetMonitor</tt></a>, which, when supplied enables polling while a monitor is alarmed. The annotation takes two, required arguments…</p> 
+     <ol style="list-style-type: decimal"> 
+      <li>resetInterval</li> 
+      <li><a class="externalLink" href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/TimeUnit.html"><tt>resetIntervalUnit</tt></a></li> 
+     </ol></li> 
+   </ul>
   </div>
  </div>
 </div>
@@ -241,13 +193,10 @@ PollResponse.SUCCESS()
 							<a href="index.html" title="Introduction">Introduction </a>
 						</li>
 						<li>
-							<a href="history.html" title="History">History </a>
+							<a href="installation.html" title="Installation">Installation </a>
 						</li>
 						<li>
-							<a href="obtaining-installation.html" title="Installation">Installation </a>
-						</li>
-						<li>
-							<a href="ootb-features.html" title="Out-of-the-Box Features">Out-of-the-Box Features </a>
+							<a href="standard-features.html" title="Standard Features">Standard Features </a>
 						</li>
 					</ul>
 				</div>
