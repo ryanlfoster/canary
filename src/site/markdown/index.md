@@ -11,6 +11,8 @@ can distribute and execute on that data. In addition to polling and distribution
 The AEM Canary framework consists of registered [Monitor(s)](adding-a-monitor.html) that provide responses to poll requests. These poll requests are
 collected and analyzed in the framework based on supplied configurations.
 
+![Canary Basic Overview](https://raw.github.com/Citytechinc/canary/develop/src/site/images/overview.png "Canary Basic Overview")
+
 The analysis for poll requests can invoke any of the following other extensible service types:
 
 * [Poll Response Handlers](adding-a-response-handler.html) - All poll responses from Monitors are routed to all registered Poll Response Handlers. Handlers can choose

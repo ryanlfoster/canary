@@ -1,6 +1,6 @@
-## Out-of-the-Box Features
+## Standard Features
 
-In addition to the Canary Framework itself, there are numerous bundled, out-of-the-box features present in the project.
+In addition to the Canary Framework itself, there are numerous bundled, standard features present in the project.
 These features are implementations of the Canary API itself in the form of a few [Monitors](adding-a-monitor.html),
 [Notification Agents](adding-a-notification-agent.html), and a JCR implementation of a
 [Record Persistence Services](adding-a-persistence-service.html).

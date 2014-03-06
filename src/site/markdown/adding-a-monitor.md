@@ -1,10 +1,21 @@
 ## Adding a monitor
 
 As mentioned in the [Overview](index.html), Monitors are the source of data for the Canary Framework. Monitors are polled
-by the framework and their data is kept in-memory. The poll data is interpreted by the internal mechanisms and reported
-back through the framework as defined by the configuration.
+by the framework based on their specific configurations -- an interval and a time unit (seconds, minutes, etc...). Monitors
+can poll up to once per second. Any configuration unit smaller than a single second will be rounded up to a second. If
+ a poll exceeds the maximum execution time, it will be interrupted and a failure will
+be recorded indicting the interruption. Poll responses are recorded in-memory and routed to Mission Control for distribution to all
+[Poll Response Handlers](adding-a-response-handler.html).
 
-Developers can register a monitor by modifying or creating an AEM OSGi component such that...
+In order to detect an alarm state, poll data is analyzed each time a poll is pushed into the in-memory record storage.
+The configured alarm threshold and criteria are used to determine and flag an alarm state. Monitors support alarm
+ criteria: `Recent Polls`, `Average Execution Time`, or `Average Failure Rate`. Note: The averaged alarm criteria are
+ affected by the max number of records configured for the monitor.
+
+If an alarm state is detected, the entire in-memory set of records is routed to Mission Control for distribution to all
+[Notification Agents](adding-a-notification-agent.html). If the monitor is configured to persist when alarmed, the same
+record set sent to the [Notification Agents](adding-a-notification-agent.html) is additionally routed to all
+ [Persistence Services](adding-a-persistence-service.html).
 
 #### Basic, minimum configuration
 

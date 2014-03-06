@@ -54,7 +54,7 @@
         <menu name="Overview">
             <item name="Introduction" href="index.html"/>
             <item name="Installation" href="installation.html"/>
-            <item name="Out-of-the-Box Features" href="ootb-features.html"/>
+            <item name="Standard Features" href="standard-features.html"/>
         </menu>
         <menu name="Usage" inherit="bottom">
             <item name="Monitors" href="adding-a-monitor.html" />
