@@ -96,7 +96,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                 }
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getMonitor().getClass().getCanonicalName(),
+                        wrapper.getIdentifier(),
                         wrapper.getName(),
                         wrapper.getDescription(),
                         wrapper.getPollInterval() + " " + wrapper.getPollIntervalUnit(),
@@ -141,7 +141,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgentsConfigurations()) {
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getAgent().getClass().getCanonicalName(),
+                        wrapper.getIdentifier(),
                         wrapper.getStrategy().toString(),
                         wrapper.getSpecifics().toString() }));
             }
@@ -178,7 +178,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             for (final PollResponseHandlerWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getHandler().getClass().getCanonicalName(),
+                        wrapper.getIdentifier(),
                         wrapper.getStrategy().toString(),
                         wrapper.getSpecifics().toString()}));
             }
@@ -217,7 +217,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
             for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServicesConfigurations()) {
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getService().getClass().getCanonicalName(),
+                        wrapper.getIdentifier(),
                         wrapper.getRanking(),
                         wrapper.getProvidesReadOperations(),
                         wrapper.getProvidesWriteOperations()}));
@@ -271,7 +271,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     final RecordHolder record = optionalRecord.get();
 
                     tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                            wrapper.getMonitor().getClass().getCanonicalName(),
+                            wrapper.getIdentifier(),
                             record.isAlarmed(),
                             record.mostRecentPollDate().isPresent() ? Constants.JMX_DATE_TIME_FORMATTER.format(record.mostRecentPollDate().get()) : "--",
                             record.mostRecentPollResponse().isPresent() ? record.mostRecentPollResponse().get().toString() : "--",
@@ -317,7 +317,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
             for (final NotificationAgentWrapper wrapper : serviceManager.getNotificationAgentsConfigurations()) {
 
-                final Statistics statistics = serviceManager.getStatistics(wrapper.getAgent().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.NOTIFICATION_AGENT).get();
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getIdentifier(), MissionControlActor.GetStatistics.Type.NOTIFICATION_AGENT).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getAgent().getClass().getCanonicalName(),
@@ -362,7 +362,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
             for (final PollResponseHandlerWrapper wrapper : serviceManager.getPollResponseHandlersConfigurations()) {
 
-                final Statistics statistics = serviceManager.getStatistics(wrapper.getHandler().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.POLL_RESPONSE_HANDLER).get();
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getIdentifier(), MissionControlActor.GetStatistics.Type.POLL_RESPONSE_HANDLER).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                         wrapper.getHandler().getClass().getCanonicalName(),
@@ -407,10 +407,10 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
             for (final RecordPersistenceServiceWrapper wrapper : serviceManager.getRecordPersistenceServicesConfigurations()) {
 
-                final Statistics statistics = serviceManager.getStatistics(wrapper.getService().getClass().getCanonicalName(), MissionControlActor.GetStatistics.Type.RECORD_PERSISTENCE_SERVICE).get();
+                final Statistics statistics = serviceManager.getStatistics(wrapper.getIdentifier(), MissionControlActor.GetStatistics.Type.RECORD_PERSISTENCE_SERVICE).get();
 
                 tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                        wrapper.getService().getClass().getCanonicalName(),
+                        wrapper.getIdentifier(),
                         statistics.getDeliveredMessages(),
                         statistics.getProcessedMessages(),
                         statistics.getMessageExceptions(),

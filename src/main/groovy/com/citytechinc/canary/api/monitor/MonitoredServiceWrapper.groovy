@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit
 public final class MonitoredServiceWrapper {
 
     @JsonIgnore
-    @Delegate final MonitoredService monitor
+    @Delegate
+    final MonitoredService monitor
 
     final String identifier
 

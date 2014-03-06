@@ -313,7 +313,7 @@ final class MissionControlActor extends DynamicDispatchActor {
             RecordPersistenceServiceWrapper persistenceWrapper = recordPersistenceServices.keySet().findAll { it.providesReadOperations }.sort { it.ranking }.first()
             RecordPersistenceServiceActor persistenceActor = recordPersistenceServices.get(persistenceWrapper)
 
-            log.debug("Polling ${persistenceWrapper.service.class} for records")
+            log.debug("Polling ${persistenceWrapper.identifier} for records")
 
             persistenceActor.sendAndContinue(new RecordPersistenceServiceActor.GetPersistedRecord(identifier: wrapper.identifier), { Optional<List<DetailedPollResponse>> pollResponses ->
 

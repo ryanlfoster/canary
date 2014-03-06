@@ -16,7 +16,8 @@ import java.util.concurrent.TimeUnit
 public final class NotificationAgentWrapper {
 
     @JsonIgnore
-    @Delegate final NotificationAgent agent
+    @Delegate
+    final NotificationAgent agent
 
     final String identifier
     final SubscriptionStrategy strategy
