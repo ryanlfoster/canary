@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
-@MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 3, pollIntervalUnit = TimeUnit.MINUTES, alarmThreshold = 10)
+@MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 10, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 12)
 @AutomaticResetMonitor(resetInterval = 3, resetIntervalUnit = TimeUnit.MINUTES)
 class BlockedAgentQueueMonitor implements MonitoredService {
 

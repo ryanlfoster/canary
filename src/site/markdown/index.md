@@ -1,23 +1,25 @@
-##Introduction
-
-The CITYTECH AEM Canary Framework
-The CQ Component Plugin mitigates the effort required in Adobe CQ component development by generating, at built time, .content.xml, _cq_editConfig.xml, and dialog.xml files for your components, leaving you free to focus on functionality.
-
 ## Overview
 
-Canary is a framework that enables simple monitoring of OSGi components and services. The Canary API provides a
-set of interfaces and annotations that quickly enable developers and engineers to peer into critical aspects
-of their system. Canary does this by collecting data from registered, monitored services and distributing that
-data to notification agents, poll response handlers, and persistence services. Canary also aims to reduce outage
-response and investigation by escalating log levels for problematic services and informing necessary parties of
-precisely where an investigation might begin. Lastly, Canary provides a clean, responsive UI for viewing
-collected data and other metrics, in addition to exposing data via JMX beans.
+The Canary framework is a simple, stand alone monitoring, profiling, and reporting tool for OSGi components and
+services within AEM. The framework enables scheduled, custom monitoring or profiling of critical aspects of an AEM
+instance. Canary provides a conduit between Monitors, which collect data, and other registered service types that
+can distribute and execute on that data. In addition to polling and distribution, Canary provides an API for talking
+ to services in the framework, JMX beans for reporting and maintenance, and a rich UI for representing this data.
 
-[![Build Status](https://travis-ci.org/Citytechinc/canary.png?branch=develop)](https://travis-ci.org/Citytechinc/canary)
+## Details
 
-[![Stories in Ready](https://badge.waffle.io/citytechinc/canary.png?label=ready)](http://waffle.io/citytechinc/canary)
+The AEM Canary framework consists of registered [Monitor(s)](adding-a-monitor.html) that provide responses to poll requests. These poll requests are
+collected and analyzed in the framework based on supplied configurations.
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/Citytechinc/canary/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+The analysis for poll requests can invoke any of the following other extensible service types:
+
+* [Poll Response Handlers](adding-a-response-handler.html) - All poll responses from Monitors are routed to all registered Poll Response Handlers. Handlers can choose
+ to opt into or out of messages based off specific monitor paths.
+* [Notification Agents](adding-a-notification-agent.html) - Receive the entire set of in-memory records for a Monitor when the individual Monitor becomes alarmed or
+ has its alarm reset. Notification Agents also allow for aggregation. When enabled, aggregation allows the agent to collect
+ notifications for a configurable period of time. Once expired, or flushed, these messages are delivered to their destination in a single call.
+* [Record Persistence Services](adding-a-persistence-service.html) - Responsible for the persistence and retrieval of every Monitor's data. The intent of Record
+ Persistence Services is to provide persistent storage.
 
 ## Requirements
 

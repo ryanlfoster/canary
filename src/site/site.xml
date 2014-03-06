@@ -9,7 +9,7 @@
     </skin>
 
     <bannerRight>
-        <name>${project.name}</name>
+        <name>AEM Canary Framework</name>
         <href>http://code.citytechinc.com/canary</href>
     </bannerRight>
 
@@ -28,10 +28,10 @@
             <highlightJsTheme>github</highlightJsTheme>
             <topNav>Basics|Overview|Usage|reports</topNav>
             <brand>
-                <name>${project.name}</name>
+                <name>AEM Canary Framework</name>
                 <href>http://code.citytechinc.com/canary</href>
             </brand>
-            <slogan>Service monitoring and reporting platform for Adobe AEM!</slogan>
+            <slogan>Monitoring, profiling, and reporting framework for Adobe AEM</slogan>
             <body />
             <bottomNav maxSpan="9">
                 <column>Main</column>
@@ -53,8 +53,7 @@
         </menu>
         <menu name="Overview">
             <item name="Introduction" href="index.html"/>
-            <item name="History" href="history.html"/>
-            <item name="Installation" href="obtaining-installation.html"/>
+            <item name="Installation" href="installation.html"/>
             <item name="Out-of-the-Box Features" href="ootb-features.html"/>
         </menu>
         <menu name="Usage" inherit="bottom">
@@ -62,7 +61,7 @@
             <item name="Response Handlers" href="adding-a-response-handler.html" />
             <item name="Notification Agents" href="adding-a-notification-agent.html" />
             <item name="Persistence Services" href="adding-a-persistence-service.html" />
-            <item name="Bundle/Component State Monitoring" href="howto-bundle-component-state-monitoring.html" />
+            <item name="JMX Beans" href="exposed-jmx-beans.html" />
         </menu>
         <menu ref="reports"/>
         <footer></footer>
