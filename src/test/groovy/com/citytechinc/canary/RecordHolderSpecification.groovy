@@ -1,5 +1,9 @@
 package com.citytechinc.canary
 
+import com.citytechinc.canary.api.monitor.AlarmCriteria
+import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.PollResponseType
+import com.citytechinc.canary.api.monitor.RecordHolder
 import spock.lang.Specification
 
 class RecordHolderSpecification extends Specification {
@@ -42,5 +46,36 @@ class RecordHolderSpecification extends Specification {
 
     def "Test recent polls alarm criteria alarmed after threshold"() {
 
+        RecordHolder recordHolder = new RecordHolder('com.a.b.c', 10, AlarmCriteria.RECENT_POLLS, 3, [])
+
+        when:
+        3.times {
+            recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.SUCCESS))
+        }
+
+        then:
+        !recordHolder.isAlarmed()
+
+        when:
+        2.times {
+            recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.UNEXPECTED_SERVICE_RESPONSE))
+        }
+
+        then:
+        !recordHolder.isAlarmed()
+
+        when:
+        recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.SUCCESS))
+
+        then:
+        !recordHolder.isAlarmed()
+
+        when:
+        3.times {
+            recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.UNEXPECTED_SERVICE_RESPONSE))
+        }
+
+        then:
+        recordHolder.isAlarmed()
     }
 }
