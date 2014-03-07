@@ -4,6 +4,7 @@ import com.google.common.base.Optional
 import com.google.common.collect.EvictingQueue
 import com.google.common.collect.Lists
 import groovy.transform.ToString
+import groovy.transform.TupleConstructor
 import groovy.util.logging.Slf4j
 
 import java.math.RoundingMode
@@ -25,27 +26,22 @@ class RecordHolder {
     final Integer alarmThreshold
     final Queue<DetailedPollResponse> records
 
-    private RecordHolder(String monitorIdentifier, Integer maxNumberOfRecords, AlarmCriteria alarmCriteria, Integer alarmThreshold) {
+    /**
+     *
+     * @param monitorIdentifier
+     * @param maxNumberOfRecords
+     * @param alarmCriteria
+     * @param alarmThreshold
+     * @param records
+     */
+    public RecordHolder(String monitorIdentifier, Integer maxNumberOfRecords, AlarmCriteria alarmCriteria, Integer alarmThreshold, List<DetailedPollResponse> records) {
         this.monitorIdentifier = monitorIdentifier
         this.maxNumberOfRecords = maxNumberOfRecords
         this.alarmCriteria = alarmCriteria
         this.alarmThreshold = alarmThreshold
 
-        records = new EvictingQueue<DetailedPollResponse>(maxNumberOfRecords)
-    }
-
-    public static CREATE_NEW(MonitoredServiceWrapper wrapper) {
-
-        return new RecordHolder(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold)
-    }
-
-    public static CREATE_FROM_RECORDS(MonitoredServiceWrapper wrapper, List<DetailedPollResponse> detailedPollResponses) {
-
-        RecordHolder recordHolder = new RecordHolder(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold)
-
-        detailedPollResponses.each { recordHolder.addRecord(it) }
-
-        recordHolder
+        this.records = new EvictingQueue<DetailedPollResponse>(maxNumberOfRecords)
+        this.records.addAll(records)
     }
 
     Boolean addRecord(DetailedPollResponse record) {
