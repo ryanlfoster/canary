@@ -1,6 +1,7 @@
 package com.citytechinc.canary.components.dashboard
 
 import com.citytechinc.canary.services.manager.ServiceManager
+import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
 import com.citytechinc.canary.servlets.AbstractJSONResponseServlet
 import com.google.common.base.Optional
@@ -29,7 +30,7 @@ class GetStatistics extends AbstractJSONResponseServlet {
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) {
 
-        Optional<Statistics> statistics = serviceManager.getRecordHolder(request.getParameter('identifier'))
+        Optional<Statistics> statistics = serviceManager.getStatistics(request.getParameter('identifier'), MissionControlActor.GetStatistics.Type.valueOf(request.getParameter('type')))
         writeJsonResponse(response, statistics.present ? statistics.get() : [])
     }
 }
