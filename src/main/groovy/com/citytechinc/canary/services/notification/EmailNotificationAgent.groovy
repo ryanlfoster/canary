@@ -31,7 +31,7 @@ import javax.mail.internet.InternetAddress
  * Copyright 2013 CITYTECH, Inc.
  *
  */
-@Component(policy = ConfigurationPolicy.REQUIRE, label = 'CITYTECH Service Monitor EMail Notification', description = '', immediate = true, metatype = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, label = 'Canary Framework Email Notification Agent', description = 'Requires a valid MailService configuration', immediate = true, metatype = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
