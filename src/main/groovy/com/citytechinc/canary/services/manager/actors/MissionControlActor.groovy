@@ -261,7 +261,7 @@ final class MissionControlActor extends DynamicDispatchActor {
         }
 
         // IF THE MONITOR DEFINITION STATES PERSISTENCE WHEN ALARMED, SEND RECORD HOLDERS TO PERSISTENCE SERVICES
-        if (monitors.keySet().find { it.identifier == message.recordHolder.monitorIdentifier }?.persistWhenAlarmed()) {
+        if (monitors.keySet().find { it.identifier == message.recordHolder.monitorIdentifier }?.persistWhenAlarmed) {
 
             log.debug("Service monitor ${message.recordHolder.monitorIdentifier} is configured to persist when alarmed. Sending" +
                     " persist message to ${recordPersistenceServices.size()} record persistence services")
