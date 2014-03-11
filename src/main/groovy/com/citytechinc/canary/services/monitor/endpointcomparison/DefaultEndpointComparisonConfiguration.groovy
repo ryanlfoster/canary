@@ -17,17 +17,16 @@ import org.apache.sling.commons.osgi.PropertiesUtil
  *
  */
 @Service
-@Component(label = 'Endpoint Comparison Monitor Configuration', description = '', configurationFactory = true, policy = ConfigurationPolicy.REQUIRE, metatype = true)
+@Component(label = 'Canary Endpoint Comparison Monitor Configuration', description = '', configurationFactory = true, policy = ConfigurationPolicy.REQUIRE, metatype = true)
 class DefaultEndpointComparisonConfiguration implements EndpointComparisonConfiguration {
 
     @Property(name = 'label', label = 'Label', value = '')
     private String label
 
-    @Property(name = 'type', label = 'Type',
-            options = [
-            @PropertyOption(name = 'Load Balancer', value = 'LOAD_BALANCER'),
-            @PropertyOption(name = 'Application Server', value = 'APPSERVER'),
-            @PropertyOption(name = 'Web Server', value = 'WEBSERVER')])
+    @Property(name = 'type', label = 'Type', options = [
+        @PropertyOption(value = 'Load Balancer', name = 'LOAD_BALANCER'),
+        @PropertyOption(value = 'Application Server', name = 'APPSERVER'),
+        @PropertyOption(value = 'Web Server', name = 'WEBSERVER')])
     private EndpointComparisonConfiguration.TargetType type
 
     @Property(name = 'url', label = 'URL', value = '')
