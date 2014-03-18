@@ -62,6 +62,9 @@
                 <include>com.google.guava</include>
                 <include>org.codehaus.gpars</include>
                 <include>org.codehaus.groovy</include>
+                <include>org.apache.httpcomponents:httpclient-osgi</include>
+                <include>org.apache.httpcomponents:httpcore-osgi</include>
+                <include>org.zeromq:jeromq</include>
             </includes>
             <useStrictFiltering>true</useStrictFiltering>
         </dependencySet>
