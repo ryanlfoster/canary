@@ -7,6 +7,7 @@ import com.citytechinc.canary.api.notification.NotificationAgent
 import com.citytechinc.canary.api.notification.NotificationAgentDefinition
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import groovy.util.logging.Slf4j
+import groovyjarjarcommonscli.MissingArgumentException
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
@@ -68,6 +69,12 @@ class TwitterNotificationAgent implements NotificationAgent {
         consumerSecret = PropertiesUtil.toString(properties.get('consumerSecret'), '')
         type = TwitterNotificationActionType.valueOf(PropertiesUtil.toString(properties.get('type'), 'UPDATE_STATUS'))
         directMessageTwitterHandles = PropertiesUtil.toStringArray(properties.get('directMessageTwitterHandles')) as List
+
+        if (!accessToken && !accessSecret && !consumerKey && !consumerSecret) {
+
+            throw new MissingArgumentException("One or more required configuration values is not set:" +
+                " accessToken: ${accessToken}, accessSecret: ${accessSecret}, consumerKey: ${consumerKey}, consumerSecret: ${consumerSecret}")
+        }
     }
 
     @Override
