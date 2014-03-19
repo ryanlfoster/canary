@@ -55,7 +55,7 @@ class EndpointComparisonMonitor implements MonitoredService {
     @Property(name = 'type', label = 'Comparison Type', options = [
         @PropertyOption(name = 'Random Page', value = 'RANDOM_PAGE'),
         @PropertyOption(name = 'Page From List', value = 'PAGE_FROM_LIST'),
-        @PropertyOption(value = 'Root Server Path', name = 'ROOT_SERVER_PATH')])
+        @PropertyOption(name = 'Root Server Path', value = 'ROOT_SERVER_PATH')])
     private ComparisonType type
     enum ComparisonType { RANDOM_PAGE, PAGE_FROM_LIST, ROOT_SERVER_PATH }
 
