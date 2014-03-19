@@ -1,11 +1,13 @@
 package com.citytechinc.canary.services.notification
 
 import com.citytechinc.canary.Constants
+import com.citytechinc.canary.api.notification.AggregateAlarms
 import com.citytechinc.canary.api.notification.AlarmNotification
 import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.api.notification.NotificationAgent
 import com.citytechinc.canary.api.notification.NotificationAgentDefinition
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
+import com.google.common.base.Preconditions
 import groovy.util.logging.Slf4j
 import groovyjarjarcommonscli.MissingArgumentException
 import org.apache.felix.scr.annotations.Activate
@@ -27,6 +29,8 @@ import org.apache.http.util.EntityUtils
 import org.apache.sling.commons.osgi.PropertiesUtil
 import org.osgi.framework.Constants as OsgiConstants
 
+import java.util.concurrent.TimeUnit
+
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2014
@@ -37,9 +41,10 @@ import org.osgi.framework.Constants as OsgiConstants
 @Component(policy = ConfigurationPolicy.REQUIRE, label = 'Canary Framework Twilio SMS Notification Agent', description = '', immediate = true, metatype = true)
 @Service
 @Properties(value = [
-@Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
+    @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
 @NotificationAgentDefinition(strategy = SubscriptionStrategy.ALL)
+@AggregateAlarms(aggregationWindow = 1, aggregationWindowTimeUnit = TimeUnit.MINUTES)
 class TwilioSMSNotificationAgent implements NotificationAgent {
 
     static final String HOST = 'api.twilio.com'
@@ -105,7 +110,7 @@ class TwilioSMSNotificationAgent implements NotificationAgent {
             parameters.add(new BasicNameValuePair('To', destination))
             parameters.add(new BasicNameValuePair('Body', message))
 
-            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parameters, "UTF-8")
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parameters, 'UTF-8')
 
             postMethod.setEntity(entity)
 

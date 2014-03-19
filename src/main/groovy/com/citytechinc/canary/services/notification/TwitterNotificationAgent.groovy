@@ -1,6 +1,7 @@
 package com.citytechinc.canary.services.notification
 
 import com.citytechinc.canary.Constants
+import com.citytechinc.canary.api.notification.AggregateAlarms
 import com.citytechinc.canary.api.notification.AlarmNotification
 import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.api.notification.NotificationAgent
@@ -22,6 +23,8 @@ import twitter4j.Twitter
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
 
+import java.util.concurrent.TimeUnit
+
 /**
  *
  * @author Josh Durbin, CITYTECH, Inc. 2014
@@ -35,6 +38,7 @@ import twitter4j.conf.ConfigurationBuilder
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
 @NotificationAgentDefinition(strategy = SubscriptionStrategy.ALL)
+@AggregateAlarms(aggregationWindow = 1, aggregationWindowTimeUnit = TimeUnit.MINUTES)
 class TwitterNotificationAgent implements NotificationAgent {
 
     @Property(name = 'accessToken', label = 'Twitter Access Token')

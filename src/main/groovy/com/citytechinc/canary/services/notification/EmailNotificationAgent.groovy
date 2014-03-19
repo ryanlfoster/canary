@@ -1,5 +1,6 @@
 package com.citytechinc.canary.services.notification
 
+import com.citytechinc.canary.api.notification.AggregateAlarms
 import com.citytechinc.canary.api.notification.AlarmNotification
 import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.api.notification.NotificationAgent
@@ -23,6 +24,7 @@ import org.apache.sling.settings.SlingSettingsService
 import org.osgi.framework.Constants as OsgiConstants
 
 import javax.mail.internet.InternetAddress
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -37,6 +39,7 @@ import javax.mail.internet.InternetAddress
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @Slf4j
 @NotificationAgentDefinition(strategy = SubscriptionStrategy.ALL)
+@AggregateAlarms(aggregationWindow = 1, aggregationWindowTimeUnit = TimeUnit.MINUTES)
 class EmailNotificationAgent implements NotificationAgent {
 
     @Reference
