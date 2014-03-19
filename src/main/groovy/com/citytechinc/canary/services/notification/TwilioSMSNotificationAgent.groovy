@@ -15,6 +15,15 @@ import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Service
+import org.apache.http.HttpResponse
+import org.apache.http.NameValuePair
+import org.apache.http.auth.AuthScope
+import org.apache.http.auth.UsernamePasswordCredentials
+import org.apache.http.client.entity.UrlEncodedFormEntity
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.message.BasicNameValuePair
+import org.apache.http.util.EntityUtils
 import org.apache.sling.commons.osgi.PropertiesUtil
 import org.osgi.framework.Constants as OsgiConstants
 
@@ -33,14 +42,13 @@ import org.osgi.framework.Constants as OsgiConstants
 @NotificationAgentDefinition(strategy = SubscriptionStrategy.ALL)
 class TwilioSMSNotificationAgent implements NotificationAgent {
 
-    @Property(name = 'twilioHost', label = 'Twilio Host', value = 'api.twilio.com')
-    private String twilioHost
+    static final String HOST = 'api.twilio.com'
 
-    @Property(name = 'apiID', label = 'Twilio API ID')
-    private String apiID
+    @Property(name = 'accountSID', label = 'Twilio API AccountSID')
+    private String accountSID
 
-    @Property(name = 'apiPass', label = 'Twilio API Pass')
-    private String apiPass
+    @Property(name = 'authToken', label = 'Twilio API Auth Token')
+    private String authToken
 
     @Property(name = 'fromNumber', label = 'SMS From Number')
     private String fromNumber
@@ -52,51 +60,63 @@ class TwilioSMSNotificationAgent implements NotificationAgent {
     @Modified
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        twilioHost = PropertiesUtil.toString(properties.get('twilioHost'), 'api.twilio.com')
-        apiID = PropertiesUtil.toString(properties.get('apiID'), '')
-        apiPass = PropertiesUtil.toString(properties.get('apiPass'), '')
+        accountSID = PropertiesUtil.toString(properties.get('accountSID'), '')
+        authToken = PropertiesUtil.toString(properties.get('authToken'), '')
         fromNumber = PropertiesUtil.toString(properties.get('fromNumber'), '')
         destinationNumbers = PropertiesUtil.toStringArray(properties.get('destinationNumbers')) as List
 
-        if (!twilioHost && !apiID && !apiPass && !fromNumber && !destinationNumbers) {
+        if (!accountSID && !authToken && !fromNumber && !destinationNumbers) {
             throw new MissingArgumentException("One or more required configuration values is not set:" +
-                    " twilioHost: ${twilioHost}, apiID: ${apiID}, apiPass: ${apiPass}, fromNumber: ${fromNumber}," +
+                    " accountSID: ${accountSID}, authToken: ${authToken}, fromNumber: ${fromNumber}," +
                     " destinationNumbers: ${destinationNumbers}")
         }
     }
 
     @Override
     void handleAlarm(List<AlarmNotification> alarmNotifications) {
-//
-//        HostConfiguration hc = new HostConfiguration()
-//        hc.setHost(twilioHost, 443, "https")
-//
-//        String url = "/2008-08-01/Accounts/$apiID/SMS/Messages"
-//
-//        HttpClient client = new HttpClient()
-//        Credentials credentials = new UsernamePasswordCredentials(apiID, apiPass)
-//        client.getState().setCredentials(null, null, credentials)
-//
-//        destinationNumbers.each { toNumber ->
-//
-//            PostMethod post = new PostMethod(url)
-//            post.addParameter 'IfMachine', 'Continue'
-//            post.addParameter 'Method', 'POST'
-//            post.addParameter 'From', fromNumber
-//            post.addParameter 'To', toNumber
-//            post.addParameter 'Body', "Monitors: ${alarmNotifications}*.monitorName are alarmed"
-//
-//            client.executeMethod(hc, post)
-//
-//            log.info("Received status code ${post.statusCode} and text ${post.statusText}")
-//            log.trace("Received response body ${post.responseBodyAsString}")
-//
-//            post.releaseConnection()
-//        }
+
+        destinationNumbers.each {
+
+            sendSMS("${alarmNotifications.size()} alarm(s) have been raised on AEM instance w/ runmodes ${['test']}", it)
+        }
     }
 
     @Override
     void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
 
+        destinationNumbers.each {
+
+            sendSMS("${alarmResetNotifications.size()} alarm(s) have been reset on AEM instance w/ runmodes ${['test']}", it)
+        }
+    }
+
+    private void sendSMS(String message, String destination) {
+
+        DefaultHttpClient httpclient = new DefaultHttpClient()
+
+        try {
+
+            httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(accountSID, authToken))
+
+            HttpPost postMethod = new HttpPost("https://${HOST}/2010-04-01/Accounts/${accountSID}/Messages.json")
+
+            List<NameValuePair> parameters = new ArrayList<NameValuePair>()
+            parameters.add(new BasicNameValuePair('From', fromNumber))
+            parameters.add(new BasicNameValuePair('To', destination))
+            parameters.add(new BasicNameValuePair('Body', message))
+
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parameters, "UTF-8")
+
+            postMethod.setEntity(entity)
+
+            HttpResponse response = httpclient.execute(postMethod)
+
+            log.info("Received status code ${response.statusLine.statusCode} and phrase ${response.statusLine.reasonPhrase}")
+            log.trace("Received response ${EntityUtils.toString(response.entity)}")
+
+        } finally {
+
+            httpclient.getConnectionManager().shutdown()
+        }
     }
 }
