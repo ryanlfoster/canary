@@ -80,7 +80,18 @@ class TwitterNotificationAgent implements NotificationAgent {
     @Override
     void handleAlarm(List<AlarmNotification> alarmNotifications) {
 
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+        updateTwitter("${alarmNotifications.size()} alarm(s) have been raised on AEM instance w/ runmodes ${['test']}")
+    }
+
+    @Override
+    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
+
+        updateTwitter("${alarmResetNotifications.size()} alarm(s) have been reset on AEM instanec w/ runmodes ${['test']}")
+    }
+
+    private void updateTwitter(String message) {
+
+        final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
         configurationBuilder.setDebugEnabled(true)
                 .setOAuthConsumerKey(consumerKey)
                 .setOAuthConsumerSecret(consumerSecret)
@@ -89,18 +100,20 @@ class TwitterNotificationAgent implements NotificationAgent {
 
         try {
 
-            TwitterFactory factory = new TwitterFactory(configurationBuilder.build())
-            Twitter twitter = factory.getInstance()
+            final TwitterFactory factory = new TwitterFactory(configurationBuilder.build())
+            final Twitter twitter = factory.getInstance()
 
-            twitter.updateStatus('Canary test')
+            if (type == TwitterNotificationActionType.UPDATE_STATUS || type == TwitterNotificationActionType.BOTH) {
+                twitter.updateStatus(message)
+            }
+
+            if ((type == TwitterNotificationActionType.DIRECT_MESSAGE_USERS || type == TwitterNotificationActionType.BOTH) && !directMessageTwitterHandles.empty) {
+                directMessageTwitterHandles.each { twitter.sendDirectMessage(it, message) }
+            }
+
         } catch (Exception e) {
 
             log.error("An error occurred attempting to notify twitter of an alarm", e)
         }
-    }
-
-    @Override
-    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
-
     }
 }
