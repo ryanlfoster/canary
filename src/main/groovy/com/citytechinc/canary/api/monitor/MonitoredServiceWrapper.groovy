@@ -35,6 +35,7 @@ public final class MonitoredServiceWrapper {
     final Boolean escalateLogs
 
     // RESET MONITOR
+    final Boolean interruptablePollingEnabled
     final Boolean resetCriteriaDefined
     final Integer resetInterval
     final TimeUnit resetIntervalUnit
@@ -58,6 +59,7 @@ public final class MonitoredServiceWrapper {
         maxExecutionTime = definition.maxExecutionTime()
         escalateLogs = definition.logEscalation()
 
+        interruptablePollingEnabled = maxExecutionTime > 0L
         resetCriteriaDefined = automaticResetMonitorDefinition != null
         resetInterval = resetCriteriaDefined ? automaticResetMonitorDefinition.resetInterval() : null
         resetIntervalUnit = resetCriteriaDefined ? automaticResetMonitorDefinition.resetIntervalUnit() : null
