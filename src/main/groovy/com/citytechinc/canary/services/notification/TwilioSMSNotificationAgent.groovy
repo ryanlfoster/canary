@@ -82,7 +82,7 @@ class TwilioSMSNotificationAgent implements NotificationAgent {
 
         destinationNumbers.each {
 
-            sendSMS("${alarmNotifications.size()} alarm(s) have been raised on AEM instance w/ runmodes ${['test']}", it)
+            sendSMS("${alarmNotifications.size()} alarm(s) raised on AEM instance w/ runmodes ${alarmNotifications.collect { it.context }.collect { it.hostname }.unique()}", it)
         }
     }
 
@@ -91,17 +91,17 @@ class TwilioSMSNotificationAgent implements NotificationAgent {
 
         destinationNumbers.each {
 
-            sendSMS("${alarmResetNotifications.size()} alarm(s) have been reset on AEM instance w/ runmodes ${['test']}", it)
+            sendSMS("${alarmResetNotifications.size()} alarm(s) reset on AEM instance w/ runmodes ${alarmResetNotifications.collect { it.context }.collect { it.hostname }.unique()}", it)
         }
     }
 
     private void sendSMS(String message, String destination) {
 
-        DefaultHttpClient httpclient = new DefaultHttpClient()
+        DefaultHttpClient httpClient = new DefaultHttpClient()
 
         try {
 
-            httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(accountSID, authToken))
+            httpClient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(accountSID, authToken))
 
             HttpPost postMethod = new HttpPost("https://${HOST}/2010-04-01/Accounts/${accountSID}/Messages.json")
 
@@ -114,14 +114,14 @@ class TwilioSMSNotificationAgent implements NotificationAgent {
 
             postMethod.setEntity(entity)
 
-            HttpResponse response = httpclient.execute(postMethod)
+            HttpResponse response = httpClient.execute(postMethod)
 
             log.info("Received status code ${response.statusLine.statusCode} and phrase ${response.statusLine.reasonPhrase}")
             log.trace("Received response ${EntityUtils.toString(response.entity)}")
 
         } finally {
 
-            httpclient.getConnectionManager().shutdown()
+            httpClient.getConnectionManager().shutdown()
         }
     }
 }

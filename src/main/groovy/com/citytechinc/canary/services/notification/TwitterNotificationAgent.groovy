@@ -50,7 +50,7 @@ class TwitterNotificationAgent implements NotificationAgent {
     @Property(name = 'consumerKey', label = 'Twitter Consumer Key')
     private String consumerKey
 
-    @Property(name = 'consumerSecret', label = 'Tiwtter Consumer Secret')
+    @Property(name = 'consumerSecret', label = 'Twitter Consumer Secret')
     private String consumerSecret
 
     @Property(name = 'type', label = 'Notification Action Type', options = [
@@ -84,13 +84,13 @@ class TwitterNotificationAgent implements NotificationAgent {
     @Override
     void handleAlarm(List<AlarmNotification> alarmNotifications) {
 
-        updateTwitter("${alarmNotifications.size()} alarm(s) have been raised on AEM instance w/ runmodes ${['test']}")
+        updateTwitter("${alarmNotifications.size()} alarm(s) raised on AEM instance w/ runmodes ${alarmNotifications.collect { it.context }.collect { it.hostname }.unique()}")
     }
 
     @Override
     void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
 
-        updateTwitter("${alarmResetNotifications.size()} alarm(s) have been reset on AEM instanec w/ runmodes ${['test']}")
+        updateTwitter("${alarmResetNotifications.size()} alarm(s) reset on AEM instance w/ runmodes ${alarmResetNotifications.collect { it.context }.collect { it.hostname }.unique()}")
     }
 
     private void updateTwitter(String message) {
