@@ -54,10 +54,10 @@ class EndpointComparisonMonitor implements MonitoredService {
 
     @Property(name = 'type', label = 'Comparison Type', options = [
         @PropertyOption(name = 'Random Page', value = 'RANDOM_PAGE'),
-        @PropertyOption(name = 'Page From List', value = 'PAGE_FROM_LIST'),
+        @PropertyOption(name = 'Random Page From List', value = 'RANDOM_PAGE_FROM_LIST'),
         @PropertyOption(name = 'Root Server Path', value = 'ROOT_SERVER_PATH')])
     private ComparisonType type
-    enum ComparisonType { RANDOM_PAGE, PAGE_FROM_LIST, ROOT_SERVER_PATH }
+    enum ComparisonType { RANDOM_PAGE, RANDOM_PAGE_FROM_LIST, ROOT_SERVER_PATH }
 
     @Property(name = 'randomPathStartPath', label = 'Random Page Start Path', value = '', description = 'Used if type is \'Random Page\', this represents the page path that will be used to randomly select a child for comparison')
     private String randomPathStartPath
@@ -73,7 +73,7 @@ class EndpointComparisonMonitor implements MonitoredService {
     private List<EndpointComparisonConfiguration> endpointComparisonConfigurations = Lists.newCopyOnWriteArrayList()
 
     @Reference
-    private ResourceResolverFactory resourceResolverFactory;
+    private ResourceResolverFactory resourceResolverFactory
 
     void bindEndpointComparisonConfiguration(EndpointComparisonConfiguration endpointComparisonConfiguration) {
         endpointComparisonConfigurations.add(endpointComparisonConfiguration)
@@ -122,19 +122,31 @@ class EndpointComparisonMonitor implements MonitoredService {
                     explicitPagePath = descendantPathPaths.get(RANDOM_GENERATOR.nextInt(descendantPathPaths.size())) + '.html'
                 }
 
-            } else if (type == ComparisonType.PAGE_FROM_LIST) {
+            } else if (type == ComparisonType.RANDOM_PAGE_FROM_LIST) {
 
-                List<String> activatePages = []
+                List<String> activePages = []
 
-                pagePaths.each { pagePath ->
+                if (pagePaths.empty) {
 
-                    if (pageManager.getPage(pagePath) && pageManager.getPage(pagePath).adaptTo(ReplicationStatus).activated) {
+                    log.debug("Random page paths was the selected configuration but no paths were supplied")
 
-                        activatePages.add(pagePath)
+                } else {
+
+                    pagePaths.each { pagePath ->
+
+                        if (pageManager.getPage(pagePath) && pageManager.getPage(pagePath).adaptTo(ReplicationStatus).activated) {
+
+                            activePages.add(pagePath)
+                        }
+                    }
+
+                    if (activePages.empty) {
+
+                        log.debug("Looked up ${pagePaths.size()} pages but none were found and active")
                     }
                 }
 
-                explicitPagePath = activatePages.get(RANDOM_GENERATOR.nextInt(activatePages.size())) + '.html'
+                explicitPagePath = activePages.get(RANDOM_GENERATOR.nextInt(activePages.size())) + '.html'
             }
 
         } catch (Exception e) {
