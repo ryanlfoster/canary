@@ -16,4 +16,5 @@ class BaseNotificationMessage {
     String monitorName
     String monitorDescription
     RecordHolder recordHolder
+    AlarmContext context
 }
