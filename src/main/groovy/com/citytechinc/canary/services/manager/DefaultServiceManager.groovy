@@ -87,7 +87,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredMonitors.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true))
         }
     }
 
@@ -98,7 +98,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false))
         }
     }
 
@@ -107,7 +107,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredNotificationAgents.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true))
         }
     }
 
@@ -118,7 +118,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false))
         }
     }
 
@@ -127,7 +127,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredPersistenceServices.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true))
         }
     }
 
@@ -138,7 +138,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false))
         }
     }
 
@@ -147,7 +147,7 @@ class DefaultServiceManager implements ServiceManager {
         registeredPollResponseHandlers.add(service)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true))
         }
     }
 
@@ -158,7 +158,7 @@ class DefaultServiceManager implements ServiceManager {
         sleep(100)
 
         if (missionControl?.isActive()) {
-            missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
+            missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false))
         }
     }
 
@@ -175,10 +175,10 @@ class DefaultServiceManager implements ServiceManager {
                 "${registeredPersistenceServices.size()} persistence handlers, and " +
                 "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
 
-        registeredPersistenceServices.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
-        registeredMonitors.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
-        registeredNotificationAgents.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
-        registeredPollResponseHandlers.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true) }
+        registeredPersistenceServices.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true)) }
+        registeredMonitors.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true)) }
+        registeredNotificationAgents.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true)) }
+        registeredPollResponseHandlers.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: true)) }
     }
 
     @Deactivate
@@ -191,10 +191,10 @@ class DefaultServiceManager implements ServiceManager {
                     "${registeredPersistenceServices.size()} persistence handlers, and " +
                     "${registeredPollResponseHandlers.size()} poll response handlers with mission control...")
 
-            registeredMonitors.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
-            registeredNotificationAgents.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
-            registeredPersistenceServices.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
-            registeredPollResponseHandlers.each { missionControl << new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false) }
+            registeredMonitors.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false)) }
+            registeredNotificationAgents.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false)) }
+            registeredPersistenceServices.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false)) }
+            registeredPollResponseHandlers.each { missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: it, isRegistration: false)) }
 
             log.debug("Shutting down mission control...")
             missionControl.stop()
