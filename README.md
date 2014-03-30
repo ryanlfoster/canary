@@ -16,6 +16,8 @@ collected data and other metrics, in addition to exposing data via JMX beans.
 
 [![Stories in Ready](https://badge.waffle.io/citytechinc/canary.png?label=ready)](http://waffle.io/citytechinc/canary)
 
+[![Coverage Status](https://coveralls.io/repos/Citytechinc/canary/badge.png)](https://coveralls.io/r/Citytechinc/canary)
+
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/Citytechinc/canary/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 See the [Maven site](http://code.citytechinc.com/canary) for full documentation.

@@ -59,7 +59,7 @@ public final class MonitoredServiceWrapper {
         alarmThreshold = definition.alarmThreshold()
         persistWhenAlarmed = definition.persistWhenAlarmed()
 
-        final Long pollIntervalInMS = TimeUnit.MILLISECONDS.convert(pollInterval(), pollIntervalUnit())
+        final Long pollIntervalInMS = TimeUnit.MILLISECONDS.convert(pollInterval, pollIntervalUnit)
 
         if (pollIntervalInMS < definition.maxExecutionTime()) {
 
