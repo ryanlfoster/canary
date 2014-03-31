@@ -8,7 +8,6 @@
 
 		search: '',
 		titleFilter: null,
-		needs: ['alerts'],
 
 		// Subsets:
 

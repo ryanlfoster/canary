@@ -4,5 +4,5 @@
           jcr:primaryType="cq:Component"
           jcr:title="Service Monitor Dashboard"
           jcr:description="Dashboard page for service monitors"
-          sling:resourceSuperType=""
+          sling:resourceSuperType="foundation/components/page"
           contentClass=""/>

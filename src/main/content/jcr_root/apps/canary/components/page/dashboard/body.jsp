@@ -1,5 +1,11 @@
 <%@include file="/apps/canary/components/global.jsp"%>
 
-<div id="canary"></div>
+<body>
 
-<cq:includeClientLib categories="citytech-canary-dashboard"/>
+    <!--test-->
+
+    <div id="canary"></div>
+
+    <cq:includeClientLib categories="citytech-canary-dashboard"/>
+
+</body>

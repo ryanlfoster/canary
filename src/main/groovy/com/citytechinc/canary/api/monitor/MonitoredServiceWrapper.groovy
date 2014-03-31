@@ -1,6 +1,7 @@
 package com.citytechinc.canary.api.monitor
 
 import groovy.transform.EqualsAndHashCode
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 import org.codehaus.jackson.annotate.JsonIgnore
 
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit
  *
  */
 @EqualsAndHashCode
+@Slf4j
 public final class MonitoredServiceWrapper {
 
     @JsonIgnore
@@ -35,7 +37,7 @@ public final class MonitoredServiceWrapper {
     final Boolean escalateLogs
 
     // RESET MONITOR
-    final Boolean interruptablePollingEnabled
+    final Boolean interruptiblePollingEnabled
     final Boolean resetCriteriaDefined
     final Integer resetInterval
     final TimeUnit resetIntervalUnit
@@ -56,10 +58,20 @@ public final class MonitoredServiceWrapper {
         alarmCriteria = definition.alarmCriteria()
         alarmThreshold = definition.alarmThreshold()
         persistWhenAlarmed = definition.persistWhenAlarmed()
-        maxExecutionTime = definition.maxExecutionTime()
+
+        final Long pollIntervalInMS = TimeUnit.MILLISECONDS.convert(pollInterval, pollIntervalUnit)
+
+        if (pollIntervalInMS < definition.maxExecutionTime()) {
+
+            log.warn("The poll interval in milliseconds is ${pollIntervalInMS} which is less than the max execution time of ${definition.maxExecutionTime()}, therefore the max execution time will be set to the poll interval of ${pollIntervalInMS}")
+            maxExecutionTime = pollIntervalInMS
+        } else {
+            maxExecutionTime = definition.maxExecutionTime()
+        }
+
         escalateLogs = definition.logEscalation()
 
-        interruptablePollingEnabled = maxExecutionTime > 0L
+        interruptiblePollingEnabled = maxExecutionTime > 0L
         resetCriteriaDefined = automaticResetMonitorDefinition != null
         resetInterval = resetCriteriaDefined ? automaticResetMonitorDefinition.resetInterval() : null
         resetIntervalUnit = resetCriteriaDefined ? automaticResetMonitorDefinition.resetIntervalUnit() : null

@@ -11,19 +11,19 @@
       paths = {
 
         /** list paths */
-        MONITOR: 'etc/canarydashboard/jcr:content.listmonitors.json',
-        NOTIFICATION_AGENT: 'etc/canarydashboard/jcr:content.listnotificationagents.json',
-        POLL_RESPONSE_HANDLER: 'etc/canarydashboard/jcr:content.listpollresponsehandlers.json',
-        RECORD_PERSISTENCE_SERVICE: 'etc/canarydashboard/jcr:content.listrecordpersistenceservices.json',
+        MONITOR: '/etc/canarydashboard/jcr:content.listmonitors.json',
+        NOTIFICATION_AGENT: '/etc/canarydashboard/jcr:content.listnotificationagents.json',
+        POLL_RESPONSE_HANDLER: '/etc/canarydashboard/jcr:content.listpollresponsehandlers.json',
+        RECORD_PERSISTENCE_SERVICE: '/etc/canarydashboard/jcr:content.listrecordpersistenceservices.json',
 
         /**
          * where identifier is the identifier listed in a call to list notification agents, poll response handlers, or record persistence services
          * where type is NOTIFICATION_AGENT or POLL_RESPONSE_HANDLER or RECORD_PERSISTENCE_SERVICE - ?identifier=&type=
          */
-        statistics: 'etc/canarydashboard/jcr:content.statistics.json',
+        statistics: '/etc/canarydashboard/jcr:content.statistics.json',
 
         /** where identifier is the identifier listed in list monitors - ?identifier=*/
-        records: 'etc/canarydashboard/jcr:content.records.json'
+        records: '/etc/canarydashboard/jcr:content.records.json'
 
       };
 
@@ -298,7 +298,6 @@
       /** Handle the resolution of the promise, passing the requested data to resolution callbacks. */
       function complete() {
         var payload = get( typeKey, id );
-        console.log( payload );
         resolve( payload );
       }
 

@@ -217,6 +217,8 @@ final class MissionControlActor extends DynamicDispatchActor {
                 pollResponseHandlers.remove(wrapper)?.terminate()
             }
         }
+
+        sender.send(true)
     }
 
     void onMessage(RequestAllMonitorsPersist message) {

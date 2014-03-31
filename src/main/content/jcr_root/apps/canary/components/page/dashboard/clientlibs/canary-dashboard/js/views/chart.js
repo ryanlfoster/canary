@@ -33,7 +33,7 @@
       if ( this.get('controller.records.records').length > 0 ) {
         _.forEach(this.get('controller.records.records'), function(record) {
           chartData.labels.push(record.startTime);
-          chartData.datasets[0].data.push(Canary.calculateDurationInMilliseconds(record.startTime, record.endTime));
+          chartData.datasets[0].data.push(Canary.dateOffsetInMilliseconds(record.startTime, record.endTime));
         });
       }
 
