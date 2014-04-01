@@ -11,6 +11,6 @@
   - endTime (date) mandatory
   - responseType (string) mandatory
   - stackTrace (string)
-  - message (string)
+  - message (string) multiple
   - excused (boolean) mandatory
 

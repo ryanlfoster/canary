@@ -11,7 +11,7 @@ public class PollResponse {
 
     private final PollResponseType pollResponseType
     private final String exceptionStackTrace
-    private String message
+    private final List<String> messages = []
 
     private PollResponse(PollResponseType pollResponseType, String exceptionStackTrace) {
         this.pollResponseType = pollResponseType
@@ -50,20 +50,15 @@ public class PollResponse {
         return new PollResponse(PollResponseType.UNEXPECTED_SERVICE_RESPONSE, '')
     }
 
-    public PollResponseType getPollResponseType() {
-        return pollResponseType
-    }
+    public PollResponse addMessages(List<String> messages) {
+        this.messages.addAll(messages)
 
-    public String getExceptionStackTrace() {
-        return exceptionStackTrace
-    }
-
-    String getMessage() {
-        return message
+        this
     }
 
     public PollResponse addMessage(String message) {
-        this.message = message
+        messages.add(message)
+
         this
     }
 }
