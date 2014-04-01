@@ -71,7 +71,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
                 try {
 
-                    wrapper.handleAlarm([message])
+                    wrapper.handleAlarmNotification([message])
                     ++statistics.processedMessages
 
                 } catch (Exception e) {
@@ -117,7 +117,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
                 try {
 
-                    wrapper.handleAlarm([message])
+                    wrapper.handleAlarmNotification([message])
                     ++statistics.processedMessages
 
                 } catch (Exception e) {
@@ -148,8 +148,8 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         try {
 
-            wrapper.handleAlarm(queuedAlarmNotifications.values() as List<AlarmNotification>)
-            wrapper.handleAlarmReset(queuedAlarmResetNotifications.values() as List<AlarmResetNotification>)
+            wrapper.handleAlarmNotification(queuedAlarmNotifications.values() as List<AlarmNotification>)
+            wrapper.handleAlarmResetNotification(queuedAlarmResetNotifications.values() as List<AlarmResetNotification>)
             ++statistics.processedMessages
 
         } catch (Exception e) {

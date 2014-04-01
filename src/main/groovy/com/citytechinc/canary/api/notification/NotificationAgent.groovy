@@ -17,11 +17,11 @@ public interface NotificationAgent {
      *
      * @param alarmNotifications
      */
-    public void handleAlarm(List<AlarmNotification> alarmNotifications)
+    public void handleAlarmNotification(List<AlarmNotification> alarmNotifications)
 
     /**
      *
      * @param alarmResetNotifications
      */
-    public void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications)
+    public void handleAlarmResetNotification(List<AlarmResetNotification> alarmResetNotifications)
 }

@@ -43,7 +43,7 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     ConfigurationAdmin configurationAdmin
 
     @Override
-    void handleAlarm(List<AlarmNotification> alarmNotifications) {
+    void handleAlarmNotification(List<AlarmNotification> alarmNotifications) {
 
         alarmNotifications.each { AlarmNotification alarmNotification ->
 
@@ -72,7 +72,7 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     }
 
     @Override
-    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
+    void handleAlarmResetNotification(List<AlarmResetNotification> alarmResetNotifications) {
 
         alarmResetNotifications.each { AlarmResetNotification notification ->
 

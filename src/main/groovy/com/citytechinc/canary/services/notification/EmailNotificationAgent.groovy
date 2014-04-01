@@ -68,7 +68,7 @@ class EmailNotificationAgent implements NotificationAgent {
     }
 
     @Override
-    void handleAlarm(List<AlarmNotification> alarmNotifications) {
+    void handleAlarmNotification(List<AlarmNotification> alarmNotifications) {
 
         HtmlEmail email = new HtmlEmail()
 
@@ -81,7 +81,7 @@ class EmailNotificationAgent implements NotificationAgent {
     }
 
     @Override
-    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
+    void handleAlarmResetNotification(List<AlarmResetNotification> alarmResetNotifications) {
 
         HtmlEmail email = new HtmlEmail()
 
