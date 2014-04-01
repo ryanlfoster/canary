@@ -11,7 +11,7 @@
     start = start || '';
     stop = stop || '';
     var startDate = new Date(start), stopDate = new Date(stop);
-    return startDate - stopDate;
+    return stopDate - startDate;
   };
 
 })();
