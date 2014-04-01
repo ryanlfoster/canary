@@ -35,5 +35,5 @@ public final class Constants {
     // ABSTRACT JSON RESPONSE SERVLET
     public static final String ABSTRACT_JSON_RESPONSE_SERVLET_CONTENT_TYPE = 'application/json'
     public static final String ABSTRACT_JSON_RESPONSE_SERVLET_CHARACTER_ENCODING = 'utf-8'
-    public static final String ABSTRACT_JSON_RESPONSE_SERVLET_DEFAULT_DATE_DEFINITION = 'MM/dd/yyyy hh:mm aaa z'
+    public static final String ABSTRACT_JSON_RESPONSE_SERVLET_DEFAULT_DATE_DEFINITION = 'yyyy-MM-dd\'T\'HH:mm:ss.SSSZ'
 }
