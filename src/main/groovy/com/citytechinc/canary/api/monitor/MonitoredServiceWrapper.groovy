@@ -34,7 +34,6 @@ public final class MonitoredServiceWrapper {
     final Integer alarmThreshold
     final Boolean persistWhenAlarmed
     final Long maxExecutionTime
-    final Boolean escalateLogs
 
     // RESET MONITOR
     final Boolean interruptiblePollingEnabled
@@ -68,8 +67,6 @@ public final class MonitoredServiceWrapper {
         } else {
             maxExecutionTime = definition.maxExecutionTime()
         }
-
-        escalateLogs = definition.logEscalation()
 
         interruptiblePollingEnabled = maxExecutionTime > 0L
         resetCriteriaDefined = automaticResetMonitorDefinition != null

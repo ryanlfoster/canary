@@ -65,8 +65,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     "History Size",
                     "Persist when alarmed?",
                     "Max Execution Time (ms)",
-                    "Auto Reset?",
-                    "Log Escalation?"};
+                    "Auto Reset?"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,      // Classname
@@ -78,8 +77,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.INTEGER,     // Configured History Size
                     SimpleType.BOOLEAN,     // Configured to persist when alarmed?
                     SimpleType.LONG,        // Configured Max Execution Time
-                    SimpleType.STRING,      // Configured to Auto Reset?
-                    SimpleType.BOOLEAN};    // Log escalation?
+                    SimpleType.STRING};     // Configured to Auto Reset?
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
             final TabularType pageTabularType = new TabularType("List of Monitor Service Configurations", "Monitor Configurations", pageType, itemNamesDescriptionsAndIndexName);
@@ -105,8 +103,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                         wrapper.getMaxNumberOfRecords(),
                         wrapper.getPersistWhenAlarmed(),
                         wrapper.getMaxExecutionTime(),
-                        autoResume,
-                        wrapper.getEscalateLogs()}));
+                        autoResume}));
             }
 
         } catch (final Exception exception) {
