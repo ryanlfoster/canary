@@ -99,24 +99,9 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 Ember.TEMPLATES["_monitorCard"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, helper, options, self=this, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
+  var buffer = '', stack1, helper, options, escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing, self=this;
 
 function program1(depth0,data) {
-
-  var buffer = '', stack1, helper, options;
-  data.buffer.push(" ");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "monitor", "identifier", options) : helperMissing.call(depth0, "link-to", "monitor", "identifier", options));
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  return buffer;
-  }
-function program2(depth0,data) {
-
-
-  data.buffer.push(" <span data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"There are new alerts for this monitor.\" class=\"floated-icon pull-right glyphicon glyphicon-exclamation-sign has-tooltip\"></span> ");
-  }
-
-function program4(depth0,data) {
 
   var buffer = '', stack1;
   data.buffer.push(" <h3 class=\"panel-title\">");
@@ -126,27 +111,70 @@ function program4(depth0,data) {
   return buffer;
   }
 
-function program6(depth0,data) {
+function program3(depth0,data) {
 
-  var buffer = '', stack1, helper, options;
+  var buffer = '', stack1;
   data.buffer.push(" <div class=\"panel-body\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
   data.buffer.push("> ");
-  stack1 = helpers['if'].call(depth0, "isError", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "isError", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" ");
-  stack1 = helpers['if'].call(depth0, "hasActiveAlerts", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  data.buffer.push(escapeExpression((helper = helpers.render || (depth0 && depth0.render),options={hash:{
-    'hideLabels': (true)
-  },hashTypes:{'hideLabels': "BOOLEAN"},hashContexts:{'hideLabels': depth0},contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "chart", "monitor", options) : helperMissing.call(depth0, "render", "chart", "monitor", options))));
   data.buffer.push(" <p>");
   stack1 = helpers._triageMustache.call(depth0, "description", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</p> </div> <div class=\"panel-footer\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push("> <table class=\"table table-condensed table-responsive\"> <tr> <td class=\"text-right text-muted\">Last Logged:</td> <td colspan=\"4\">");
+  data.buffer.push("> <table class=\"table table-condensed table-responsive\"> ");
+  stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(12, program12, data),fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" <tr> <td colspan=\"2\" class=\"text-right text-muted\">Poll Interval:</td> <td colspan=\"3\">");
+  stack1 = helpers._triageMustache.call(depth0, "pollInterval", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" ");
+  stack1 = helpers._triageMustache.call(depth0, "pollIntervalUnit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td class=\"text-right text-muted\">Criteria:</td> <td colspan=\"2\">");
+  stack1 = helpers._triageMustache.call(depth0, "alarmThreshold", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" ");
+  stack1 = helpers._triageMustache.call(depth0, "alarmCriteria", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> </tr> </table> </div> ");
+  return buffer;
+  }
+function program4(depth0,data) {
+
+  var buffer = '';
+  data.buffer.push(" <div class=\"alert alert-danger\"> <p class=\"text-center\">Monitor has paused polling due to errors.<br><button ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "reset", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
+  data.buffer.push(" class=\"btn btn-default btn-sm\">reset</button></p> </div> ");
+  return buffer;
+  }
+
+function program6(depth0,data) {
+
+  var buffer = '', helper, options;
+  data.buffer.push(" ");
+  data.buffer.push(escapeExpression((helper = helpers.render || (depth0 && depth0.render),options={hash:{
+    'hideLabels': (true)
+  },hashTypes:{'hideLabels': "BOOLEAN"},hashContexts:{'hideLabels': depth0},contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "chart", "monitor", options) : helperMissing.call(depth0, "render", "chart", "monitor", options))));
+  data.buffer.push(" ");
+  return buffer;
+  }
+
+function program8(depth0,data) {
+
+
+  data.buffer.push(" <div class=\"alert alert-info\"> <p>This monitor has not generated any records yet.</p> </div> ");
+  }
+
+function program10(depth0,data) {
+
+  var buffer = '', stack1;
+  data.buffer.push(" <tr> <td class=\"text-right text-muted\">Last Logged:</td> <td colspan=\"4\">");
   stack1 = helpers._triageMustache.call(depth0, "lastLoggedTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> <td colspan=\"2\" class=\"text-right text-muted\">Status:</td> <td>");
@@ -170,55 +198,14 @@ function program6(depth0,data) {
   data.buffer.push("</td> <td class=\"text-right text-muted\">Min Dur:</td> <td>");
   stack1 = helpers._triageMustache.call(depth0, "minDuration", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> </tr> <tr> <td colspan=\"2\" class=\"text-right text-muted\">Poll Interval:</td> <td colspan=\"3\">");
-  stack1 = helpers._triageMustache.call(depth0, "pollInterval", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  stack1 = helpers._triageMustache.call(depth0, "pollIntervalUnit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td class=\"text-right text-muted\">Criteria:</td> <td colspan=\"2\">");
-  stack1 = helpers._triageMustache.call(depth0, "alarmThreshold", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  stack1 = helpers._triageMustache.call(depth0, "alarmCriteria", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> </tr> </table> </div> ");
-  return buffer;
-  }
-function program7(depth0,data) {
-
-  var buffer = '';
-  data.buffer.push(" <div class=\"alert alert-danger\"> <p class=\"text-center\">Monitor has paused polling due to errors.<br><button ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "reset", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(" class=\"btn btn-default btn-sm\">reset</button></p> </div> ");
+  data.buffer.push("</td> </tr> ");
   return buffer;
   }
 
-function program9(depth0,data) {
+function program12(depth0,data) {
 
-  var buffer = '', stack1;
-  data.buffer.push(" ");
-  stack1 = helpers.each.call(depth0, "alerts", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  return buffer;
-  }
-function program10(depth0,data) {
 
-  var buffer = '', stack1;
-  data.buffer.push(" ");
-  stack1 = helpers['if'].call(depth0, "active", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  return buffer;
-  }
-function program11(depth0,data) {
-
-  var buffer = '', helper, options;
-  data.buffer.push(" ");
-  data.buffer.push(escapeExpression((helper = helpers.partial || (depth0 && depth0.partial),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "alertShort", options) : helperMissing.call(depth0, "partial", "alertShort", options))));
-  data.buffer.push(" ");
-  return buffer;
+  data.buffer.push(" <tr> <td colspan=\"8\"> This monitor has not generated any records yet. </td> </tr> ");
   }
 
   data.buffer.push("<div ");
@@ -232,13 +219,10 @@ function program11(depth0,data) {
     'class': (":floated-icon :pull-right :glyphicon :has-tooltip isCardExpanded:glyphicon-minus isCardExpanded::glyphicon-plus")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push("></span> ");
-  stack1 = helpers['if'].call(depth0, "hasActiveAlerts", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "monitor", "identifier", options) : helperMissing.call(depth0, "link-to", "monitor", "identifier", options));
+  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "monitor", "identifier", options) : helperMissing.call(depth0, "link-to", "monitor", "identifier", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </div> ");
-  stack1 = helpers['if'].call(depth0, "isCardExpanded", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "isCardExpanded", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </div>");
   return buffer;
@@ -262,6 +246,31 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
 
+  var buffer = '', stack1;
+  data.buffer.push(" <td>");
+  stack1 = helpers._triageMustache.call(depth0, "lastLoggedTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "status", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "average", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "lastResponseType", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> ");
+  return buffer;
+  }
+
+function program3(depth0,data) {
+
+
+  data.buffer.push(" <td colspan=\"4\"> This monitor has not generated any records yet. </td> ");
+  }
+
+function program5(depth0,data) {
+
   var buffer = '';
   data.buffer.push(" <button class=\"btn btn-default btn-xs\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "reset", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
@@ -281,20 +290,11 @@ function program1(depth0,data) {
   data.buffer.push("</td> <td>");
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "lastLoggedTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("</td> ");
+  stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "status", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "average", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "lastResponseType", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td> ");
-  stack1 = helpers['if'].call(depth0, "isError", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push(" <td> ");
+  stack1 = helpers['if'].call(depth0, "isError", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </td> </tr> ");
   return buffer;
@@ -450,9 +450,26 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 Ember.TEMPLATES["monitor"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, helper, options, escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing, self=this;
+  var buffer = '', stack1, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
+
+  var buffer = '', helper, options;
+  data.buffer.push(" ");
+  data.buffer.push(escapeExpression((helper = helpers.render || (depth0 && depth0.render),options={hash:{
+    'hideLabels': (false)
+  },hashTypes:{'hideLabels': "BOOLEAN"},hashContexts:{'hideLabels': depth0},contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "chart", "controller", options) : helperMissing.call(depth0, "render", "chart", "controller", options))));
+  data.buffer.push(" ");
+  return buffer;
+  }
+
+function program3(depth0,data) {
+
+
+  data.buffer.push(" <div class=\"alert alert-info\"> <p>This monitor has not generated any records yet.</p> </div> ");
+  }
+
+function program5(depth0,data) {
 
   var buffer = '';
   data.buffer.push(" <div class=\"alert alert-danger\"> <p class=\"text-center\">Monitor has paused polling due to errors.<br><button ");
@@ -461,78 +478,10 @@ function program1(depth0,data) {
   return buffer;
   }
 
-function program3(depth0,data) {
-
-  var buffer = '', stack1;
-  data.buffer.push(" <dt>Reset Criteria</dt> <dd>");
-  stack1 = helpers._triageMustache.call(depth0, "resetInterval", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  stack1 = helpers._triageMustache.call(depth0, "resetIntervalUnit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</dd> ");
-  return buffer;
-  }
-
-function program5(depth0,data) {
-
-
-  data.buffer.push(" <dt>Reset Criteria</dt> <dd>Not Configured</dd> ");
-  }
-
 function program7(depth0,data) {
 
-  var buffer = '', stack1, helper, options;
-  data.buffer.push(" <tr> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "startTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "endTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
-  data.buffer.push(escapeExpression((helper = helpers.duration || (depth0 && depth0.duration),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["ID","ID"],data:data},helper ? helper.call(depth0, "startTime", "endTime", options) : helperMissing.call(depth0, "duration", "startTime", "endTime", options))));
-  data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  stack1 = helpers['if'].call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(10, program10, data),fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "excused", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "responseType", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> </tr> ");
-  return buffer;
-  }
-function program8(depth0,data) {
-
   var buffer = '', stack1;
-  data.buffer.push(" ");
-  stack1 = helpers._triageMustache.call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  return buffer;
-  }
-
-function program10(depth0,data) {
-
-
-  data.buffer.push(" -- ");
-  }
-
-  data.buffer.push("<section id=\"reports\"> <div class=\"row\"> <div class=\"col-md-12\"> <h1 class=\"page-header\">");
-  stack1 = helpers._triageMustache.call(depth0, "serviceName", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</h1> </div> </div> <!-- /row --> <div class=\"row\"> <div class=\"col-md-8 col-md-push-4\"> ");
-  data.buffer.push(escapeExpression((helper = helpers.render || (depth0 && depth0.render),options={hash:{
-    'hideLabels': (false)
-  },hashTypes:{'hideLabels': "BOOLEAN"},hashContexts:{'hideLabels': depth0},contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "chart", "controller", options) : helperMissing.call(depth0, "render", "chart", "controller", options))));
-  data.buffer.push(" </div> <div class=\"col-md-4 col-md-pull-8\"> <div class=\"panel panel-default\"> <div class=\"panel-heading\"> <h2>Monitor Status</h2> </div> <div class=\"panel-body\"> ");
-  stack1 = helpers['if'].call(depth0, "isError", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" <h3>Status</h3> <dl class=\"dl-horizontal\"> <dt>Current Status</dt> <dd>");
+  data.buffer.push(" <dl class=\"dl-horizontal\"> <dt>Current Status</dt> <dd>");
   stack1 = helpers._triageMustache.call(depth0, "status", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</dd> <dt>Last Logged</dt> <dd>");
@@ -556,7 +505,93 @@ function program10(depth0,data) {
   data.buffer.push("</dd> <dt>Min Duration</dt> <dd>");
   stack1 = helpers._triageMustache.call(depth0, "minDuration", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</dd> </dd> <hr> <h3>Configuration</h3> <dl class=\"dl-horizontal\"> <dt>Alarm Criteria</dt> <dd>");
+  data.buffer.push("</dd> </dd> ");
+  return buffer;
+  }
+
+function program9(depth0,data) {
+
+  var buffer = '', stack1;
+  data.buffer.push(" <dt>Reset Criteria</dt> <dd>");
+  stack1 = helpers._triageMustache.call(depth0, "resetInterval", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" ");
+  stack1 = helpers._triageMustache.call(depth0, "resetIntervalUnit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</dd> ");
+  return buffer;
+  }
+
+function program11(depth0,data) {
+
+
+  data.buffer.push(" <dt>Reset Criteria</dt> <dd>Not Configured</dd> ");
+  }
+
+function program13(depth0,data) {
+
+  var buffer = '', stack1;
+  data.buffer.push(" <table class=\"table table-condensed table-striped table-hover\"> <tbody> <tr> <th>Start Time</th> <th>End Time</th> <th>Duration (ms)</th> <th>Message</th> <th>Excused</th> <th>Response Type</th> </tr> ");
+  stack1 = helpers.each.call(depth0, "records.records", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(14, program14, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" </tbody> </table> ");
+  return buffer;
+  }
+function program14(depth0,data) {
+
+  var buffer = '', stack1, helper, options;
+  data.buffer.push(" <tr> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "startTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "endTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td>");
+  data.buffer.push(escapeExpression((helper = helpers.duration || (depth0 && depth0.duration),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["ID","ID"],data:data},helper ? helper.call(depth0, "startTime", "endTime", options) : helperMissing.call(depth0, "duration", "startTime", "endTime", options))));
+  data.buffer.push("</td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" ");
+  stack1 = helpers['if'].call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(17, program17, data),fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" </td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "excused", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "responseType", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> </tr> ");
+  return buffer;
+  }
+function program15(depth0,data) {
+
+  var buffer = '', stack1;
+  data.buffer.push(" ");
+  stack1 = helpers._triageMustache.call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" ");
+  return buffer;
+  }
+
+function program17(depth0,data) {
+
+
+  data.buffer.push(" -- ");
+  }
+
+  data.buffer.push("<section id=\"reports\"> <div class=\"row\"> <div class=\"col-md-12\"> <h1 class=\"page-header\">");
+  stack1 = helpers._triageMustache.call(depth0, "serviceName", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</h1> </div> </div> <!-- /row --> <div class=\"row\"> <div class=\"col-md-8 col-md-push-4\"> ");
+  stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" </div> <div class=\"col-md-4 col-md-pull-8\"> <div class=\"panel panel-default\"> <div class=\"panel-heading\"> <h2>Monitor Status</h2> </div> <div class=\"panel-body\"> ");
+  stack1 = helpers['if'].call(depth0, "isError", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" <h3>Status</h3> ");
+  stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" <hr> <h3>Configuration</h3> <dl class=\"dl-horizontal\"> <dt>Alarm Criteria</dt> <dd>");
   stack1 = helpers._triageMustache.call(depth0, "alarmThreshold", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" ");
@@ -575,15 +610,15 @@ function program10(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "persistWhenAlarmed", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</dd> ");
-  stack1 = helpers['if'].call(depth0, "resetCriterialDefined", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "resetCriterialDefined", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" <dt>Maximum Records</dt> <dd>");
   stack1 = helpers._triageMustache.call(depth0, "maxNumberOfRecords", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</dd> </dd> </div> </div> </div> </div> <!-- /row --> <div class=\"row\"> <div class=\"col-md-12\"> <div class=\"table-responsive\"> <h2>Records</h2> <table class=\"table table-condensed table-striped table-hover\"> <tbody> <tr> <th>Start Time</th> <th>End Time</th> <th>Duration (ms)</th> <th>Message</th> <th>Excused</th> <th>Response Type</th> </tr> ");
-  stack1 = helpers.each.call(depth0, "records.records", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("</dd> </dd> </div> </div> </div> </div> <!-- /row --> <div class=\"row\"> <div class=\"col-md-12\"> <div class=\"table-responsive\"> <h2>Records</h2> ");
+  stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(13, program13, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </tbody> </table> </div> </div> </div> <!-- /row --> </section>");
+  data.buffer.push(" </div> </div> </div> <!-- /row --> </section>");
   return buffer;
 
 });
@@ -638,13 +673,13 @@ function program4(depth0,data) {
   stack1 = helpers['if'].call(depth0, "errorCount", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" ");
-  stack1 = helpers['if'].call(depth0, "warnCount", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "warnCount", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Normal Services</h2class=\"text-left\"></caption> <thead><tr><th>Identifier</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
   stack1 = helpers._triageMustache.call(depth0, "normalCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td></tr></tfoot> <tbody> ");
-  stack1 = helpers.each.call(depth0, "normals", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "normals", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(10, program10, data),fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </tbody> </table> ");
   return buffer;
@@ -656,7 +691,7 @@ function program5(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "errorCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td></tr></tfoot> <tbody> ");
-  stack1 = helpers.each.call(depth0, "errors", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "errors", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </tbody> </table> ");
   return buffer;
@@ -672,23 +707,23 @@ function program6(depth0,data) {
 
 function program8(depth0,data) {
 
-  var buffer = '', helper, options;
-  data.buffer.push(" ");
-  data.buffer.push(escapeExpression((helper = helpers.partial || (depth0 && depth0.partial),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "monitorTableIfEmpty", options) : helperMissing.call(depth0, "partial", "monitorTableIfEmpty", options))));
-  data.buffer.push(" ");
-  return buffer;
-  }
-
-function program10(depth0,data) {
-
   var buffer = '', stack1;
   data.buffer.push(" <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Service Warnings</h2<</caption> <thead><tr><th>ID</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
   stack1 = helpers._triageMustache.call(depth0, "warnCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td></tr></tfoot> <tbody> ");
-  stack1 = helpers.each.call(depth0, "warnings", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "warnings", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </tbody> </table> ");
+  return buffer;
+  }
+
+function program10(depth0,data) {
+
+  var buffer = '', helper, options;
+  data.buffer.push(" ");
+  data.buffer.push(escapeExpression((helper = helpers.partial || (depth0 && depth0.partial),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "monitorTableIfEmpty", options) : helperMissing.call(depth0, "partial", "monitorTableIfEmpty", options))));
+  data.buffer.push(" ");
   return buffer;
   }
 

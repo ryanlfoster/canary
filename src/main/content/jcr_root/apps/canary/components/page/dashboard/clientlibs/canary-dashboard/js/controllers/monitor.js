@@ -25,6 +25,10 @@
       return this.get('records.alarmed') === true;
     }.property('records.alarmed'),
 
+    hasRecords: function() {
+      return this.get('records.records').length > 0;
+    }.property('records.records'),
+
     // Latest Record
 
     lastLogged: function () {
