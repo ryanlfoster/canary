@@ -123,7 +123,7 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
                             Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
                             detailedPollResponse.executionTimeInMilliseconds(),
                             detailedPollResponse.getResponseType().toString(),
-                            detailedPollResponse.getMessage(),
+                            detailedPollResponse.getMessages(),
                             detailedPollResponse.getExcused() }));
                 }
             }

@@ -148,8 +148,17 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         try {
 
-            wrapper.handleAlarmNotification(queuedAlarmNotifications.values() as List<AlarmNotification>)
-            wrapper.handleAlarmResetNotification(queuedAlarmResetNotifications.values() as List<AlarmResetNotification>)
+            def alarmNotifications = queuedAlarmNotifications.values() as List<AlarmNotification>
+            def alarmResetNotifications = queuedAlarmResetNotifications.values() as List<AlarmResetNotification>
+
+            if (!alarmNotifications.isEmpty()) {
+                wrapper.handleAlarmNotification(alarmNotifications)
+            }
+
+            if (!alarmResetNotifications.isEmpty()) {
+                wrapper.handleAlarmResetNotification(alarmResetNotifications)
+            }
+
             ++statistics.processedMessages
 
         } catch (Exception e) {

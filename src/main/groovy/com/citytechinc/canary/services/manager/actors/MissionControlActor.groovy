@@ -153,8 +153,16 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             } else if (!message.isRegistration && monitors.containsKey(wrapper)) {
 
+                log.debug("Sending GetRecord request to actor for service ${wrapper.identifier}")
+
+                RecordHolder recordHolder = monitors.get(wrapper).sendAndWait(new MonitoredServiceActor.GetRecord())
+                recordPersistenceServices.values().each { it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: recordHolder) }
+
                 log.debug("Termination actor for monitored service agent ${wrapper.identifier}")
                 monitors.remove(wrapper)?.terminate()
+
+                // THIS CALL IS BLOCKING
+                sender.send(true)
             }
 
         } else if (message.service instanceof NotificationAgent) {
@@ -217,8 +225,6 @@ final class MissionControlActor extends DynamicDispatchActor {
                 pollResponseHandlers.remove(wrapper)?.terminate()
             }
         }
-
-        sender.send(true)
     }
 
     void onMessage(RequestAllMonitorsPersist message) {

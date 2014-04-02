@@ -83,7 +83,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
                 endTime: new Date(),
                 responseType: pollResponse.pollResponseType,
-                message: pollResponse.message,
+                messages: pollResponse.messages,
                 stackTrace: pollResponse.exceptionStackTrace)
 
         if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {

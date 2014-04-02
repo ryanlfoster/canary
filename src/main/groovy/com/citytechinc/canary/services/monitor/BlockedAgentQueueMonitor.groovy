@@ -49,7 +49,7 @@ class BlockedAgentQueueMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        StringBuilder message = new StringBuilder()
+        List<String> messages = []
 
         agentManager.agents.values().findAll { it.enabled }
                 .findAll { agentIds.contains(it.configuration.agentId) }
@@ -57,10 +57,10 @@ class BlockedAgentQueueMonitor implements MonitoredService {
 
             if (it.queue.status.nextRetryTime > 0) {
 
-                message.append("The replication queue for ${it.configuration.agentId} is blocked. ")
+                messages.add("The replication queue for ${it.configuration.agentId} is blocked.")
             }
         }
 
-        message.size() > 0 ? PollResponse.SUCCESS() : PollResponse.UNEXPECTED_SERVICE_RESPONSE().addMessage(message)
+        messages.size() > 0 ? PollResponse.SUCCESS() : PollResponse.UNEXPECTED_SERVICE_RESPONSE().addMessages(messages)
     }
 }

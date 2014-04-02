@@ -97,7 +97,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
                 pollResponseNode.set('endTime', endCal)
                 pollResponseNode.set('responseType', pollResponse.responseType as String)
                 pollResponseNode.set('stackTrace', pollResponse.stackTrace)
-                pollResponseNode.set('message', pollResponse.message)
+                pollResponseNode.set('messages', pollResponse.messages)
                 pollResponseNode.set('excused', pollResponse.excused)
             }
 
@@ -141,14 +141,14 @@ class JCRPersistenceManager implements RecordPersistenceService {
                     def endTime = pollResponseNode.get('endTime').getTime()
                     def responseType = pollResponseNode.get('responseType') as PollResponseType
                     def stackTrace = pollResponseNode.get('stackTrace')
-                    def message = pollResponseNode.get('message')
+                    def messages = pollResponseNode.get('messages') as List<String>
                     def excused = pollResponseNode.get('excused') as Boolean
 
                     detailedPollResponses.add(new DetailedPollResponse(startTime: startTime,
                             endTime: endTime,
                             responseType: responseType,
                             stackTrace: stackTrace,
-                            message: message,
+                            messages: messages,
                             excused: excused))
                 }
 

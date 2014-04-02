@@ -71,7 +71,8 @@ class LogListenerExceptionCollectingMonitor implements MonitoredService, LogList
 
     @Override
     PollResponse poll() {
-        return null
+
+        PollResponse.SUCCESS()
     }
 
     @Override
