@@ -13,4 +13,3 @@
   - stackTrace (string)
   - messages (string) multiple
   - excused (boolean) mandatory
-
