@@ -2,10 +2,10 @@ package com.citytechinc.canary.jmx;
 
 import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
 import com.citytechinc.canary.Constants;
-import com.citytechinc.canary.api.monitor.DetailedPollResponse;
+import com.citytechinc.canary.api.monitor.PollResult;
+import com.citytechinc.canary.api.monitor.MonitorRecords;
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper;
 import com.citytechinc.canary.api.monitor.PollResponseType;
-import com.citytechinc.canary.api.monitor.RecordHolder;
 import com.citytechinc.canary.services.manager.ServiceManager;
 import com.google.common.base.Optional;
 import org.apache.felix.scr.annotations.Component;
@@ -112,19 +112,19 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
             final TabularType pageTabularType = new TabularType("Records for Monitored Service", "asdf", pageType, itemNamesDescriptionsAndIndexName);
             tabularDataSupport = new TabularDataSupport(pageTabularType);
 
-            Optional<RecordHolder> record = serviceManager.getRecordHolder(monitoredService);
+            Optional<MonitorRecords> record = serviceManager.getRecordHolder(monitoredService);
 
             if (record.isPresent()) {
 
-                for (final DetailedPollResponse detailedPollResponse : record.get().getRecords()) {
+                for (final PollResult pollResult : record.get().getRecords()) {
 
                     tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
-                            Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
-                            Constants.JMX_DATE_TIME_FORMATTER.format(detailedPollResponse.getStartTime()),
-                            detailedPollResponse.executionTimeInMilliseconds(),
-                            detailedPollResponse.getResponseType().toString(),
-                            detailedPollResponse.getMessages(),
-                            detailedPollResponse.getExcused() }));
+                            Constants.JMX_DATE_TIME_FORMATTER.format(pollResult.getStartTime()),
+                            Constants.JMX_DATE_TIME_FORMATTER.format(pollResult.getStartTime()),
+                            pollResult.executionTimeInMilliseconds(),
+                            pollResult.getResponseType().toString(),
+                            pollResult.getMessages(),
+                            pollResult.getExcused() }));
                 }
             }
 
@@ -141,16 +141,16 @@ public final class CanaryMaintenanceMBeanImpl extends AnnotatedStandardMBean imp
 
         String stacktrace = "n/a";
 
-        Optional<RecordHolder> record = serviceManager.getRecordHolder(monitoredService);
+        Optional<MonitorRecords> record = serviceManager.getRecordHolder(monitoredService);
 
         if (record.isPresent()) {
 
-            for (final DetailedPollResponse detailedPollResponse : record.get().getRecords()) {
+            for (final PollResult pollResult : record.get().getRecords()) {
 
                 final Date dateToCompare = Constants.JMX_DATE_TIME_PARSER.parseDateTime(startDate).toDate();
 
-                if (detailedPollResponse.getStartTime() == dateToCompare && detailedPollResponse.getResponseType() == PollResponseType.EXCEPTION) {
-                    stacktrace = detailedPollResponse.getStackTrace();
+                if (pollResult.getStartTime() == dateToCompare && pollResult.getResponseType() == PollResponseType.EXCEPTION) {
+                    stacktrace = pollResult.getStackTrace();
                 }
             }
         }

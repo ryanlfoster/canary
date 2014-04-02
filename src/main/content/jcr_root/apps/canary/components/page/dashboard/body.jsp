@@ -2,8 +2,6 @@
 
 <body>
 
-    <!--test-->
-
     <div id="canary"></div>
 
     <cq:includeClientLib categories="citytech-canary-dashboard"/>

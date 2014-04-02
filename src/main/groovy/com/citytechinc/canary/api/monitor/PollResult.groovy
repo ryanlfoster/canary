@@ -14,7 +14,7 @@ import groovy.transform.ToString
 @ToString(includeNames = true, excludes = ['stackTrace'])
 @AutoClone
 @Canonical
-class DetailedPollResponse {
+class PollResult {
 
     Date startTime
     Date endTime

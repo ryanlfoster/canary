@@ -1,12 +1,12 @@
 <canary = 'http://code.citytechinc.com/canary/'>
 
 [canary:MonitorServiceStorage]
-  + * (canary:RecordHolder)
+  + * (canary:MonitorRecords)
 
-[canary:RecordHolder]
-  + * (canary:DetailedPollResponse)
+[canary:MonitorRecords]
+  + * (canary:PollResult)
 
-[canary:DetailedPollResponse]
+[canary:PollResult]
   - startTime (date) mandatory
   - endTime (date) mandatory
   - responseType (string) mandatory

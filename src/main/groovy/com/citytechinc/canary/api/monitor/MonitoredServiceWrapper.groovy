@@ -62,7 +62,7 @@ public final class MonitoredServiceWrapper {
 
         if (pollIntervalInMS < definition.maxExecutionTime()) {
 
-            log.warn("The poll interval in milliseconds is ${pollIntervalInMS} which is less than the max execution time of ${definition.maxExecutionTime()}, therefore the max execution time will be set to the poll interval of ${pollIntervalInMS}")
+            log.trace("The poll interval in milliseconds is ${pollIntervalInMS} which is less than the max execution time of ${definition.maxExecutionTime()}, therefore the max execution time will be set to the poll interval of ${pollIntervalInMS}")
             maxExecutionTime = pollIntervalInMS
         } else {
             maxExecutionTime = definition.maxExecutionTime()

@@ -31,23 +31,18 @@ public class PollResponse {
 
     /**
      *
-     * Used to denote that the service being polled has suddenly become unavailable. This requires optional binding to
-     *   said monitored service which means that the monitor is probably not defined on said monitored service.
-     *
      * @return
      */
-    public static PollResponse SERVICE_UNAVAILABLE() {
-        return new PollResponse(PollResponseType.SERVICE_UNAVAILABLE, '')
+    public static PollResponse WARNING() {
+        return new PollResponse(PollResponseType.WARNING, '')
     }
 
     /**
      *
-     * Unexpected response is the general response for any error or abnormal result.
-     *
      * @return
      */
-    public static PollResponse UNEXPECTED_SERVICE_RESPONSE() {
-        return new PollResponse(PollResponseType.UNEXPECTED_SERVICE_RESPONSE, '')
+    public static PollResponse ERROR() {
+        return new PollResponse(PollResponseType.ERROR, '')
     }
 
     public PollResponse addMessages(List<String> messages) {

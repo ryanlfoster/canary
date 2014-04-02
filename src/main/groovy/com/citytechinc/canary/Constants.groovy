@@ -29,8 +29,8 @@ public final class Constants {
 
     // NODE IDENTIFIERS
     public static final String JCR_NODE_TYPE_MONITORED_SERVICE_STORAGE = 'canary:MonitorServiceStorage'
-    public static final String JCR_NODE_TYPE_DETAILED_POLL_RESPONSE = 'canary:DetailedPollResponse'
-    public static final String JCR_NODE_TYPE_RECORD_HOLDER = 'canary:RecordHolder'
+    public static final String JCR_NODE_TYPE_RECORD_HOLDER = 'canary:MonitorRecords'
+    public static final String JCR_NODE_TYPE_DETAILED_POLL_RESPONSE = 'canary:PollResult'
 
     // ABSTRACT JSON RESPONSE SERVLET
     public static final String ABSTRACT_JSON_RESPONSE_SERVLET_CONTENT_TYPE = 'application/json'

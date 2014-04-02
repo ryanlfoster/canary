@@ -59,7 +59,7 @@ class SlingEventJobMonitor implements MonitoredService {
         if (jobManager.statistics.averageProcessingTime > averageProcessingTimeThreshold ||
                 jobManager.statistics.averageWaitingTime > averageWaitingTimeThreshold) {
 
-            response = PollResponse.UNEXPECTED_SERVICE_RESPONSE()
+            response = PollResponse.WARNING()
 
             if (jobManager.statistics.averageProcessingTime > averageProcessingTimeThreshold) {
                 response.addMessage("Average processing time of ${jobManager.statistics.averageProcessingTime} exceeds threshold of ${averageProcessingTimeThreshold}")

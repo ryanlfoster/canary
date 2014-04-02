@@ -9,7 +9,7 @@ import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandler
 import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
 import com.citytechinc.canary.Constants
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
 import com.google.common.base.Optional
@@ -243,7 +243,7 @@ class DefaultServiceManager implements ServiceManager {
     }
 
     @Override
-    Optional<RecordHolder> getRecordHolder(String identifier) {
+    Optional<MonitorRecords> getRecordHolder(String identifier) {
 
         def message = new MissionControlActor.GetRecords(identifier: identifier)
         missionControl.sendAndWait(message)

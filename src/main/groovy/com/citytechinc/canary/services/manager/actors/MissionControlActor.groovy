@@ -1,6 +1,6 @@
 package com.citytechinc.canary.services.manager.actors
 
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.PollResult
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.notification.AlarmNotification
@@ -11,7 +11,7 @@ import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandler
 import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import com.citytechinc.canary.services.manager.actors.monitor.MonitoredServiceActor
 import com.google.common.base.Optional
 import groovy.util.logging.Slf4j
@@ -119,7 +119,7 @@ final class MissionControlActor extends DynamicDispatchActor {
             actor = monitors.get(monitors.keySet().find { it.identifier == message.identifier })
         }
 
-        Optional<RecordHolder> records
+        Optional<MonitorRecords> records
         records = actor ? Optional.of(actor.sendAndWait(new MonitoredServiceActor.GetRecord())) : Optional.absent()
 
         sender.send(records)
@@ -155,7 +155,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
                 log.debug("Sending GetRecord request to actor for service ${wrapper.identifier}")
 
-                RecordHolder recordHolder = monitors.get(wrapper).sendAndWait(new MonitoredServiceActor.GetRecord())
+                MonitorRecords recordHolder = monitors.get(wrapper).sendAndWait(new MonitoredServiceActor.GetRecord())
                 recordPersistenceServices.values().each { it << new RecordPersistenceServiceActor.PersistRecord(recordHolder: recordHolder) }
 
                 log.debug("Termination actor for monitored service agent ${wrapper.identifier}")
@@ -231,7 +231,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
         monitors.values().each { MonitoredServiceActor actor ->
 
-            actor.sendAndContinue(new MonitoredServiceActor.GetRecord(), { RecordHolder recordHolder ->
+            actor.sendAndContinue(new MonitoredServiceActor.GetRecord(), { MonitorRecords recordHolder ->
 
                 recordPersistenceServices.values().each { RecordPersistenceServiceActor persistenceActor ->
 
@@ -306,7 +306,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             // INSTANTIATE A NEW ACTOR WITH AN EMPTY RECORD HOLDER
             actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this,
-                    recordHolder: new RecordHolder(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold, []))
+                    recordHolder: new MonitorRecords(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold, []))
             actor.start()
 
             monitors.put(wrapper, actor)
@@ -324,18 +324,18 @@ final class MissionControlActor extends DynamicDispatchActor {
 
             log.debug("Polling ${persistenceWrapper.identifier} for records")
 
-            persistenceActor.sendAndContinue(new RecordPersistenceServiceActor.GetPersistedRecord(identifier: wrapper.identifier), { Optional<List<DetailedPollResponse>> pollResponses ->
+            persistenceActor.sendAndContinue(new RecordPersistenceServiceActor.GetPersistedRecord(identifier: wrapper.identifier), { Optional<List<PollResult>> pollResponses ->
 
                 MonitoredServiceActor actor
 
                 if (pollResponses.present) {
 
                     log.debug("Records present for service ${wrapper.identifier}, using records to start actor")
-                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new RecordHolder(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold, pollResponses.get()))
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new MonitorRecords(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold, pollResponses.get()))
                 } else {
 
                     log.debug("Records absent for service ${wrapper.identifier}, starting a clean actor")
-                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new RecordHolder(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold, []))
+                    actor = new MonitoredServiceActor(scheduler: scheduler, wrapper: wrapper, missionControl: this, recordHolder: new MonitorRecords(wrapper.identifier, wrapper.maxNumberOfRecords, wrapper.alarmCriteria, wrapper.alarmThreshold, []))
                 }
 
                 actor.start()
