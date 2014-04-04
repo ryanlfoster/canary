@@ -45,12 +45,22 @@ public class PollResponse {
         return new PollResponse(PollResponseType.ERROR, '')
     }
 
+    /**
+     *
+     * @param messages
+     * @return
+     */
     public PollResponse addMessages(List<String> messages) {
         this.messages.addAll(messages)
 
         this
     }
 
+    /**
+     *
+     * @param message
+     * @return
+     */
     public PollResponse addMessage(String message) {
         messages.add(message)
 
