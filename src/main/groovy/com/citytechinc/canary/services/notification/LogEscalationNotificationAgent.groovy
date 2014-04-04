@@ -49,7 +49,7 @@ class LogEscalationNotificationAgent implements NotificationAgent {
 
             if (configurationAdmin.listConfigurations()
                     .findAll { it.factoryPid == LOG_FACTORY_PID }
-                    .findAll { it.properties.get('pid') == alarmNotification.recordHolder.monitorIdentifier }.isEmpty()) {
+                    .findAll { it.properties.get('pid') == alarmNotification.recordHolder.monitorIdentifier }) {
 
                 Configuration newConfiguration = configurationAdmin.createFactoryConfiguration(LOG_FACTORY_PID, null)
 

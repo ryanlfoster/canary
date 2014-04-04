@@ -59,12 +59,12 @@ class QueryStatisticsMonitor implements MonitoredService {
 
         def names = server.queryNames(new ObjectName(BEAN), null)
 
-        if (!names.isEmpty()) {
+        if (!names) {
 
             def timesSeriesMBean = names.first()
             def averageQueriesInMinutes = server.getAttribute(timesSeriesMBean, ATTRIBUTE) as List<Long>
 
-            if (!averageQueriesInMinutes.findAll { it > warningThreshold }.isEmpty()) {
+            if (!averageQueriesInMinutes.findAll { it > warningThreshold }) {
 
                 response = PollResponse.WARNING().addMessage("Highest average query time of: '${averageQueriesInMinutes.sort().last()}' exceeds threshold of: '${warningThreshold}'")
             }

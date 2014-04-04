@@ -298,7 +298,7 @@ final class MissionControlActor extends DynamicDispatchActor {
 
     void instantiateMonitoredServiceActor(MonitoredServiceWrapper wrapper) {
 
-        if (recordPersistenceServices.isEmpty()) {
+        if (recordPersistenceServices) {
 
             log.debug("No record persistence services to poll for data, starting a clean actor")
 

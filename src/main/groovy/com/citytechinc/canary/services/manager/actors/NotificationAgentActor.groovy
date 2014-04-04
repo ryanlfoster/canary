@@ -50,7 +50,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             if (wrapper.aggregationCriteriaDefined) {
 
-                if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
+                if (queuedAlarmNotifications && queuedAlarmResetNotifications) {
 
                     Date now = new Date()
                     scheduler.fireJobAt(JOB_PREFIX + wrapper.identifier, {
@@ -96,7 +96,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             if (wrapper.aggregationCriteriaDefined) {
 
-                if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
+                if (queuedAlarmNotifications && queuedAlarmResetNotifications) {
 
                     Date now = new Date()
                     scheduler.fireJobAt(JOB_PREFIX + wrapper.identifier, {
@@ -151,11 +151,11 @@ final class NotificationAgentActor extends DynamicDispatchActor {
             def alarmNotifications = queuedAlarmNotifications.values() as List<AlarmNotification>
             def alarmResetNotifications = queuedAlarmResetNotifications.values() as List<AlarmResetNotification>
 
-            if (!alarmNotifications.isEmpty()) {
+            if (!alarmNotifications) {
                 wrapper.handleAlarmNotification(alarmNotifications)
             }
 
-            if (!alarmResetNotifications.isEmpty()) {
+            if (!alarmResetNotifications) {
                 wrapper.handleAlarmResetNotification(alarmResetNotifications)
             }
 
