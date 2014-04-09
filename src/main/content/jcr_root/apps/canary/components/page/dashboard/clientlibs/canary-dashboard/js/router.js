@@ -51,8 +51,13 @@
   });
 
   Canary.SearchRoute = Ember.Route.extend({
-    setupController: function(controller) {
-      controller.set('monitors', Canary.store.all('MONITOR'));
+    model: function(params) {
+      this.searchTerm = params.search_term;
+      return Canary.store.contains('MONITOR', params.search_term);
+    },
+    setupController: function(controller, model) {
+      controller.set('search', this.searchTerm);
+      controller.set('content', model);
     },
     renderTemplate: function() {
       this.render('search', {

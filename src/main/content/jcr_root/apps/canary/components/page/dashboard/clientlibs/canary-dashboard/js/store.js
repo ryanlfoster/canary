@@ -3,7 +3,7 @@
   'use strict';
 
   /** canaryData is the object that stores the dashboard data. */
-  var canaryData = {},
+  var canaryData = new Em.Object(),
       /** Valid typeKeys for data requets. */
       typeKeys = ['MONITOR', 'NOTIFICATION_AGENT', 'POLL_RESPONSE_HANDLER', 'RECORD_PERSISTENCE_SERVICE'],
 
@@ -11,19 +11,19 @@
       paths = {
 
         /** list paths */
-        MONITOR: '/etc/canarydashboard/jcr:content.listmonitors.json',
-        NOTIFICATION_AGENT: '/etc/canarydashboard/jcr:content.listnotificationagents.json',
-        POLL_RESPONSE_HANDLER: '/etc/canarydashboard/jcr:content.listpollresponsehandlers.json',
-        RECORD_PERSISTENCE_SERVICE: '/etc/canarydashboard/jcr:content.listrecordpersistenceservices.json',
+        MONITOR: 'etc/canarydashboard/jcr:content.listmonitors.json',
+        NOTIFICATION_AGENT: 'etc/canarydashboard/jcr:content.listnotificationagents.json',
+        POLL_RESPONSE_HANDLER: 'etc/canarydashboard/jcr:content.listpollresponsehandlers.json',
+        RECORD_PERSISTENCE_SERVICE: 'etc/canarydashboard/jcr:content.listrecordpersistenceservices.json',
 
         /**
          * where identifier is the identifier listed in a call to list notification agents, poll response handlers, or record persistence services
          * where type is NOTIFICATION_AGENT or POLL_RESPONSE_HANDLER or RECORD_PERSISTENCE_SERVICE - ?identifier=&type=
          */
-        statistics: '/etc/canarydashboard/jcr:content.statistics.json',
+        statistics: 'etc/canarydashboard/jcr:content.statistics.json',
 
         /** where identifier is the identifier listed in list monitors - ?identifier=*/
-        records: '/etc/canarydashboard/jcr:content.records.json'
+        records: 'etc/canarydashboard/jcr:content.records.json'
 
       };
 
@@ -189,7 +189,7 @@
     var requestPath,
         dataType,
         doneCount = 0,
-        doneTarget = canaryData[ typeKey ].length;
+        doneTarget = canaryData.get(typeKey+'.length');
 
     /** Set the dataType value and requestPath interface based on the typeKey. */
     if ( typeKey === 'MONITOR' ) {
@@ -203,14 +203,14 @@
     var promise = new Ember.RSVP.Promise(function(resolve) {
 
       /** For each item in the specified collection, make a call off to the appropriate request path and store the results, then call complete(). */
-      _.forEach( canaryData[ typeKey ], function (item) {
+      _.forEach( canaryData.get(typeKey), function (item) {
         $.getJSON( requestPath( typeKey, item.identifier ), function( data ) {
           setData( typeKey, item.identifier, dataType, data );
 
           doneCount++;
 
           if (doneCount === doneTarget) {
-            resolve( canaryData[ typeKey ] );
+            resolve( canaryData.get(typeKey) );
           }
 
         });
@@ -232,17 +232,17 @@
    * @returns {object} Promise
    */
   function get ( typeKey, id ) {
-    if ( typeof canaryData[ typeKey ] !== 'undefined' ) {
+    if ( typeof canaryData.get(typeKey) !== 'undefined' ) {
       if (typeof id !== 'undefined' ) {
         var item;
-        for (var n=0; n<canaryData[ typeKey ].length; n++) {
-          if ( canaryData[ typeKey ][ n ].identifier === id ) {
-            item = canaryData[ typeKey ][ n ];
+        for (var n=0; n<canaryData.get(typeKey+'.length'); n++) {
+          if ( canaryData.get(typeKey+'.'+n+'.identifier') === id ) {
+            item = canaryData.get(typeKey+'.'+n);
           }
         }
         return item;
       } else {
-        return canaryData[ typeKey ];
+        return canaryData.get(typeKey).toArray();
       }
     }
     return undefined;
@@ -257,7 +257,7 @@
    */
   function setAll (typeKey, data) {
     if ( isValidTypeKey( typeKey ) ) {
-      canaryData[ typeKey ] = data;
+      canaryData.set(typeKey, data);
     }
   }
 
@@ -272,11 +272,11 @@
    */
   function setData (typeKey, id, dataType, data) {
     if ( isValidTypeKey( typeKey ) ) {
-      for (var n=0; n<canaryData[ typeKey ].length; n++) {
-        if (canaryData[ typeKey ][ n ].identifier === id) {
-          canaryData[ typeKey ][ n ][ dataType ] = data;
+      for (var n=0; n<canaryData.get(typeKey+'.length'); n++) {
+        if (canaryData.get(typeKey+'.'+n+'.identifier') === id) {
+          canaryData.set(typeKey+'.'+n+'.'+dataType, data);
           if ( typeKey === 'MONITOR' &&  dataType === 'records' ) {
-            canaryData[ typeKey ][ n ].recordLookUpDate = new Date();
+            canaryData.set(typeKey+'.'+n+'.recordLookUpDate', new Date());
           }
         }
       }
@@ -292,7 +292,6 @@
    * @returns {object} Promise.
    */
   function doRequest(typeKey, id) {
-
     var promise = new Ember.RSVP.Promise(function(resolve){
 
       /** Handle the resolution of the promise, passing the requested data to resolution callbacks. */
@@ -308,7 +307,7 @@
         result = load( typeKey );
         result.then( function (p) { p.then(function() {complete();}); } );
       } else if ( typeKey === 'MONITOR' && ifMonitorsNeedRefreshed( result ) ) {
-        result = loadItemData( canaryData[ 'MONITOR' ], 'MONITOR' );
+        result = loadItemData( 'MONITOR' );
         result.then( function () { complete(); } );
       } else {
         complete();
@@ -322,12 +321,50 @@
 
 
 
+  /**
+   * The search request handler. Returns a promise that passes the requested list of items whose name inlcudes a search string into its resolution.
+   * @param {string} typeKey The typeKey for the list or record to look up.
+   * @param {string} searchString The exact string to search for.
+   * @returns {object} Promise.
+   */
+  function doSearchRequest (typeKey, searchString) {
+
+    var promise = new Ember.RSVP.Promise(function(resolve){
+
+      var resultArray = [];
+
+      function complete(payload) {
+        resolve( payload );
+      }
+
+      var all = doRequest(typeKey);
+
+      all.then(function (list) {
+        _.forEach(list, function(item) {
+          if ( item.name.indexOf(searchString) > -1 ) {
+            resultArray.push(item);
+          }
+        });
+        complete(resultArray);
+      });
+    });
+
+    return promise;
+  }
+
+
+
   /** The exposed interface. */
   Canary.store = {
 
     /** Get all members of a list of given type. */
     all: function(typeKey) {
       return doRequest(typeKey);
+    },
+
+    /** Get all members of a list of given type whose 'name' parameter includes a given search string. */
+    contains: function(typeKey, searchString) {
+      return doSearchRequest(typeKey, searchString);
     },
 
     /** Get a specific record by type and identifier. */

@@ -1,4 +1,5 @@
 (function(){
+
   'use strict';
 
   Canary.MonitorController = Ember.ObjectController.extend({

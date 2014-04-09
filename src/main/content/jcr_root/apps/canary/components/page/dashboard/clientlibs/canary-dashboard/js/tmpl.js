@@ -399,10 +399,10 @@ function program5(depth0,data) {
   data.buffer.push(" <div class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\"> <div class=\"container-fluid\"> <div class=\"navbar-header\"> <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\"> <span class=\"sr-only\">Toggle navigation</span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </button> <a class=\"navbar-brand\" href=\"#\">Canary CQ Service Monitor</a> </div> <div class=\"navbar-collapse collapse\"> <ul class=\"nav navbar-nav navbar-right\"> <li>");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "monitors", options) : helperMissing.call(depth0, "link-to", "monitors", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</li> <li>");
+  data.buffer.push("</li> <!--<li>");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "settings", options) : helperMissing.call(depth0, "link-to", "settings", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</li> <li>");
+  data.buffer.push("</li>--> <li>");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "help", options) : helperMissing.call(depth0, "link-to", "help", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</li> </ul> <form class=\"navbar-form navbar-right\"> ");
@@ -443,7 +443,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 
 
 
-  data.buffer.push("<section> <div class=\"row\"> <div class=\"col-md-12\"> <h1>Canary Help</h1> <p>Lorem ipsum dolor sit amet</p> <h2>CITYTECH, Inc</h2> <p>Lorem ipsum dolor sit amet</p> </div> </div> </section>");
+  data.buffer.push("<section> <div class=\"row\"> <div class=\"col-md-12\"> <h1>CQ Canary Framework</h1> <p> The Canary framework is a simple, stand alone monitoring, profiling, and reporting tool for OSGi components and services within AEM. The framework enables scheduled, custom monitoring or profiling of critical aspects of an AEM instance. Canary provides a conduit between Monitors, which collect data, and other registered service types that can distribute and execute on that data. In addition to polling and distribution, Canary provides an API for talking to services in the framework, JMX beans for reporting and maintenance, and a rich UI for representing this data. </p> <p> The AEM Canary framework consists of registered Monitor(s) that provide responses to poll requests. These poll requests are collected and analyzed in the framework based on supplied configurations. </p> <h2>Monitors</h2> <p> Monitors are the source of data for the Canary Framework. Monitors are polled by the framework based on their specific configurations – an interval and a time unit (seconds, minutes, etc…). Monitors can poll up to once per second. Any configuration unit smaller than a single second will be rounded up to a second. If a poll exceeds the maximum execution time, it will be interrupted and a failure will be recorded indicting the interruption. Poll responses are recorded in-memory and routed to Mission Control for distribution to all Poll Response Handlers. </p> <p> In order to detect an alarm state, poll data is analyzed each time a poll is pushed into the in-memory record storage. The configured alarm threshold and criteria are used to determine and flag an alarm state. Monitors support alarm criteria: Recent Polls, Average Execution Time, or Average Failure Rate. Note: The averaged alarm criteria are affected by the max number of records configured for the monitor. </p> <h2>Documentation</h2> <p>For more information, visit the <a href=\"http://code.citytechinc.com/canary/\">Maven site</a> or the <a href=\"https://github.com/Citytechinc/canary\">Github project</a>.</p> <h2>About</h2> <p>This project is hosted on <a href=\"https://github.com/Citytechinc/canary\">Github project</a> for <a href=\"http://www.citytechinc.com/\">CITYTECH, Inc.</a></p> <p>The UI was built using <a href=\"http://emberjs.com/\">ember.js</a>, <a href=\"http://www.chartjs.org/\">chart.js</a> and <a href=\"http://www.getbootstrap.com/\">bootstrap</a>.</p> </div> </div> </section>");
 
 });
 
@@ -473,7 +473,7 @@ function program5(depth0,data) {
 
   var buffer = '';
   data.buffer.push(" <div class=\"alert alert-danger\"> <p class=\"text-center\">Monitor has paused polling due to errors.<br><button ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "reset", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "reset", "identifier", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
   data.buffer.push(" class=\"btn btn-default btn-sm\">reset</button></p> </div> ");
   return buffer;
   }
@@ -756,16 +756,16 @@ function program1(depth0,data) {
 
   var buffer = '', stack1;
   data.buffer.push(" <tr ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "identifier", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
   data.buffer.push(" ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("isError:danger isWarning:warning isNormal:success")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push("> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "identifier", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "serviceName", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> <td>");
   stack1 = helpers._triageMustache.call(depth0, "lastLoggedTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
@@ -789,14 +789,14 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  data.buffer.push(" <section class=\"row\" id=\"reports\"> <h1 class=\"page-header\">Search Monitors</h1> <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Normal Services</h2class=\"text-left\"></caption> <thead><tr><th>ID</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Response</th></tr></thead> <tfoot> <tr> <td colspan=\"6\" class=\"text-right\">Showing ");
-  stack1 = helpers._triageMustache.call(depth0, "searchResults.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push(" <section class=\"row\" id=\"reports\"> <h1 class=\"page-header\">Search Monitors</h1> <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Search Term: '");
+  stack1 = helpers._triageMustache.call(depth0, "search", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" of ");
-  stack1 = helpers._triageMustache.call(depth0, "monitors.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("'</h2class=\"text-left\"></caption> <thead><tr><th>Identifier</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Response</th></tr></thead> <tfoot> <tr> <td colspan=\"6\" class=\"text-right\">Showing ");
+  stack1 = helpers._triageMustache.call(depth0, "length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td> </tr> </tfoot> <tbody> ");
-  stack1 = helpers.each.call(depth0, "searchResults", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[],types:[],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </tbody> </table> </section>");
   return buffer;
