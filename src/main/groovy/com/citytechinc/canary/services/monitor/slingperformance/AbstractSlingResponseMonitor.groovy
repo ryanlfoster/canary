@@ -89,7 +89,16 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
     @Override
     PollResponse poll() {
 
-        PollResponse.SUCCESS()
+        Map<String, RequestStatistic> statistics = requestStatistics.sendAndWait { removeAllStatistics() } as Map
+
+        def messages = statistics.keySet().collect {
+
+            def stat = statistics.get(it)
+
+            return "The resource '${it}' has been rendered ${stat.numberOfRequests} times, shortest duration: ${stat.shortestDuration}ms, average: ${stat.averageDuration}ms, longest: ${stat.longestDuration}"
+        }
+
+        messages ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(messages)
     }
 
     abstract Logger getLogger()
@@ -114,7 +123,7 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
             }
         }
 
-        private def Map<String, RequestStatistic> removeAllStatistics() {
+        private Map<String, RequestStatistic> removeAllStatistics() {
 
             def items = Maps.newHashMap(data)
             data.clear()
