@@ -88,17 +88,16 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
     @Override
     PollResponse poll() {
 
-        Map<String, RequestStatistic> statistics = requestStatistics.val as Map
+        def statistics = requestStatistics.val as Map
+
+        def messages = statistics.collect {
+
+            "'${it.key}' rendered ${it.value.numberOfRequests} times, shortest: ${it.value.shortestDuration}ms, average: ${it.value.averageDuration}ms, longest: ${it.value.longestDuration}ms"
+        }
 
         requestStatistics << {clearStatistics()}
 
-        def messages = statistics.keySet().collect {
-
-            def stat = statistics.get(it)
-            "'${it}' rendered ${stat.numberOfRequests} times, shortest: ${stat.shortestDuration}ms, average: ${stat.averageDuration}ms, longest: ${stat.longestDuration}ms"
-        }
-
-        messages ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(messages)
+        messages ? PollResponse.WARNING().addMessages(messages) : PollResponse.SUCCESS()
     }
 
     abstract Logger getLogger()
