@@ -298,7 +298,6 @@
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Bundle-Category>citytech</Bundle-Category>
                         <Sling-Nodetypes>SLING-INF/nodetypes/canary.cnd</Sling-Nodetypes>
-                        <Embed-Dependency>twitter4j-core</Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
@@ -506,24 +505,6 @@
         </dependency>
 
         <!-- 3rd party -->
-        <dependency>
-            <groupId>org.twitter4j</groupId>
-            <artifactId>twitter4j-core</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient-osgi</artifactId>
-            <version>4.1.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore-osgi</artifactId>
-            <version>4.1.4</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>com.citytechinc.cq</groupId>
             <artifactId>cq-groovy-extension</artifactId>

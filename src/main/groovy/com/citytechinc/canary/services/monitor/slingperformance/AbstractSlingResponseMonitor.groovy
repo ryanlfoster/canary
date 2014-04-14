@@ -4,7 +4,6 @@ import com.citytechinc.canary.Constants
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.google.common.base.Stopwatch
-import com.google.common.collect.Maps
 import groovyx.gpars.agent.Agent
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
@@ -71,7 +70,7 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
 
                 if (duration > warningThreshold) {
 
-                    requestStatistics << {insertStatistic(slingRequest.requestURI, duration, new Date())}
+                    requestStatistics << {recordRequest(slingRequest.requestURI, duration, new Date(System.currentTimeMillis() - duration))}
                 }
             }
 
@@ -89,13 +88,14 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
     @Override
     PollResponse poll() {
 
-        Map<String, RequestStatistic> statistics = requestStatistics.sendAndWait { removeAllStatistics() } as Map
+        Map<String, RequestStatistic> statistics = requestStatistics.val as Map
+
+        requestStatistics << {clearStatistics()}
 
         def messages = statistics.keySet().collect {
 
             def stat = statistics.get(it)
-
-            return "The resource '${it}' has been rendered ${stat.numberOfRequests} times, shortest duration: ${stat.shortestDuration}ms, average: ${stat.averageDuration}ms, longest: ${stat.longestDuration}"
+            "'${it}' rendered ${stat.numberOfRequests} times, shortest: ${stat.shortestDuration}ms, average: ${stat.averageDuration}ms, longest: ${stat.longestDuration}ms"
         }
 
         messages ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(messages)
@@ -112,7 +112,7 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
             super([:])
         }
 
-        private def insertStatistic(String requestURI, Long duration, Date occurrence) {
+        private def recordRequest(String requestURI, Long duration, Date occurrence) {
 
             if (data.containsKey(requestURI)) {
 
@@ -123,12 +123,9 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
             }
         }
 
-        private Map<String, RequestStatistic> removeAllStatistics() {
+        private def clearStatistics() {
 
-            def items = Maps.newHashMap(data)
             data.clear()
-
-            items
         }
     }
 
