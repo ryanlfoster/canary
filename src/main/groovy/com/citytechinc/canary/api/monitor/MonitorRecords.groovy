@@ -4,7 +4,6 @@ import com.google.common.base.Optional
 import com.google.common.collect.EvictingQueue
 import com.google.common.collect.Lists
 import groovy.transform.ToString
-import groovy.transform.TupleConstructor
 import groovy.util.logging.Slf4j
 
 import java.math.RoundingMode
@@ -18,13 +17,13 @@ import java.math.RoundingMode
  */
 @ToString(includeFields = true, includeNames = true)
 @Slf4j
-class RecordHolder {
+class MonitorRecords {
 
     final String monitorIdentifier
     final Integer maxNumberOfRecords
     final AlarmCriteria alarmCriteria
     final Integer alarmThreshold
-    final Queue<DetailedPollResponse> records
+    final Queue<PollResult> records
 
     /**
      *
@@ -34,22 +33,30 @@ class RecordHolder {
      * @param alarmThreshold
      * @param records
      */
-    public RecordHolder(String monitorIdentifier, Integer maxNumberOfRecords, AlarmCriteria alarmCriteria, Integer alarmThreshold, List<DetailedPollResponse> records) {
+    public MonitorRecords(String monitorIdentifier, Integer maxNumberOfRecords, AlarmCriteria alarmCriteria, Integer alarmThreshold, List<PollResult> records) {
         this.monitorIdentifier = monitorIdentifier
         this.maxNumberOfRecords = maxNumberOfRecords
         this.alarmCriteria = alarmCriteria
         this.alarmThreshold = alarmThreshold
 
-        this.records = new EvictingQueue<DetailedPollResponse>(maxNumberOfRecords)
+        this.records = new EvictingQueue<PollResult>(maxNumberOfRecords)
         this.records.addAll(records)
     }
 
-    Boolean addRecord(DetailedPollResponse record) {
+    /**
+     *
+     * @param record
+     * @return
+     */
+    Boolean addRecord(PollResult record) {
 
         records.offer(record)
         isAlarmed()
     }
 
+    /**
+     *
+     */
     void resetAlarm() {
 
         if (isAlarmed()) {
@@ -57,32 +64,61 @@ class RecordHolder {
         }
     }
 
-    List<DetailedPollResponse> getRecords() {
+    /**
+     *
+     * @return
+     */
+    List<PollResult> getRecords() {
         (records as List).reverse()
     }
 
-    List<DetailedPollResponse> getUnexcusedRecords() {
+    /**
+     *
+     * @return
+     */
+    List<PollResult> getUnexcusedRecords() {
         getRecords().findAll { !it.excused }
     }
 
+    /**
+     *
+     * @return
+     */
     Optional<Date> mostRecentPollDate() {
 
         records.empty ? Optional.absent() : Optional.of(getRecords().first().startTime)
     }
 
+    /**
+     *
+     * @return
+     */
     Optional<PollResponseType> mostRecentPollResponse() {
 
         records.empty ? Optional.absent() : Optional.of(getRecords().first().responseType)
     }
 
+    /**
+     *
+     * @return
+     */
     Integer numberOfPolls() {
         records.size()
     }
 
+    /**
+     *
+     * @return
+     */
     Integer numberOfFailures() {
         getRecords().count { it.responseType != PollResponseType.SUCCESS}
     }
 
+    /**
+     *
+     * @param useUnexcused
+     * @return
+     */
     BigDecimal failureRate(Boolean useUnexcused) {
 
         def scrutinizedRecords = useUnexcused ? getUnexcusedRecords() : getRecords()
@@ -99,6 +135,11 @@ class RecordHolder {
 
     }
 
+    /**
+     *
+     * @param useUnexcused
+     * @return
+     */
     Long averagePollExecutionTime(Boolean useUnexcused) {
 
         Long averageExecutionTime = 0L
@@ -118,6 +159,10 @@ class RecordHolder {
         averageExecutionTime
     }
 
+    /**
+     *
+     * @return
+     */
     Boolean isAlarmed() {
 
         Boolean alarmed = false
@@ -134,7 +179,7 @@ class RecordHolder {
 
             if (getUnexcusedRecords().size() > alarmThreshold) {
 
-                final List<DetailedPollResponse> scrutinizedRecords
+                final List<PollResult> scrutinizedRecords
 
                 if (getRecords().size() > alarmThreshold) {
                     scrutinizedRecords = Lists.partition(getRecords(), alarmThreshold).first()

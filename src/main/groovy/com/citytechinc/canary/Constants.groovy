@@ -13,7 +13,7 @@ import org.joda.time.format.DateTimeFormatter
  */
 public final class Constants {
 
-    public static final String CITYTECH_SERVICE_VENDOR_NAME = 'CITYTECH, Inc.'
+    public static final CITYTECH_SERVICE_VENDOR_NAME = 'CITYTECH, Inc.'
 
     // COMMON DATES
     public static final String JMX_DATE_TIME_DEFINITION = 'yyyy-MM-dd HH:mm:ss'
@@ -29,8 +29,8 @@ public final class Constants {
 
     // NODE IDENTIFIERS
     public static final String JCR_NODE_TYPE_MONITORED_SERVICE_STORAGE = 'canary:MonitorServiceStorage'
-    public static final String JCR_NODE_TYPE_DETAILED_POLL_RESPONSE = 'canary:DetailedPollResponse'
-    public static final String JCR_NODE_TYPE_RECORD_HOLDER = 'canary:RecordHolder'
+    public static final String JCR_NODE_TYPE_RECORD_HOLDER = 'canary:MonitorRecords'
+    public static final String JCR_NODE_TYPE_DETAILED_POLL_RESPONSE = 'canary:PollResult'
 
     // ABSTRACT JSON RESPONSE SERVLET
     public static final String ABSTRACT_JSON_RESPONSE_SERVLET_CONTENT_TYPE = 'application/json'

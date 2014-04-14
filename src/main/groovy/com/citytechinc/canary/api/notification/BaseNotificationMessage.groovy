@@ -1,6 +1,6 @@
 package com.citytechinc.canary.api.notification
 
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import groovy.transform.ToString
 
 /**
@@ -15,6 +15,6 @@ class BaseNotificationMessage {
 
     String monitorName
     String monitorDescription
-    RecordHolder recordHolder
+    MonitorRecords recordHolder
     AlarmContext context
 }

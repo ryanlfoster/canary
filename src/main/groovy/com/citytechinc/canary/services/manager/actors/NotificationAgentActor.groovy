@@ -50,7 +50,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             if (wrapper.aggregationCriteriaDefined) {
 
-                if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
+                if (queuedAlarmNotifications && queuedAlarmResetNotifications) {
 
                     Date now = new Date()
                     scheduler.fireJobAt(JOB_PREFIX + wrapper.identifier, {
@@ -71,7 +71,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
                 try {
 
-                    wrapper.handleAlarm([message])
+                    wrapper.handleAlarmNotification([message])
                     ++statistics.processedMessages
 
                 } catch (Exception e) {
@@ -96,7 +96,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
             if (wrapper.aggregationCriteriaDefined) {
 
-                if (queuedAlarmNotifications.isEmpty() && queuedAlarmResetNotifications.isEmpty()) {
+                if (queuedAlarmNotifications && queuedAlarmResetNotifications) {
 
                     Date now = new Date()
                     scheduler.fireJobAt(JOB_PREFIX + wrapper.identifier, {
@@ -117,7 +117,7 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
                 try {
 
-                    wrapper.handleAlarm([message])
+                    wrapper.handleAlarmNotification([message])
                     ++statistics.processedMessages
 
                 } catch (Exception e) {
@@ -148,8 +148,17 @@ final class NotificationAgentActor extends DynamicDispatchActor {
 
         try {
 
-            wrapper.handleAlarm(queuedAlarmNotifications.values() as List<AlarmNotification>)
-            wrapper.handleAlarmReset(queuedAlarmResetNotifications.values() as List<AlarmResetNotification>)
+            def alarmNotifications = queuedAlarmNotifications.values() as List<AlarmNotification>
+            def alarmResetNotifications = queuedAlarmResetNotifications.values() as List<AlarmResetNotification>
+
+            if (!alarmNotifications) {
+                wrapper.handleAlarmNotification(alarmNotifications)
+            }
+
+            if (!alarmResetNotifications) {
+                wrapper.handleAlarmResetNotification(alarmResetNotifications)
+            }
+
             ++statistics.processedMessages
 
         } catch (Exception e) {

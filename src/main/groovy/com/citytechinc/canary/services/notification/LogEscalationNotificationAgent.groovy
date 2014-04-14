@@ -43,13 +43,13 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     ConfigurationAdmin configurationAdmin
 
     @Override
-    void handleAlarm(List<AlarmNotification> alarmNotifications) {
+    void handleAlarmNotification(List<AlarmNotification> alarmNotifications) {
 
         alarmNotifications.each { AlarmNotification alarmNotification ->
 
             if (configurationAdmin.listConfigurations()
                     .findAll { it.factoryPid == LOG_FACTORY_PID }
-                    .findAll { it.properties.get('pid') == alarmNotification.recordHolder.monitorIdentifier }.isEmpty()) {
+                    .findAll { it.properties.get('pid') == alarmNotification.recordHolder.monitorIdentifier }) {
 
                 Configuration newConfiguration = configurationAdmin.createFactoryConfiguration(LOG_FACTORY_PID, null)
 
@@ -72,7 +72,7 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     }
 
     @Override
-    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
+    void handleAlarmResetNotification(List<AlarmResetNotification> alarmResetNotifications) {
 
         alarmResetNotifications.each { AlarmResetNotification notification ->
 

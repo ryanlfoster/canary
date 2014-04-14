@@ -1,6 +1,6 @@
 package com.citytechinc.canary.services.manager.actors
 
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.PollResult
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
 import com.google.common.base.Stopwatch
@@ -22,7 +22,7 @@ final class PollResponseHandlerActor extends DynamicDispatchActor {
     static class PollResponseReceipt {
 
         String identifier
-        DetailedPollResponse response
+        PollResult response
     }
 
     PollResponseHandlerWrapper wrapper

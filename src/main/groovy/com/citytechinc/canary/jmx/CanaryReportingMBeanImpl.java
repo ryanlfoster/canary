@@ -1,6 +1,7 @@
 package com.citytechinc.canary.jmx;
 
 import com.adobe.granite.jmx.annotation.AnnotatedStandardMBean;
+import com.citytechinc.canary.api.monitor.MonitorRecords;
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper;
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper;
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper;
@@ -9,7 +10,6 @@ import com.citytechinc.canary.Constants;
 import com.citytechinc.canary.services.manager.ServiceManager;
 import com.citytechinc.canary.services.manager.actors.MissionControlActor;
 import com.citytechinc.canary.services.manager.actors.Statistics;
-import com.citytechinc.canary.api.monitor.RecordHolder;
 import com.google.common.base.Optional;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
@@ -65,8 +65,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     "History Size",
                     "Persist when alarmed?",
                     "Max Execution Time (ms)",
-                    "Auto Reset?",
-                    "Log Escalation?"};
+                    "Auto Reset?"};
 
             final OpenType[] itemTypes = {
                     SimpleType.STRING,      // Classname
@@ -78,8 +77,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                     SimpleType.INTEGER,     // Configured History Size
                     SimpleType.BOOLEAN,     // Configured to persist when alarmed?
                     SimpleType.LONG,        // Configured Max Execution Time
-                    SimpleType.STRING,      // Configured to Auto Reset?
-                    SimpleType.BOOLEAN};    // Log escalation?
+                    SimpleType.STRING};     // Configured to Auto Reset?
 
             final CompositeType pageType = new CompositeType("page", "Page size info", itemNamesDescriptionsAndIndexName, itemNamesDescriptionsAndIndexName, itemTypes);
             final TabularType pageTabularType = new TabularType("List of Monitor Service Configurations", "Monitor Configurations", pageType, itemNamesDescriptionsAndIndexName);
@@ -105,8 +103,7 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
                         wrapper.getMaxNumberOfRecords(),
                         wrapper.getPersistWhenAlarmed(),
                         wrapper.getMaxExecutionTime(),
-                        autoResume,
-                        wrapper.getEscalateLogs()}));
+                        autoResume}));
             }
 
         } catch (final Exception exception) {
@@ -264,11 +261,11 @@ public final class CanaryReportingMBeanImpl extends AnnotatedStandardMBean imple
 
             for (final MonitoredServiceWrapper wrapper : serviceManager.getMonitoredServicesConfigurations()) {
 
-                final Optional<RecordHolder> optionalRecord = serviceManager.getRecordHolder(wrapper.getIdentifier());
+                final Optional<MonitorRecords> optionalRecord = serviceManager.getRecordHolder(wrapper.getIdentifier());
 
                 if (optionalRecord.isPresent()) {
 
-                    final RecordHolder record = optionalRecord.get();
+                    final MonitorRecords record = optionalRecord.get();
 
                     tabularDataSupport.put(new CompositeDataSupport(pageType, itemNamesDescriptionsAndIndexName, new Object[] {
                             wrapper.getIdentifier(),

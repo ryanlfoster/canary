@@ -82,13 +82,13 @@ class TwitterNotificationAgent implements NotificationAgent {
     }
 
     @Override
-    void handleAlarm(List<AlarmNotification> alarmNotifications) {
+    void handleAlarmNotification(List<AlarmNotification> alarmNotifications) {
 
         updateTwitter("${alarmNotifications.size()} alarm(s) raised on AEM instance w/ runmodes ${alarmNotifications.collect { it.context }.collect { it.hostname }.unique()}")
     }
 
     @Override
-    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
+    void handleAlarmResetNotification(List<AlarmResetNotification> alarmResetNotifications) {
 
         updateTwitter("${alarmResetNotifications.size()} alarm(s) reset on AEM instance w/ runmodes ${alarmResetNotifications.collect { it.context }.collect { it.hostname }.unique()}")
     }

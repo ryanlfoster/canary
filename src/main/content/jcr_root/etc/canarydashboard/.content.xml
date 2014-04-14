@@ -2,22 +2,12 @@
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
           jcr:primaryType="cq:Page">
     <jcr:content
-            cq:designPath="/etc/designs/canary"
-            cq:lastModified="{Date}2014-03-03T13:18:46.614-07:00"
-            cq:lastModifiedBy="admin"
-            cq:lastReplicated="{Date}2014-03-03T13:18:49.263-07:00"
-            cq:lastReplicatedBy="admin"
-            cq:lastReplicationAction="Activate"
+            cq:defaultView="html"
             cq:template="/apps/canary/templates/dashboard"
-            jcr:isCheckedOut="{Boolean}true"
-            jcr:mixinTypes="[mix:versionable]"
             jcr:primaryType="cq:PageContent"
             jcr:title="Canary Framework Dashboard"
-            jcr:uuid="f5469248-569b-4e6e-a175-fd0d75273c5d"
-            sling:resourceType="canary/components/page/dashboard"
-            cq:defaultView="html">
+            sling:resourceType="canary/components/page/dashboard" >
         <dashboard
-                jcr:primaryType="nt:unstructured"
-                />
+                jcr:primaryType="nt:unstructured" />
     </jcr:content>
 </jcr:root>

@@ -1,9 +1,7 @@
 package com.citytechinc.canary.components.dashboard
 
-import com.citytechinc.canary.api.monitor.MonitorRecords
 import com.citytechinc.canary.services.manager.ServiceManager
 import com.citytechinc.canary.servlets.AbstractJSONResponseServlet
-import com.google.common.base.Optional
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.sling.SlingServlet
 import org.apache.sling.api.SlingHttpServletRequest
@@ -18,18 +16,29 @@ import org.apache.sling.api.SlingHttpServletResponse
  */
 @SlingServlet(
         resourceTypes = 'canary/components/page/dashboard',
-        methods = 'GET',
-        selectors = 'records',
+        methods = 'POST',
+        selectors = 'resetalarm',
         extensions = 'json')
-class GetRecords extends AbstractJSONResponseServlet {
+class ResetAlarmForMonitor extends AbstractJSONResponseServlet {
 
     @Reference
     ServiceManager serviceManager
 
     @Override
-    protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) {
+    protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) {
 
-        Optional<MonitorRecords> record = serviceManager.getRecordHolder(request.getParameter('identifier'))
-        writeJsonResponse(response, record.present ? record.get() : [])
+        def recordHolder = serviceManager.getRecordHolder(request.getParameter('identifier'))
+        def resetSuccess = false
+
+        if (recordHolder.present) {
+
+            if (recordHolder.get().isAlarmed()) {
+
+                serviceManager.resetAlarm('identifier')
+                resetSuccess = true
+            }
+        }
+
+        writeJsonResponse(response, resetSuccess)
     }
 }

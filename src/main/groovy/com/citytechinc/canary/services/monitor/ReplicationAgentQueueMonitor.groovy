@@ -32,15 +32,19 @@ import java.util.concurrent.TimeUnit
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 10, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 12)
 @AutomaticResetMonitor(resetInterval = 3, resetIntervalUnit = TimeUnit.MINUTES)
-class BlockedAgentQueueMonitor implements MonitoredService {
+class ReplicationAgentQueueMonitor implements MonitoredService {
 
     @Property(name = 'agentIds', label = 'Agent IDs', value = ['publish', ''], description = 'Agent IDs to examine for blocked replication queues')
     private List<String> agentIds
+
+    @Property(name = 'queueWarningThreshold', label = 'Queue size warning threshold', intValue =  50, description = 'The threshold used to indicate a warning')
+    private Integer queueWarningThreshold
 
     @Activate
     @Modified
     protected void activate(Map<String, Object> properties) throws Exception {
         agentIds = PropertiesUtil.toStringArray(properties.get('agentIds')) as List
+        queueWarningThreshold = PropertiesUtil.toInteger(properties.get('queueWarningThreshold'), 50)
     }
 
     @Reference
@@ -49,7 +53,7 @@ class BlockedAgentQueueMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        StringBuilder message = new StringBuilder()
+        PollResponse response = PollResponse.SUCCESS()
 
         agentManager.agents.values().findAll { it.enabled }
                 .findAll { agentIds.contains(it.configuration.agentId) }
@@ -57,10 +61,13 @@ class BlockedAgentQueueMonitor implements MonitoredService {
 
             if (it.queue.status.nextRetryTime > 0) {
 
-                message.append("The replication queue for ${it.configuration.agentId} is blocked. ")
+                response = PollResponse.ERROR().addMessage("The replication queue for agent: '${it.configuration.agentId}' is blocked.")
+            } else if (it.queue.entries().size() > queueWarningThreshold) {
+
+                response = PollResponse.WARNING().addMessage("The replication queue for agent: '${it.configuration.agentId}' is above threshold.")
             }
         }
 
-        message.size() > 0 ? PollResponse.SUCCESS() : PollResponse.UNEXPECTED_SERVICE_RESPONSE().addMessage(message)
+        response
     }
 }

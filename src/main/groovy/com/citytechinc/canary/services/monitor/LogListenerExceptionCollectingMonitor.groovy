@@ -71,7 +71,12 @@ class LogListenerExceptionCollectingMonitor implements MonitoredService, LogList
 
     @Override
     PollResponse poll() {
-        return null
+
+        // todo currently is not thread safe -- won't throw errors, but could end up with lost entries between closure processing and clear operation
+        def messages = entries.collect { "An exception was logged at ${Constants.JMX_DATE_TIME_FORMATTER.format(it.time)}" }
+        entries.clear()
+
+        entries ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(messages)
     }
 
     @Override

@@ -9,4 +9,5 @@ package com.citytechinc.canary.api.notification
  */
 class AlarmNotification extends BaseNotificationMessage {
 
+    // USED FOR GPARS ACTOR MESSAGING
 }

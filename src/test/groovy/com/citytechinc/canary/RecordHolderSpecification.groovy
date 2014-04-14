@@ -1,9 +1,9 @@
 package com.citytechinc.canary
 
 import com.citytechinc.canary.api.monitor.AlarmCriteria
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.PollResult
 import com.citytechinc.canary.api.monitor.PollResponseType
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import spock.lang.Specification
 
 class RecordHolderSpecification extends Specification {
@@ -46,11 +46,11 @@ class RecordHolderSpecification extends Specification {
 
     def "Test recent polls alarm criteria alarmed after threshold"() {
 
-        RecordHolder recordHolder = new RecordHolder('com.a.b.c', 10, AlarmCriteria.RECENT_POLLS, 3, [])
+        MonitorRecords recordHolder = new MonitorRecords('com.a.b.c', 10, AlarmCriteria.RECENT_POLLS, 3, [])
 
         when:
         3.times {
-            recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.SUCCESS))
+            recordHolder.addRecord(new PollResult(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.SUCCESS))
         }
 
         then:
@@ -58,21 +58,21 @@ class RecordHolderSpecification extends Specification {
 
         when:
         2.times {
-            recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.UNEXPECTED_SERVICE_RESPONSE))
+            recordHolder.addRecord(new PollResult(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.ERROR))
         }
 
         then:
         !recordHolder.isAlarmed()
 
         when:
-        recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.SUCCESS))
+        recordHolder.addRecord(new PollResult(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.SUCCESS))
 
         then:
         !recordHolder.isAlarmed()
 
         when:
         3.times {
-            recordHolder.addRecord(new DetailedPollResponse(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.UNEXPECTED_SERVICE_RESPONSE))
+            recordHolder.addRecord(new PollResult(startTime: new Date(), endTime: new Date(), responseType: PollResponseType.ERROR))
         }
 
         then:

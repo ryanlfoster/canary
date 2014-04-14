@@ -1,6 +1,6 @@
 package com.citytechinc.canary.api.responsehandler
 
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.PollResult
 
 /**
  *
@@ -14,7 +14,7 @@ public interface PollResponseHandler {
     /**
      *
      * @param identifier
-     * @param detailedPollResponse
+     * @param pollResult
      */
-    void handleResponse(String identifier, DetailedPollResponse detailedPollResponse)
+    void handleResponse(String identifier, PollResult pollResult)
 }

@@ -54,12 +54,25 @@ class SlingEventJobMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
+        final PollResponse response
+
         if (jobManager.statistics.averageProcessingTime > averageProcessingTimeThreshold ||
                 jobManager.statistics.averageWaitingTime > averageWaitingTimeThreshold) {
 
-            PollResponse.UNEXPECTED_SERVICE_RESPONSE()
+            response = PollResponse.WARNING()
+
+            if (jobManager.statistics.averageProcessingTime > averageProcessingTimeThreshold) {
+                response.addMessage("Average processing time of ${jobManager.statistics.averageProcessingTime} exceeds threshold of ${averageProcessingTimeThreshold}")
+            }
+
+            if (jobManager.statistics.averageWaitingTime > averageWaitingTimeThreshold) {
+                response.addMessage("Average waiting time of ${jobManager.statistics.averageWaitingTime} exceeds threshold of ${averageWaitingTimeThreshold}")
+            }
+
         } else {
-            PollResponse.SUCCESS()
+            response = PollResponse.SUCCESS()
         }
+
+        response
     }
 }

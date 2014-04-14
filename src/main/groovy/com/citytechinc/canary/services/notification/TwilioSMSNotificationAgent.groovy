@@ -78,7 +78,7 @@ class TwilioSMSNotificationAgent implements NotificationAgent {
     }
 
     @Override
-    void handleAlarm(List<AlarmNotification> alarmNotifications) {
+    void handleAlarmNotification(List<AlarmNotification> alarmNotifications) {
 
         destinationNumbers.each {
 
@@ -87,7 +87,7 @@ class TwilioSMSNotificationAgent implements NotificationAgent {
     }
 
     @Override
-    void handleAlarmReset(List<AlarmResetNotification> alarmResetNotifications) {
+    void handleAlarmResetNotification(List<AlarmResetNotification> alarmResetNotifications) {
 
         destinationNumbers.each {
 

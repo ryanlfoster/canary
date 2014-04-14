@@ -1,8 +1,8 @@
 package com.citytechinc.canary.services.persistence
 
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.PollResult
 import com.citytechinc.canary.api.monitor.PollResponseType
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import com.citytechinc.canary.api.persistence.RecordPersistenceService
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceDefinition
 import com.citytechinc.canary.Constants
@@ -57,7 +57,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
     }
 
     @Override
-    void persistRecordHolder(RecordHolder recordHolder) {
+    void persistRecordHolder(MonitorRecords recordHolder) {
 
         log.debug("Persiting data for monitor: ${recordHolder.monitorIdentifier}")
 
@@ -83,7 +83,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
             // CREATE A NEW NODE FOR THE MONITOR
             def recordHolderNode = rootStorageNode.addNode(recordHolder.monitorIdentifier, Constants.JCR_NODE_TYPE_RECORD_HOLDER)
 
-            recordHolder.records.each { DetailedPollResponse pollResponse ->
+            recordHolder.records.each { PollResult pollResponse ->
 
                 def pollResponseNode = recordHolderNode.addNode(Constants.JCR_POLL_RESPONSE_NODE_STORAGE_FORMATTER.format(pollResponse.startTime), Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE)
 
@@ -97,7 +97,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
                 pollResponseNode.set('endTime', endCal)
                 pollResponseNode.set('responseType', pollResponse.responseType as String)
                 pollResponseNode.set('stackTrace', pollResponse.stackTrace)
-                pollResponseNode.set('message', pollResponse.message)
+                pollResponseNode.set('messages', pollResponse.messages)
                 pollResponseNode.set('excused', pollResponse.excused)
             }
 
@@ -114,7 +114,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
     }
 
     @Override
-    Optional<List<DetailedPollResponse>> getPollResponseRecordsForMonitor(String monitorName) {
+    Optional<List<PollResult>> getPollResponseRecordsForMonitor(String monitorName) {
 
         def optionalRecords = Optional.absent()
         def session
@@ -133,28 +133,28 @@ class JCRPersistenceManager implements RecordPersistenceService {
 
                 def recordHolderNode = session.getNode(nodePath)
 
-                List<DetailedPollResponse> detailedPollResponses = []
+                List<PollResult> fetchedResults = []
 
-                recordHolderNode.recurse(Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE) { pollResponseNode ->
+                recordHolderNode.recurse(Constants.JCR_NODE_TYPE_DETAILED_POLL_RESPONSE) { pollResultNode ->
 
-                    def startTime = pollResponseNode.get('startTime').getTime()
-                    def endTime = pollResponseNode.get('endTime').getTime()
-                    def responseType = pollResponseNode.get('responseType') as PollResponseType
-                    def stackTrace = pollResponseNode.get('stackTrace')
-                    def message = pollResponseNode.get('message')
-                    def excused = pollResponseNode.get('excused') as Boolean
+                    def startTime = pollResultNode.get('startTime').getTime()
+                    def endTime = pollResultNode.get('endTime').getTime()
+                    def responseType = pollResultNode.get('responseType') as PollResponseType
+                    def stackTrace = pollResultNode.get('stackTrace')
+                    def messages = pollResultNode.get('messages') as List<String>
+                    def excused = pollResultNode.get('excused') as Boolean
 
-                    detailedPollResponses.add(new DetailedPollResponse(startTime: startTime,
+                    fetchedResults.add(new PollResult(startTime: startTime,
                             endTime: endTime,
                             responseType: responseType,
                             stackTrace: stackTrace,
-                            message: message,
+                            messages: messages,
                             excused: excused))
                 }
 
-                log.debug("Found ${detailedPollResponses.size()} poll responses in the JCR for service ${monitorName}")
+                log.debug("Found ${fetchedResults.size()} poll responses in the JCR for service ${monitorName}")
 
-                optionalRecords = Optional.of(detailedPollResponses)
+                optionalRecords = Optional.of(fetchedResults)
             }
 
         } catch (Exception e) {

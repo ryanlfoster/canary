@@ -1,7 +1,7 @@
 package com.citytechinc.canary.services.manager.actors
 
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import com.google.common.base.Stopwatch
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
@@ -23,7 +23,7 @@ final class RecordPersistenceServiceActor extends DynamicDispatchActor {
         String identifier
     }
 
-    static class PersistRecord { RecordHolder recordHolder }
+    static class PersistRecord { MonitorRecords recordHolder }
 
     RecordPersistenceServiceWrapper wrapper
     Statistics statistics = new Statistics()

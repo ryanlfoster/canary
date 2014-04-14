@@ -4,7 +4,7 @@ import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.notification.NotificationAgentWrapper
 import com.citytechinc.canary.api.persistence.RecordPersistenceServiceWrapper
 import com.citytechinc.canary.api.responsehandler.PollResponseHandlerWrapper
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
 import com.citytechinc.canary.services.manager.actors.Statistics
 import com.google.common.base.Optional
@@ -55,7 +55,7 @@ public interface ServiceManager {
      * @param identifier
      * @return
      */
-    public Optional<RecordHolder> getRecordHolder(String identifier)
+    public Optional<MonitorRecords> getRecordHolder(String identifier)
 
     /**
      *

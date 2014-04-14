@@ -87,10 +87,4 @@ import java.util.concurrent.TimeUnit
      */
     long maxExecutionTime() default 3000L
 
-    /**
-     *
-     * @return
-     */
-    boolean logEscalation() default true
-
 }

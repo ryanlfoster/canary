@@ -1,10 +1,10 @@
 package com.citytechinc.canary.services.manager.actors.monitor
 
-import com.citytechinc.canary.api.monitor.DetailedPollResponse
+import com.citytechinc.canary.api.monitor.PollResult
 import com.citytechinc.canary.api.monitor.MonitoredServiceWrapper
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.citytechinc.canary.api.monitor.PollResponseType
-import com.citytechinc.canary.api.monitor.RecordHolder
+import com.citytechinc.canary.api.monitor.MonitorRecords
 import com.citytechinc.canary.api.notification.AlarmNotification
 import com.citytechinc.canary.api.notification.AlarmResetNotification
 import com.citytechinc.canary.services.manager.actors.MissionControlActor
@@ -34,7 +34,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
     static class GetRecord { }
 
     MonitoredServiceWrapper wrapper
-    RecordHolder recordHolder
+    MonitorRecords recordHolder
     Scheduler scheduler
     MissionControlActor missionControl
     MonitoredServiceExecutingActor pollingActor
@@ -80,20 +80,20 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
         final Date startTime = new Date()
         final PollResponse pollResponse = pollingActor.sendAndWait(new Poll(), wrapper.maxExecutionTime, TimeUnit.MILLISECONDS) ?: InternalPollResponse.INTERRUPTED()
 
-        DetailedPollResponse detailedPollResponse = new DetailedPollResponse(startTime: startTime,
+        PollResult pollResult = new PollResult(startTime: startTime,
                 endTime: new Date(),
                 responseType: pollResponse.pollResponseType,
-                message: pollResponse.message,
+                messages: pollResponse.messages,
                 stackTrace: pollResponse.exceptionStackTrace)
 
         if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {
-            log.debug("Interrupted a poll which started on ${detailedPollResponse.startTime} and exceeded the max execution time of ${wrapper.maxExecutionTime} ms")
+            log.debug("Interrupted a poll which started on ${pollResult.startTime} and exceeded the max execution time of ${wrapper.maxExecutionTime} ms")
         }
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
-        Boolean isAlarmed = recordHolder.addRecord(detailedPollResponse)
+        Boolean isAlarmed = recordHolder.addRecord(pollResult)
 
-        missionControl << new PollResponseHandlerActor.PollResponseReceipt(identifier: recordHolder.monitorIdentifier, response: detailedPollResponse.clone())
+        missionControl << new PollResponseHandlerActor.PollResponseReceipt(identifier: recordHolder.monitorIdentifier, response: pollResult.clone())
 
         if (isAlarmed) {
 

@@ -34,7 +34,6 @@ public final class MonitoredServiceWrapper {
     final Integer alarmThreshold
     final Boolean persistWhenAlarmed
     final Long maxExecutionTime
-    final Boolean escalateLogs
 
     // RESET MONITOR
     final Boolean interruptiblePollingEnabled
@@ -63,13 +62,11 @@ public final class MonitoredServiceWrapper {
 
         if (pollIntervalInMS < definition.maxExecutionTime()) {
 
-            log.warn("The poll interval in milliseconds is ${pollIntervalInMS} which is less than the max execution time of ${definition.maxExecutionTime()}, therefore the max execution time will be set to the poll interval of ${pollIntervalInMS}")
+            log.trace("The poll interval in milliseconds is ${pollIntervalInMS} which is less than the max execution time of ${definition.maxExecutionTime()}, therefore the max execution time will be set to the poll interval of ${pollIntervalInMS}")
             maxExecutionTime = pollIntervalInMS
         } else {
             maxExecutionTime = definition.maxExecutionTime()
         }
-
-        escalateLogs = definition.logEscalation()
 
         interruptiblePollingEnabled = maxExecutionTime > 0L
         resetCriteriaDefined = automaticResetMonitorDefinition != null

@@ -9,6 +9,6 @@ package com.citytechinc.canary.api.monitor
  */
 public enum PollResponseType {
 
-    SUCCESS, SERVICE_UNAVAILABLE, UNEXPECTED_SERVICE_RESPONSE, EXCEPTION, INTERRUPTED
+    SUCCESS, WARNING, ERROR, EXCEPTION, INTERRUPTED
 
 }
