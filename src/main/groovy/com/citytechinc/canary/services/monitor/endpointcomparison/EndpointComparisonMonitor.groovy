@@ -13,6 +13,8 @@ import com.google.common.collect.Maps
 import com.google.common.hash.HashFunction
 import com.google.common.hash.Hashing
 import groovy.util.logging.Slf4j
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import org.apache.felix.scr.annotations.Activate
@@ -161,12 +163,12 @@ class EndpointComparisonMonitor implements MonitoredService {
             }
         }
 
-        PGroup group = new DefaultPGroup()
+        List<Actor> actors = []
         Map<EndpointComparisonConfiguration, String> results = Maps.newConcurrentMap()
 
         endpointComparisonConfigurations.each { configuration ->
 
-            group.actor {
+            actors.add(Actors.actor {
 
                 String urlString = configuration.URL + explicitPagePath
 
@@ -177,8 +179,10 @@ class EndpointComparisonMonitor implements MonitoredService {
                 log.info("Connection response received for url: ${urlString}, hash: ${urlHash}")
 
                 results.put(configuration, urlHash)
-            }
+            })
         }
+
+        actors*.join()
 
         PollResponse.SUCCESS()
     }
