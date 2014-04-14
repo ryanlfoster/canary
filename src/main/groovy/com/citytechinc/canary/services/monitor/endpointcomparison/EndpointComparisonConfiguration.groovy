@@ -9,19 +9,11 @@ package com.citytechinc.canary.services.monitor.endpointcomparison
  */
 interface EndpointComparisonConfiguration {
 
-    enum TargetType { LOAD_BALANCER, APPSERVER, WEBSERVER }
-
     /**
      *
      * @return
      */
     String getLabel()
-
-    /**
-     *
-     * @return
-     */
-    TargetType getType()
 
     /**
      *
