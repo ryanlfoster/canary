@@ -92,7 +92,7 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
 
         def messages = statistics.collect {
 
-            "'${it.key}' rendered ${it.value.numberOfRequests} times, shortest: ${it.value.shortestDuration}ms, average: ${it.value.averageDuration}ms, longest: ${it.value.longestDuration}ms"
+            "'${it.key}' rendered ${it.value.numberOfRequests} times, shortest: ${it.value.shortestDuration}ms, average: ${it.value.averageDuration}ms, longest: ${it.value.longestDuration}ms".toString()
         }
 
         requestStatistics << {clearStatistics()}
