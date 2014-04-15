@@ -19,10 +19,10 @@ import java.util.concurrent.TimeUnit
  */
 @SlingFilter(order = 1, generateService = false, generateComponent = false)
 @Component
-@MonitoredServiceDefinition(description = 'Collects and reports on page requests that exceed the configured threshold', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)
+@MonitoredServiceDefinition(description = 'Collects and reports on requests not covered by the dynamic and page response monitors that exceed the configured threshold', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)
 @AutomaticResetMonitor(resetInterval = 30, resetIntervalUnit = TimeUnit.SECONDS)
 @Slf4j
-class SlingPageResponseMonitor extends AbstractSlingResponseMonitor {
+class SlingCatchAllResponseMonitor extends AbstractSlingResponseMonitor {
 
     @Override
     Logger getLogger() {
@@ -32,6 +32,7 @@ class SlingPageResponseMonitor extends AbstractSlingResponseMonitor {
     @Override
     Boolean scrutinizeRequest(RequestPathInfo requestPathInfo) {
 
-        requestPathInfo.resourcePath.startsWith('/content') && requestPathInfo.extension == 'html'
+        ((!requestPathInfo.resourcePath.startsWith('/content') && !requestPathInfo.extension == 'html')
+            || !['json', 'xml'].contains(requestPathInfo.extension))
     }
 }

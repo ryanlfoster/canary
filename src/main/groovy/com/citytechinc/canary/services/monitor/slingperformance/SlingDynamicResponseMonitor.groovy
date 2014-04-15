@@ -10,10 +10,17 @@ import org.slf4j.Logger
 
 import java.util.concurrent.TimeUnit
 
+/**
+ *
+ * @author Josh Durbin, CITYTECH, Inc. 2014
+ *
+ * Copyright 2014 CITYTECH, Inc.
+ *
+ */
 @SlingFilter(order = 1, generateService = false, generateComponent = false)
 @Component
-@MonitoredServiceDefinition(description = 'Collects and reports on dynamic requests that exceed the configured threshold', pollInterval = 1, pollIntervalUnit = TimeUnit.MINUTES)
-@AutomaticResetMonitor(resetInterval = 1, resetIntervalUnit = TimeUnit.MINUTES)
+@MonitoredServiceDefinition(description = 'Collects and reports on dynamic (xml, json) requests that exceed the configured threshold', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)
+@AutomaticResetMonitor(resetInterval = 30, resetIntervalUnit = TimeUnit.SECONDS)
 @Slf4j
 class SlingDynamicResponseMonitor extends AbstractSlingResponseMonitor {
 
