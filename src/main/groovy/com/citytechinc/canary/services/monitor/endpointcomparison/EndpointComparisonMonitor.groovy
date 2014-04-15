@@ -135,7 +135,7 @@ class EndpointComparisonMonitor implements MonitoredService {
 
                 if (pagePaths) {
 
-                    explicitPagePath = pagePaths.get(RANDOM_GENERATOR.nextInt(pagePaths.size())) + '.html'
+                    explicitPagePath = pagePaths.get(RANDOM_GENERATOR.nextInt(pagePaths.size()))
                 }
             }
 
