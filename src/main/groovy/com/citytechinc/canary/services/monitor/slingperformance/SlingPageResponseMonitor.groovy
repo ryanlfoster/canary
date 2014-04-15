@@ -32,6 +32,8 @@ class SlingPageResponseMonitor extends AbstractSlingResponseMonitor {
     @Override
     Boolean scrutinizeRequest(RequestPathInfo requestPathInfo) {
 
-        requestPathInfo.resourcePath.startsWith('/content') && requestPathInfo.extension == 'html'
+        (requestPathInfo.resourcePath.startsWith('/content')
+                && !requestPathInfo.resourcePath.contains('jcr:content')
+                && requestPathInfo.extension == 'html')
     }
 }
