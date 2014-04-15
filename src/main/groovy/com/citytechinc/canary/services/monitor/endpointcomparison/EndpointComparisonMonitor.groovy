@@ -8,15 +8,13 @@ import com.citytechinc.canary.api.monitor.PollResponse
 import com.day.cq.replication.ReplicationStatus
 import com.day.cq.wcm.api.Page
 import com.day.cq.wcm.api.PageManager
+import com.google.common.base.Stopwatch
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
 import com.google.common.hash.HashFunction
 import com.google.common.hash.Hashing
 import groovy.util.logging.Slf4j
-import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.group.PGroup
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
@@ -42,12 +40,12 @@ import java.util.concurrent.TimeUnit
  * Copyright 2014 CITYTECH, Inc.
  *
  */
-@Component(name = 'Canary Endpoint Comparison Monitor', policy = ConfigurationPolicy.REQUIRE, immediate = true, metatype = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, immediate = true, metatype = true)
 @Service
 @Properties(value = [
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
-@MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 10, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 12)
-@AutomaticResetMonitor(resetInterval = 3, resetIntervalUnit = TimeUnit.MINUTES)
+@MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 1, pollIntervalUnit = TimeUnit.MINUTES, alarmThreshold = 10)
+@AutomaticResetMonitor(resetInterval = 1, resetIntervalUnit = TimeUnit.MINUTES)
 @Slf4j
 class EndpointComparisonMonitor implements MonitoredService {
 
@@ -55,16 +53,16 @@ class EndpointComparisonMonitor implements MonitoredService {
     static Random RANDOM_GENERATOR = new Random()
 
     @Property(name = 'type', label = 'Comparison Type', options = [
-        @PropertyOption(name = 'Random Page', value = 'RANDOM_PAGE'),
-        @PropertyOption(name = 'Random Page From List', value = 'RANDOM_PAGE_FROM_LIST'),
-        @PropertyOption(name = 'Root Server Path', value = 'ROOT_SERVER_PATH')])
+        @PropertyOption(name = 'RANDOM_PAGE', value = 'Random Page'),
+        @PropertyOption(name = 'RANDOM_PAGE_FROM_LIST', value = 'Random Page From List'),
+        @PropertyOption(name = 'ROOT_SERVER_PATH', value = 'Root Server Path')])
     private ComparisonType type
     enum ComparisonType { RANDOM_PAGE, RANDOM_PAGE_FROM_LIST, ROOT_SERVER_PATH }
 
     @Property(name = 'randomPathStartPath', label = 'Random Page Start Path', value = '', description = 'Used if type is \'Random Page\', this represents the page path that will be used to randomly select a child for comparison')
     private String randomPathStartPath
 
-    @Property(name = 'pagePaths', label = 'Path Paths to Hit', value = ['', ''], description = 'Used if type is \'Random Page\', this represents a list of page paths that will be used for comparison')
+    @Property(name = 'pagePaths', label = 'Path Paths to Hit', value = ['', ''], description = 'Used if type is \'Random Page From List\', this represents a list of page paths that will be used for comparison')
     private List<String> pagePaths
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
@@ -110,45 +108,35 @@ class EndpointComparisonMonitor implements MonitoredService {
 
                 Page rootPage = pageManager.getPage(randomPathStartPath)
 
+                log.info("rootPage= ${rootPage}")
+
                 if (rootPage) {
 
                     List<String> descendantPathPaths = []
 
                     rootPage.recurse { page ->
 
+                        log.info("processing page: ${page}")
+
                         if (page.contentResource.adaptTo(ReplicationStatus).activated) {
+
+                            log.info("page: ${page} is activated...")
                             descendantPathPaths.add(page.path)
                         }
                     }
 
-                    explicitPagePath = descendantPathPaths.get(RANDOM_GENERATOR.nextInt(descendantPathPaths.size())) + '.html'
+                    if (descendantPathPaths) {
+                        explicitPagePath = descendantPathPaths.get(RANDOM_GENERATOR.nextInt(descendantPathPaths.size())) + '.html'
+                    }
+
                 }
 
             } else if (type == ComparisonType.RANDOM_PAGE_FROM_LIST) {
 
-                List<String> activePages = []
+                if (pagePaths) {
 
-                if (pagePaths.empty) {
-
-                    log.debug("Random page paths was the selected configuration but no paths were supplied")
-
-                } else {
-
-                    pagePaths.each { pagePath ->
-
-                        if (pageManager.getPage(pagePath) && pageManager.getPage(pagePath).adaptTo(ReplicationStatus).activated) {
-
-                            activePages.add(pagePath)
-                        }
-                    }
-
-                    if (activePages.empty) {
-
-                        log.debug("Looked up ${pagePaths.size()} pages but none were found and active")
-                    }
+                    explicitPagePath = pagePaths.get(RANDOM_GENERATOR.nextInt(pagePaths.size())) + '.html'
                 }
-
-                explicitPagePath = activePages.get(RANDOM_GENERATOR.nextInt(activePages.size())) + '.html'
             }
 
         } catch (Exception e) {
@@ -158,25 +146,27 @@ class EndpointComparisonMonitor implements MonitoredService {
 
         } finally {
 
-            if (resourceResolver && resourceResolver.isLive()) {
+            if (resourceResolver?.isLive()) {
                 resourceResolver.close()
             }
         }
 
-        List<Actor> actors = []
-        Map<EndpointComparisonConfiguration, String> results = Maps.newConcurrentMap()
+        def actors = []
+        def results = Maps.newConcurrentMap()
 
         endpointComparisonConfigurations.each { configuration ->
 
             actors.add(Actors.actor {
 
+                def stopWatch = Stopwatch.createStarted()
+
                 String urlString = configuration.URL + explicitPagePath
 
-                log.info("Opening connection to url: ${urlString}")
+                log.trace("Opening connection to url: ${urlString}")
 
                 String urlHash = HASH_FUNCTION.hashBytes(urlString.toURL().getBytes()).toString()
 
-                log.info("Connection response received for url: ${urlString}, hash: ${urlHash}")
+                log.info("Connection response received for url: ${urlString}, hash: ${urlHash} in ${stopWatch.stop().elapsed(TimeUnit.MILLISECONDS)}ms")
 
                 results.put(configuration, urlHash)
             })
@@ -184,6 +174,9 @@ class EndpointComparisonMonitor implements MonitoredService {
 
         actors*.join()
 
-        PollResponse.SUCCESS()
+        (results.values() as List).unique() == 1 ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(results.collect {
+
+            "${it.key.URL} had a hash of ${it.value}" as String
+        })
     }
 }
