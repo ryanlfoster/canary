@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 @SlingFilter(order = 1, generateService = false, generateComponent = false)
 @Component
-@MonitoredServiceDefinition(description = 'Collects and reports on dynamic requests that exceed the configured threshold', pollInterval = 1, pollIntervalUnit = TimeUnit.MINUTES)
+@MonitoredServiceDefinition(description = 'Collects and reports on dynamic (xml, json) requests that exceed the configured threshold', pollInterval = 1, pollIntervalUnit = TimeUnit.MINUTES)
 @AutomaticResetMonitor(resetInterval = 1, resetIntervalUnit = TimeUnit.MINUTES)
 @Slf4j
 class SlingDynamicResponseMonitor extends AbstractSlingResponseMonitor {
