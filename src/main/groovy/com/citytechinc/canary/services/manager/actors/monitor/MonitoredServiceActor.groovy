@@ -87,7 +87,7 @@ final class MonitoredServiceActor extends DynamicDispatchActor {
                 stackTrace: pollResponse.exceptionStackTrace)
 
         if (pollResponse.pollResponseType == PollResponseType.INTERRUPTED) {
-            log.debug("Interrupted a poll which started on ${pollResult.startTime} and exceeded the max execution time of ${wrapper.maxExecutionTime} ms")
+            log.debug("Interrupted monitor ${wrapper.identifier} started on ${pollResult.startTime} and exceeded ${wrapper.maxExecutionTime}ms")
         }
 
         // ADD RECORD TO HOLDER, SEND MESSAGE TO MISSION CONTROL WITH RESPONSE FOR BROADCAST
