@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit
 
 @SlingFilter(order = 1, generateService = false, generateComponent = false)
 @Component
-@MonitoredServiceDefinition(description = 'Collects and reports on page requests that exceed the configured threshold', pollInterval = 1, pollIntervalUnit = TimeUnit.MINUTES)
-@AutomaticResetMonitor(resetInterval = 1, resetIntervalUnit = TimeUnit.MINUTES)
+@MonitoredServiceDefinition(description = 'Collects and reports on page requests that exceed the configured threshold', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)
+@AutomaticResetMonitor(resetInterval = 30, resetIntervalUnit = TimeUnit.SECONDS)
 @Slf4j
 class SlingPageResponseMonitor extends AbstractSlingResponseMonitor {
 
