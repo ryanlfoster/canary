@@ -8,10 +8,14 @@
 
     isCardExpanded: false,
 
+    alert: function() {
+      return 'Latest record generated '+this.get('lastLoggedTime')+'. Current status: '+this.get('status')+'.';
+    }.property('records'),
+
     // Calculated Values:
 
     isError: function() {
-      return this.get('records.alarmed') === true;
+      return this.get('records.alarmed');
     }.property('records.alarmed'),
 
     isNotError: function() {
@@ -27,7 +31,11 @@
     }.property('records.alarmed'),
 
     hasRecords: function() {
-      return this.get('records.records').length > 0;
+      var rec = this.get('records.records'), l = 0;
+      if ( typeof rec !== 'undefined' ) {
+        l = rec.length;
+      }
+      return l;
     }.property('records.records'),
 
     // Latest Record
