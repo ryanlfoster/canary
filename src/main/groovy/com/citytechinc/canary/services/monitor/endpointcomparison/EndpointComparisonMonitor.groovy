@@ -174,7 +174,7 @@ class EndpointComparisonMonitor implements MonitoredService {
 
         actors*.join()
 
-        (results.values() as List).unique() == 1 ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(results.collect {
+        (results.values() as List).unique().size() == 1 ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(results.collect {
 
             "${it.key.URL + explicitPagePath} had a hash of ${it.value}" as String
         })
