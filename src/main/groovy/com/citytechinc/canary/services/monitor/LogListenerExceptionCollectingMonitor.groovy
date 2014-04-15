@@ -75,7 +75,7 @@ class LogListenerExceptionCollectingMonitor implements MonitoredService, LogList
         def messages = entries.collect { "An exception was logged at ${Constants.JMX_DATE_TIME_FORMATTER.format(it.time)}".toString() }
         entries.clear()
 
-        messages ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(messages)
+        messages ? PollResponse.WARNING().addMessages(messages) : PollResponse.SUCCESS()
     }
 
     @Override
