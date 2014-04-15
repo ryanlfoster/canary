@@ -10,6 +10,13 @@ import org.slf4j.Logger
 
 import java.util.concurrent.TimeUnit
 
+/**
+ *
+ * @author Josh Durbin, CITYTECH, Inc. 2014
+ *
+ * Copyright 2014 CITYTECH, Inc.
+ *
+ */
 @SlingFilter(order = 1, generateService = false, generateComponent = false)
 @Component
 @MonitoredServiceDefinition(description = 'Collects and reports on requests not covered by the dynamic and page response monitors that exceed the configured threshold', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)

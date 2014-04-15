@@ -27,6 +27,13 @@ import javax.servlet.ServletResponse
 import java.math.RoundingMode
 import java.util.concurrent.TimeUnit
 
+/**
+ *
+ * @author Josh Durbin, CITYTECH, Inc. 2014
+ *
+ * Copyright 2014 CITYTECH, Inc.
+ *
+ */
 @Component(componentAbstract = true, policy = ConfigurationPolicy.REQUIRE, immediate = true)
 @Service
 @Properties(value = [
