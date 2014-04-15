@@ -1,4 +1,4 @@
-package com.citytechinc.canary.services.monitor
+package com.citytechinc.canary.services.monitor.statemonitoring
 
 import com.citytechinc.canary.Constants
 import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
