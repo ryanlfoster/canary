@@ -1,91 +1,3 @@
-Ember.TEMPLATES["_alertFull"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, helper, options, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-
-  var buffer = '', stack1;
-  data.buffer.push("<h3>");
-  stack1 = helpers._triageMustache.call(depth0, "title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</h3>");
-  return buffer;
-  }
-
-function program3(depth0,data) {
-
-  var stack1;
-  stack1 = helpers._triageMustache.call(depth0, "monitor.serviceName", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  else { data.buffer.push(''); }
-  }
-
-function program5(depth0,data) {
-
-
-  data.buffer.push(" <dd>New</dd> ");
-  }
-
-function program7(depth0,data) {
-
-
-  data.buffer.push(" <dd>Archived</dd> ");
-  }
-
-  data.buffer.push(" <div ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': (":alert :alert-disassemble active:alert-warning active::alert-info")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push("> <button type=\"button\" class=\"close\" aria-hidden=\"true\" ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "archive", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(">&times;</button> ");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{
-    'class': ("alert-link")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "monitor", "monitor.id", options) : helperMissing.call(depth0, "link-to", "monitor", "monitor.id", options));
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" <p>");
-  stack1 = helpers._triageMustache.call(depth0, "text", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</p> <dl class=\"dl-horizontal\"> <dt>Service</dt> <dd>");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{
-    'class': ("alert-link")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "monitor", "monitor.id", options) : helperMissing.call(depth0, "link-to", "monitor", "monitor.id", options));
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</dd> <dt>Timestamp</dt> <dd>");
-  stack1 = helpers._triageMustache.call(depth0, "timestamp", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</dd> <dt>Status</dt> ");
-  stack1 = helpers['if'].call(depth0, "active", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </dl> </div>");
-  return buffer;
-
-});
-
-Ember.TEMPLATES["_alertShort"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-
-  var stack1;
-  stack1 = helpers._triageMustache.call(depth0, "title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  else { data.buffer.push(''); }
-  }
-
-  data.buffer.push(" <div class=\"alert alert-warning\">");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{
-    'class': ("alert-link")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "alert", "id", options) : helperMissing.call(depth0, "link-to", "alert", "id", options));
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>");
-  return buffer;
-
-});
-
 Ember.TEMPLATES["_chart"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
@@ -301,78 +213,6 @@ function program5(depth0,data) {
 
 });
 
-Ember.TEMPLATES["alert"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', helper, options, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
-
-
-  data.buffer.push("<section> <div class=\"row\"> <div class=\"col-md-12\"> <h1 class=\"page-header\">Alert</h1> ");
-  data.buffer.push(escapeExpression((helper = helpers.partial || (depth0 && depth0.partial),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "alertFull", options) : helperMissing.call(depth0, "partial", "alertFull", options))));
-  data.buffer.push(" </div> </div> </section>");
-  return buffer;
-
-});
-
-Ember.TEMPLATES["alertBox"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, self=this, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-
-  var buffer = '', stack1, helper, options;
-  data.buffer.push(" <p id=\"nav-alerts-link\" class=\"alert alert-warning\"> ");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{
-    'class': ("alert-link")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "alerts", options) : helperMissing.call(depth0, "link-to", "alerts", options));
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </p> ");
-  return buffer;
-  }
-function program2(depth0,data) {
-
-  var buffer = '', stack1;
-  data.buffer.push(" <span class=\"glyphicon glyphicon-exclamation-sign\"></span> ");
-  stack1 = helpers._triageMustache.call(depth0, "active", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" Alerts ");
-  return buffer;
-  }
-
-  data.buffer.push(" <div id=\"alerts-container\" class=\"navbar-right\"> ");
-  stack1 = helpers['if'].call(depth0, "areActiveAlerts", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </div>");
-  return buffer;
-
-});
-
-Ember.TEMPLATES["alerts"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-
-  var buffer = '', helper, options;
-  data.buffer.push(" ");
-  data.buffer.push(escapeExpression((helper = helpers.partial || (depth0 && depth0.partial),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "alertFull", options) : helperMissing.call(depth0, "partial", "alertFull", options))));
-  data.buffer.push(" ");
-  return buffer;
-  }
-
-  data.buffer.push("<section id=\"reports\"> <div class=\"row\"> <div class=\"col-md-12\"> <h1 class=\"page-header\">Alerts</h1> <h2>New Alerts</h2> ");
-  stack1 = helpers.each.call(depth0, "activeAlerts", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" <h2>Archived Alerts</h2> ");
-  stack1 = helpers.each.call(depth0, "archivedAlerts", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </div> </div> </section>");
-  return buffer;
-
-});
-
 Ember.TEMPLATES["application"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
@@ -399,10 +239,10 @@ function program5(depth0,data) {
   data.buffer.push(" <div class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\"> <div class=\"container-fluid\"> <div class=\"navbar-header\"> <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\"> <span class=\"sr-only\">Toggle navigation</span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </button> <a class=\"navbar-brand\" href=\"#\">Canary CQ Service Monitor</a> </div> <div class=\"navbar-collapse collapse\"> <ul class=\"nav navbar-nav navbar-right\"> <li>");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "monitors", options) : helperMissing.call(depth0, "link-to", "monitors", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</li> <li>");
+  data.buffer.push("</li> <!--<li>");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "settings", options) : helperMissing.call(depth0, "link-to", "settings", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</li> <li>");
+  data.buffer.push("</li>--> <li>");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "help", options) : helperMissing.call(depth0, "link-to", "help", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</li> </ul> <form class=\"navbar-form navbar-right\"> ");
@@ -437,13 +277,33 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 
 });
 
+Ember.TEMPLATES["error"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+
+
+
+  data.buffer.push("<h1>An Error Occurred While Loading Data</h1>");
+
+});
+
 Ember.TEMPLATES["help"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 
 
 
-  data.buffer.push("<section> <div class=\"row\"> <div class=\"col-md-12\"> <h1>Canary Help</h1> <p>Lorem ipsum dolor sit amet</p> <h2>CITYTECH, Inc</h2> <p>Lorem ipsum dolor sit amet</p> </div> </div> </section>");
+  data.buffer.push("<section> <div class=\"row\"> <div class=\"col-md-12\"> <h1>CQ Canary Framework</h1> <p> The Canary framework is a simple, stand alone monitoring, profiling, and reporting tool for OSGi components and services within AEM. The framework enables scheduled, custom monitoring or profiling of critical aspects of an AEM instance. Canary provides a conduit between Monitors, which collect data, and other registered service types that can distribute and execute on that data. In addition to polling and distribution, Canary provides an API for talking to services in the framework, JMX beans for reporting and maintenance, and a rich UI for representing this data. </p> <p> The AEM Canary framework consists of registered Monitor(s) that provide responses to poll requests. These poll requests are collected and analyzed in the framework based on supplied configurations. </p> <h2>Monitors</h2> <p> Monitors are the source of data for the Canary Framework. Monitors are polled by the framework based on their specific configurations – an interval and a time unit (seconds, minutes, etc…). Monitors can poll up to once per second. Any configuration unit smaller than a single second will be rounded up to a second. If a poll exceeds the maximum execution time, it will be interrupted and a failure will be recorded indicting the interruption. Poll responses are recorded in-memory and routed to Mission Control for distribution to all Poll Response Handlers. </p> <p> In order to detect an alarm state, poll data is analyzed each time a poll is pushed into the in-memory record storage. The configured alarm threshold and criteria are used to determine and flag an alarm state. Monitors support alarm criteria: Recent Polls, Average Execution Time, or Average Failure Rate. Note: The averaged alarm criteria are affected by the max number of records configured for the monitor. </p> <h2>Documentation</h2> <p>For more information, visit the <a href=\"http://code.citytechinc.com/canary/\">Maven site</a> or the <a href=\"https://github.com/Citytechinc/canary\">Github project</a>.</p> <h2>About</h2> <p>This project is hosted on <a href=\"https://github.com/Citytechinc/canary\">Github project</a> for <a href=\"http://www.citytechinc.com/\">CITYTECH, Inc.</a></p> <p>The UI was built using <a href=\"http://emberjs.com/\">ember.js</a>, <a href=\"http://www.chartjs.org/\">chart.js</a> and <a href=\"http://www.getbootstrap.com/\">bootstrap</a>.</p> </div> </div> </section>");
+
+});
+
+Ember.TEMPLATES["loading"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+
+
+
+  data.buffer.push("<div class=\"col-md-12\"> <p><i class=\"loader\"></i>&nbsp;Loading <em>Canary CQ Service Monitor</em> Data&hellip;</p> </div>");
 
 });
 
@@ -472,9 +332,9 @@ function program3(depth0,data) {
 function program5(depth0,data) {
 
   var buffer = '';
-  data.buffer.push(" <div class=\"alert alert-danger\"> <p class=\"text-center\">Monitor has paused polling due to errors.<br><button ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "reset", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(" class=\"btn btn-default btn-sm\">reset</button></p> </div> ");
+  data.buffer.push(" <div class=\"alert alert-danger\"> <p class=\"text-center\">Monitor has paused polling due to errors.<br> <a href=\"#\" ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "resetAlarm", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(" class=\"btn btn-default btn-sm\">reset</a> </div> ");
   return buffer;
   }
 
@@ -531,7 +391,7 @@ function program11(depth0,data) {
 function program13(depth0,data) {
 
   var buffer = '', stack1;
-  data.buffer.push(" <table class=\"table table-condensed table-striped table-hover\"> <tbody> <tr> <th>Start Time</th> <th>End Time</th> <th>Duration (ms)</th> <th>Message</th> <th>Excused</th> <th>Response Type</th> </tr> ");
+  data.buffer.push(" <table class=\"table table-condensed table-hover record-data-table\"> <tbody> <tr> <th>Start Time</th> <th>End Time</th> <th>Duration (ms)</th> <th>Excused</th> <th>Response Type</th> </tr> ");
   stack1 = helpers.each.call(depth0, "records.records", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(14, program14, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </tbody> </table> ");
@@ -540,7 +400,7 @@ function program13(depth0,data) {
 function program14(depth0,data) {
 
   var buffer = '', stack1, helper, options;
-  data.buffer.push(" <tr> <td>");
+  data.buffer.push(" <tr class=\"record-data\"> <td>");
   stack1 = helpers._triageMustache.call(depth0, "startTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> <td>");
@@ -549,40 +409,49 @@ function program14(depth0,data) {
   data.buffer.push("</td> <td>");
   data.buffer.push(escapeExpression((helper = helpers.duration || (depth0 && depth0.duration),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["ID","ID"],data:data},helper ? helper.call(depth0, "startTime", "endTime", options) : helperMissing.call(depth0, "duration", "startTime", "endTime", options))));
   data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" ");
-  stack1 = helpers['if'].call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(17, program17, data),fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </td> <td>");
   stack1 = helpers._triageMustache.call(depth0, "excused", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> <td>");
   stack1 = helpers._triageMustache.call(depth0, "responseType", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> </tr> ");
+  stack1 = helpers['if'].call(depth0, "messages", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(18, program18, data),fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" ");
   return buffer;
   }
 function program15(depth0,data) {
 
   var buffer = '', stack1;
   data.buffer.push(" ");
-  stack1 = helpers._triageMustache.call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "message", "in", "messages", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" ");
   return buffer;
   }
+function program16(depth0,data) {
 
-function program17(depth0,data) {
-
-
-  data.buffer.push(" -- ");
+  var buffer = '', stack1;
+  data.buffer.push(" <tr><td colspan=\"5\" class=\"record-message\"><strong>Message:</strong>&nbsp;");
+  stack1 = helpers._triageMustache.call(depth0, "message", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td></tr> ");
+  return buffer;
   }
 
-  data.buffer.push("<section id=\"reports\"> <div class=\"row\"> <div class=\"col-md-12\"> <h1 class=\"page-header\">");
-  stack1 = helpers._triageMustache.call(depth0, "serviceName", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+function program18(depth0,data) {
+
+
+  data.buffer.push(" <!-- no messages --> ");
+  }
+
+  data.buffer.push("<section id=\"record\"> <div class=\"row\"> <div class=\"col-md-12\"> <h1 class=\"page-header\">");
+  stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</h1> </div> </div> <!-- /row --> <div class=\"row\"> <div class=\"col-md-8 col-md-push-4\"> ");
+  data.buffer.push("</h1> </div> <div class=\"col-md-12 alerts\"> <p class=\"alert alert-info\">");
+  stack1 = helpers._triageMustache.call(depth0, "alert", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</p> </div> </div> <!-- /row --> <div class=\"row\"> <div class=\"col-md-8 col-md-push-4\"> ");
   stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </div> <div class=\"col-md-4 col-md-pull-8\"> <div class=\"panel panel-default\"> <div class=\"panel-heading\"> <h2>Monitor Status</h2> </div> <div class=\"panel-body\"> ");
@@ -626,14 +495,26 @@ function program17(depth0,data) {
 Ember.TEMPLATES["monitorReset"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1;
+  var stack1, escapeExpression=this.escapeExpression, self=this;
 
+function program1(depth0,data) {
 
-  data.buffer.push("<div class=\"row\"> <div class=\"col-md-12\"> <h1>RESET!</h1> ");
-  stack1 = helpers._triageMustache.call(depth0, "serviceName", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" </div> </div>");
+  var buffer = '';
+  data.buffer.push(" <p>Monitor successfully reset. <a href=\"#\" ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "refresh", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(">Refresh monitor view</a>.</p> ");
   return buffer;
+  }
+
+function program3(depth0,data) {
+
+
+  data.buffer.push(" <p>Monitor reset failed.</p> ");
+  }
+
+  stack1 = helpers['if'].call(depth0, "result", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  else { data.buffer.push(''); }
 
 });
 
@@ -756,16 +637,16 @@ function program1(depth0,data) {
 
   var buffer = '', stack1;
   data.buffer.push(" <tr ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "identifier", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
   data.buffer.push(" ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("isError:danger isWarning:warning isNormal:success")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push("> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "identifier", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> <td>");
-  stack1 = helpers._triageMustache.call(depth0, "serviceName", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> <td>");
   stack1 = helpers._triageMustache.call(depth0, "lastLoggedTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
@@ -789,14 +670,14 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  data.buffer.push(" <section class=\"row\" id=\"reports\"> <h1 class=\"page-header\">Search Monitors</h1> <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Normal Services</h2class=\"text-left\"></caption> <thead><tr><th>ID</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Response</th></tr></thead> <tfoot> <tr> <td colspan=\"6\" class=\"text-right\">Showing ");
-  stack1 = helpers._triageMustache.call(depth0, "searchResults.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push(" <section class=\"row\" id=\"reports\"> <h1 class=\"page-header\">Search Monitors</h1> <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Search Term: '");
+  stack1 = helpers._triageMustache.call(depth0, "search", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" of ");
-  stack1 = helpers._triageMustache.call(depth0, "monitors.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("'</h2class=\"text-left\"></caption> <thead><tr><th>Identifier</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Response</th></tr></thead> <tfoot> <tr> <td colspan=\"6\" class=\"text-right\">Showing ");
+  stack1 = helpers._triageMustache.call(depth0, "length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td> </tr> </tfoot> <tbody> ");
-  stack1 = helpers.each.call(depth0, "searchResults", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[],types:[],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </tbody> </table> </section>");
   return buffer;

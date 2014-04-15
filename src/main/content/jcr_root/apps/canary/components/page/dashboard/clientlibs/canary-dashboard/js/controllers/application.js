@@ -6,7 +6,6 @@
 
 		// Properties:
 
-		search: '',
 		titleFilter: null,
 
 		// Subsets:

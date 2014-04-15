@@ -2,7 +2,6 @@
 
 tmpl.js
 application.js
-config.js
 store.js
 controllers/application.js
 controllers/monitor.js

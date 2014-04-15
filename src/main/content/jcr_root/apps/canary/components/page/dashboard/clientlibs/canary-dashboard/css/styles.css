@@ -76,23 +76,37 @@ body {
 }
 
 
-
+/* for icons in the corners of panel headings (+/-) */
 .floated-icon {
 	margin: 3px 10px;
 }
 
-.navbar-nav>li>a.active {
-	color: #fff;
-	font-weight: bold;
-}
-
-#alerts-container p.alert {
-	padding: 6px 12px;
-	margin: 7px;
-}
-
-#nav-alerts-link a{text-decoration: none;}
-
+/* color override for linked panel headings. */
 .panel-heading a {
 	color: inherit;
 }
+
+/* styles an inlinne loader. user the i tag or span. */
+.loader {
+	background: transparent url(data:image/gif;base64,R0lGODlhEAAQAPIAAP///zMzM87OzmdnZzMzM4GBgZqamqenpyH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==) no-repeat center;
+	height: 16px;
+	width: 16px;
+	display: inline-block;
+}
+
+/* override the bootstrap border on the table rows' tds */
+#record .table.record-data-table>thead>tr>td, #record .table.record-data-table>tbody>tr>td, #record .table.record-data-table>tfoot>tr>td {
+	border-top-width: 0;
+}
+
+/* and put it back on the record-date rows */
+#record .table.record-data-table>thead>tr.record-data>td, #record .table.record-data-table>tbody>tr.record-data>td, #record .table.record-data-table>tfoot>tr.record-data>td {
+	border-top-width: 1px;
+}
+
+/* style the message cells */
+#record .table.record-data-table>thead>tr>td.record-message, #record .table.record-data-table>tbody>tr>td.record-message, #record .table.record-data-table>tfoot>tr>td.record-message {
+	padding: 0 25px 5px;
+}
+
+
