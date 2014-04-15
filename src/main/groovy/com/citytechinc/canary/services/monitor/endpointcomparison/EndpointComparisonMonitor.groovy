@@ -108,7 +108,7 @@ class EndpointComparisonMonitor implements MonitoredService {
 
                 Page rootPage = pageManager.getPage(randomPathStartPath)
 
-                log.info("rootPage= ${rootPage}")
+                log.debug("rootPage= ${rootPage}")
 
                 if (rootPage) {
 
@@ -116,11 +116,11 @@ class EndpointComparisonMonitor implements MonitoredService {
 
                     rootPage.recurse { page ->
 
-                        log.info("processing page: ${page}")
+                        log.debug("processing page: ${page}")
 
                         if (page.contentResource.adaptTo(ReplicationStatus).activated) {
 
-                            log.info("page: ${page} is activated...")
+                            log.debug("page: ${page} is activated")
                             descendantPathPaths.add(page.path)
                         }
                     }
@@ -176,7 +176,7 @@ class EndpointComparisonMonitor implements MonitoredService {
 
         (results.values() as List).unique() == 1 ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(results.collect {
 
-            "${it.key.URL} had a hash of ${it.value}" as String
+            "${it.key.URL + explicitPagePath} had a hash of ${it.value}" as String
         })
     }
 }
