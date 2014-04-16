@@ -4,6 +4,7 @@ import com.citytechinc.canary.Constants
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.google.common.base.Stopwatch
+import com.google.common.collect.Maps
 import groovyx.gpars.agent.Agent
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
@@ -61,9 +62,8 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
 
         def slingRequest = servletRequest as SlingHttpServletRequest
         def requestPathInfo = slingRequest.requestPathInfo
-        def scrutinizeRequest = scrutinizeRequest(requestPathInfo)
 
-        if (scrutinizeRequest) {
+        if (scrutinizeRequest(requestPathInfo)) {
 
             def stopwatch = Stopwatch.createStarted()
 
@@ -95,14 +95,12 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
     @Override
     PollResponse poll() {
 
-        def statistics = requestStatistics.val as Map
+        def statistics = requestStatistics.sendAndWait { retrieveAndClearStatistics() } as Map
 
         def messages = statistics.collect {
 
             "'${it.key}' rendered ${it.value.numberOfRequests} times, shortest: ${it.value.shortestDuration}ms, average: ${it.value.averageDuration}ms, longest: ${it.value.longestDuration}ms".toString()
         }
-
-        requestStatistics << {clearStatistics()}
 
         messages ? PollResponse.WARNING().addMessages(messages) : PollResponse.SUCCESS()
     }
@@ -129,9 +127,12 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
             }
         }
 
-        private def clearStatistics() {
+        private Map<String, RequestStatistic> retrieveAndClearStatistics() {
 
+            def clonedMap = Maps.newHashMap(data)
             data.clear()
+
+            clonedMap
         }
     }
 
