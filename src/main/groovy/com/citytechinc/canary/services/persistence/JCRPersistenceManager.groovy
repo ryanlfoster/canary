@@ -43,7 +43,7 @@ class JCRPersistenceManager implements RecordPersistenceService {
     @Modified
     protected void activate(final Map<String, Object> properties) throws Exception {
 
-        Session session = slingRepository.loginAdministrative(null)
+        def session = slingRepository.loginAdministrative(null)
 
         if (!session.nodeExists(Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH)) {
 
@@ -79,8 +79,6 @@ class JCRPersistenceManager implements RecordPersistenceService {
             }
 
             def rootStorageNode = session.getNode(Constants.JCR_PERSISTENCE_STORAGE_ROOT_NODE_PATH)
-
-            // CREATE A NEW NODE FOR THE MONITOR
             def recordHolderNode = rootStorageNode.addNode(recordHolder.monitorIdentifier, Constants.JCR_NODE_TYPE_RECORD_HOLDER)
 
             recordHolder.records.each { PollResult pollResponse ->

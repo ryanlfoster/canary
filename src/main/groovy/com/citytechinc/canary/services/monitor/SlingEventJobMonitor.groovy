@@ -5,6 +5,7 @@ import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
+import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeUnit
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @MonitoredServiceDefinition(description = 'Polls the sling job manager examining average wait and process times', pollInterval = 30, pollIntervalUnit = TimeUnit.SECONDS)
 @AutomaticResetMonitor(resetInterval = 30, resetIntervalUnit = TimeUnit.SECONDS)
+@Slf4j
 class SlingEventJobMonitor implements MonitoredService {
 
     @Reference
@@ -54,7 +56,11 @@ class SlingEventJobMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        final PollResponse response
+        def response = PollResponse.SUCCESS()
+
+        log.debug("Polling. Actual process time average is: ${jobManager.statistics.averageProcessingTime}," +
+                " configured threshold is: ${averageProcessingTimeThreshold}. Actual wait time average is:" +
+                " ${jobManager.statistics.averageWaitingTime}, configured threshold is ${averageWaitingTimeThreshold}")
 
         if (jobManager.statistics.averageProcessingTime > averageProcessingTimeThreshold ||
                 jobManager.statistics.averageWaitingTime > averageWaitingTimeThreshold) {
@@ -69,8 +75,6 @@ class SlingEventJobMonitor implements MonitoredService {
                 response.addMessage("Average waiting time of ${jobManager.statistics.averageWaitingTime} exceeds threshold of ${averageWaitingTimeThreshold}")
             }
 
-        } else {
-            response = PollResponse.SUCCESS()
         }
 
         response

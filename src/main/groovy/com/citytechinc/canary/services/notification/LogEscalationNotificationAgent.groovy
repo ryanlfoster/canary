@@ -45,6 +45,8 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     @Override
     void handleAlarmNotification(List<AlarmNotification> alarmNotifications) {
 
+        log.debug("Handling alarm notification for monitors: ${alarmNotifications.collect { it.monitorName }}")
+
         alarmNotifications.each { AlarmNotification alarmNotification ->
 
             if (configurationAdmin.listConfigurations()
@@ -61,7 +63,7 @@ class LogEscalationNotificationAgent implements NotificationAgent {
                 properties.put(LOG_FILE, ROOT_LOGGER_PATH + alarmNotification.recordHolder.monitorIdentifier)
                 properties.put(LOG_LEVEL, 'debug')
 
-                log.info("Creating configuration ${newConfiguration.pid} for service ${properties.get('pid')}")
+                log.debug("Creating configuration ${newConfiguration.pid} for service ${properties.get('pid')}")
 
                 newConfiguration.update(properties)
             } else {
@@ -74,13 +76,16 @@ class LogEscalationNotificationAgent implements NotificationAgent {
     @Override
     void handleAlarmResetNotification(List<AlarmResetNotification> alarmResetNotifications) {
 
+        log.debug("Handling reset notification for monitors: ${alarmResetNotifications.collect { it.monitorName }}")
+
         alarmResetNotifications.each { AlarmResetNotification notification ->
 
-            configurationAdmin.listConfigurations().findAll { it.factoryPid == LOG_FACTORY_PID }
+            configurationAdmin.listConfigurations()
+                    .findAll { it.factoryPid == LOG_FACTORY_PID }
                     .findAll { it.properties.get('canary.created.date') && it.properties.get('pid') == notification.recordHolder.monitorIdentifier }
                     .each {
 
-                log.info("Deleting configuration ${it.pid} for service ${it.properties.get('pid')}")
+                log.debug("Deleting configuration ${it.pid} for service ${it.properties.get('pid')}")
                 it.delete()
             }
         }

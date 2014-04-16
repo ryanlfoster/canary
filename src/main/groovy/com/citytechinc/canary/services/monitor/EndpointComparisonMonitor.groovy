@@ -81,6 +81,8 @@ class EndpointComparisonMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
+        log.debug("Polling...")
+
         String explicitPagePath = ''
 
         ResourceResolver resourceResolver = null
@@ -140,25 +142,23 @@ class EndpointComparisonMonitor implements MonitoredService {
         def actors = []
         def results = Maps.newConcurrentMap()
 
-        endPoints.each {
+        actors = endPoints.collect {
 
-            actors.add(Actors.actor {
+            Actors.actor {
 
                 def stopWatch = Stopwatch.createStarted()
                 String urlString = it + explicitPagePath
 
                 log.trace("Opening connection to url: ${urlString}")
 
-                // HASH THE RESPONSE FROM THE ENDPOINT
                 def urlHash = HASH_FUNCTION.hashBytes(urlString.toURL().getBytes()).toString()
 
                 log.info("Connection response received for url: ${urlString}, hash: ${urlHash} in ${stopWatch.stop().elapsed(TimeUnit.MILLISECONDS)}ms")
 
                 results.put(urlString, urlHash)
-            })
+            }
         }
 
-        // WAIT FOR THE ACTORS TO FINISH...
         actors*.join()
 
         if (results.isEmpty() || (results.values() as List).unique().size() == 1) {

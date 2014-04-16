@@ -86,7 +86,7 @@ class DefaultServiceManager implements ServiceManager {
     void bindMonitor(final MonitoredService service) {
         registeredMonitors.add(service)
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
             missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
@@ -95,9 +95,9 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredMonitors.remove(service)
 
-        sleep(100)
-
-        if (missionControl?.isActive()) {
+        sleep(100)        
+        
+        if (missionControl?.active) {
             missionControl.sendAndWait(new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false))
         }
     }
@@ -106,7 +106,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredNotificationAgents.add(service)
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
             missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
@@ -117,7 +117,7 @@ class DefaultServiceManager implements ServiceManager {
 
         sleep(100)
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
             missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
         }
     }
@@ -126,7 +126,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredPersistenceServices.add(service)
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
             missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
@@ -137,7 +137,7 @@ class DefaultServiceManager implements ServiceManager {
 
         sleep(100)
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
             missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
         }
     }
@@ -146,7 +146,7 @@ class DefaultServiceManager implements ServiceManager {
 
         registeredPollResponseHandlers.add(service)
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
             missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: true)
         }
     }
@@ -157,7 +157,7 @@ class DefaultServiceManager implements ServiceManager {
 
         sleep(100)
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
             missionControl << new MissionControlActor.ServiceLifecycleEvent(service: service, isRegistration: false)
         }
     }
@@ -204,7 +204,7 @@ class DefaultServiceManager implements ServiceManager {
     @Override
     void requestAllMonitorsPoll() {
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
 
             missionControl << new MissionControlActor.RequestAllMonitorsPoll()
         }
@@ -252,7 +252,7 @@ class DefaultServiceManager implements ServiceManager {
     @Override
     void resetAlarm(String identifier) {
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
 
             missionControl << new MissionControlActor.RequestMonitorResetIfAlarmed(identifier: identifier)
         }
@@ -261,7 +261,7 @@ class DefaultServiceManager implements ServiceManager {
     @Override
     void resetAllAlarms() {
 
-        if (missionControl?.isActive()) {
+        if (missionControl?.active) {
 
             missionControl << new MissionControlActor.RequestAllMonitorsResetIfAlarmed()
         }

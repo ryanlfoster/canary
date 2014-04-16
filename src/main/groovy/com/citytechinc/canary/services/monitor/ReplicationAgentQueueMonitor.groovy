@@ -6,6 +6,7 @@ import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.day.cq.replication.AgentManager
+import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeUnit
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @MonitoredServiceDefinition(description = 'Examines replication agents for blocked queues', pollInterval = 10, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 12)
 @AutomaticResetMonitor(resetInterval = 3, resetIntervalUnit = TimeUnit.MINUTES)
+@Slf4j
 class ReplicationAgentQueueMonitor implements MonitoredService {
 
     @Property(name = 'agentIds', label = 'Agent IDs', value = ['publish', ''], description = 'Agent IDs to examine for blocked replication queues')
@@ -53,11 +55,16 @@ class ReplicationAgentQueueMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        PollResponse response = PollResponse.SUCCESS()
+        def response = PollResponse.SUCCESS()
 
-        agentManager.agents.values().findAll { it.enabled }
+        log.debug("Polling. Scrutinizing agent ids: ${agentIds} of ${agentManager.agents.size()} available agents...")
+
+        agentManager.agents.values()
+                .findAll { it.enabled }
                 .findAll { agentIds.contains(it.configuration.agentId) }
                 .each {
+
+            log.trace("Agent id: ${it.id} next retry is: ${it.queue.status.nextRetryTime}, queue size is: ${it.queue.entries().size()}")
 
             if (it.queue.status.nextRetryTime > 0) {
 

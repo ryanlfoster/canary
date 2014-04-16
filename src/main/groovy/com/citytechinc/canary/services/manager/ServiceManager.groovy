@@ -44,6 +44,9 @@ public interface ServiceManager {
 
     /**
      *
+     * Sends synchronous (blocking) request to Mission Control, requesting the statistics for a specific
+     *   Persistence Service, Notification Agent, or Poll Response Handler.
+     *
      * @param identifier
      * @param type
      * @return
@@ -52,6 +55,8 @@ public interface ServiceManager {
 
     /**
      *
+     * Sends synchronous (blocking) request to Mission Control, requesting the records for a specific monitor.
+     *
      * @param identifier
      * @return
      */
@@ -59,21 +64,31 @@ public interface ServiceManager {
 
     /**
      *
+     * Sends asynchronous request to Mission Control, requesting that all monitors poll, even if they are in an alarmed
+     *   state.
+     *
      */
     public void requestAllMonitorsPoll()
 
     /**
+     *
+     * Sends asynchronous request to Mission Control, requesting that all monitors persist their records to all
+     *   appropriate PersistenceServices.
      *
      */
     public void requestAllMonitorsPersist()
 
     /**
      *
+     * Sends asynchronous request to Mission Control to request that the specified monitor its alarm.
+     *
      * @param identifier
      */
     public void resetAlarm(String identifier)
 
     /**
+     *
+     * Sends asynchronous request to Mission Control to request all monitors reset their alarms.
      *
      */
     public void resetAllAlarms()

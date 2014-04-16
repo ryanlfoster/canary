@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit
 class QueryStatisticsMonitor implements MonitoredService {
 
     private static final String BEAN = 'com.adobe.granite:type=TimeSeries,name=QUERY_AVERAGE,*'
-    private static final String ATTRIBUTE = 'ValuePerMinute'
+    private static final String ATTRIBUTE = 'ValuePerSecond'
 
     @Reference
     MBeanServer server
@@ -55,14 +55,17 @@ class QueryStatisticsMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        PollResponse response = PollResponse.SUCCESS()
+        log.debug("Polling...")
 
+        def response = PollResponse.SUCCESS()
         def names = server.queryNames(new ObjectName(BEAN), null)
 
         if (!names) {
 
             def timesSeriesMBean = names.first()
             def averageQueriesInMinutes = server.getAttribute(timesSeriesMBean, ATTRIBUTE) as List<Long>
+
+            log.info("averageQueriesInMinutes: ${averageQueriesInMinutes}")
 
             if (!averageQueriesInMinutes.findAll { it > warningThreshold }) {
 

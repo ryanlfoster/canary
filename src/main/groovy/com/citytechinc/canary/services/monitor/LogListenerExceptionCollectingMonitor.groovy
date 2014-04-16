@@ -6,6 +6,7 @@ import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.google.common.collect.Lists
+import groovy.util.logging.Slf4j
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
 import org.apache.felix.scr.annotations.ConfigurationPolicy
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit
     @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 @MonitoredServiceDefinition(description = 'Collects logged exceptions, reports aggregate data back when polled', pollInterval = 10, pollIntervalUnit = TimeUnit.SECONDS, alarmThreshold = 12)
 @AutomaticResetMonitor(resetInterval = 3, resetIntervalUnit = TimeUnit.MINUTES)
+@Slf4j
 class LogListenerExceptionCollectingMonitor implements MonitoredService, LogListener {
 
     List<LogEntry> entries = Lists.newCopyOnWriteArrayList()
@@ -71,6 +73,8 @@ class LogListenerExceptionCollectingMonitor implements MonitoredService, LogList
 
     @Override
     PollResponse poll() {
+
+        log.debug("Polling. ${entries.size()} entries have been logged.")
 
         def messages = entries.collect { "An exception was logged at ${Constants.JMX_DATE_TIME_FORMATTER.format(it.time)}".toString() }
         entries.clear()
