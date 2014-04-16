@@ -161,10 +161,15 @@ class EndpointComparisonMonitor implements MonitoredService {
         // WAIT FOR THE ACTORS TO FINISH...
         actors*.join()
 
-        // IF THE VALUES IN THE MAP ARE ALL UNIQUE THEN THE ENDPOINTS ARE EQUAL, ELSE...
-        (results.values() as List).unique().size() == 1 ? PollResponse.SUCCESS() : PollResponse.WARNING().addMessages(results.collect {
+        if (results.isEmpty() || (results.values() as List).unique().size() == 1) {
 
-            "${it.key} had a hash of ${it.value}" as String
-        })
+            PollResponse.SUCCESS()
+        } else {
+
+            PollResponse.WARNING().addMessages(results.collect {
+
+                "${it.key} had a hash of ${it.value}" as String
+            })
+        }
     }
 }
