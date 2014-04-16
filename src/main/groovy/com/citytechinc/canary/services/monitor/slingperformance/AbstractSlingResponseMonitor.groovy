@@ -77,7 +77,7 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
 
                 if (duration > warningThreshold) {
 
-                    requestStatistics << {recordRequest(slingRequest.requestURI, duration, new Date(System.currentTimeMillis() - duration))}
+                    requestStatistics << { recordRequest(slingRequest.requestURI, duration, new Date(System.currentTimeMillis() - duration)) }
                 }
             }
 
