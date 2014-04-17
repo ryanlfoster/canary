@@ -141,14 +141,14 @@ class EndpointComparisonMonitor implements MonitoredService {
 
         def results = Maps.newConcurrentMap()
 
-        def actors = endPoints.collect {
+        def actors = endPoints.collect { endPoint ->
 
-            def endPoint = it
+            def locallyDefinedEndpoint = endPoint
 
             Actors.actor {
 
                 def stopWatch = Stopwatch.createStarted()
-                String urlString = it + explicitPagePath
+                String urlString = locallyDefinedEndpoint + explicitPagePath
 
                 log.trace("Opening connection to url: ${urlString}")
 
