@@ -65,7 +65,7 @@ class QueryStatisticsMonitor implements MonitoredService {
             def timesSeriesMBean = names.first()
             def averageQueriesInMinutes = server.getAttribute(timesSeriesMBean, ATTRIBUTE) as List<Long>
 
-            log.info("averageQueriesInMinutes: ${averageQueriesInMinutes}")
+            log.debug("averageQueriesInMinutes: ${averageQueriesInMinutes}")
 
             if (!averageQueriesInMinutes.findAll { it > warningThreshold }) {
 
