@@ -56,7 +56,10 @@ class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
     @Override
     PollResponse poll() {
 
-        def statistics = requestStatistics.sendAndWait { retrieveAndClearStatistics() } as Map
+        log.debug("Polling...")
+
+        //def statistics = requestStatistics.sendAndWait { retrieveAndClearStatistics() } as Map
+        def statistics = [:]
 
         def messages = []
 
@@ -67,6 +70,8 @@ class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
                 messages.add("uri: ${requestURIs.key} has had selector: ${selectors.key} requested ${selectors.value} times".toString())
             }
         }
+
+        log.debug("messages size: ${messages.size()}")
 
         messages ? PollResponse.WARNING().addMessages(messages) : PollResponse.SUCCESS()
     }
@@ -84,9 +89,9 @@ class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
         def requestSelectors = slingRequest.requestPathInfo.selectors as List<String>
         def requestResourceType = slingRequest.resource?.resourceType
 
-        log.info("Processing request for resource type: ${requestResourceType} and selectors: ${requestSelectors}")
+        log.debug("Processing request for resource type: ${requestResourceType} and selectors: ${requestSelectors}")
 
-        def matchingResourceSelectors = []
+        List<String> matchingResourceSelectors = []
 
         scrService.components.findAll { it.services?.contains(Servlet.name) }.each {
 
@@ -110,19 +115,19 @@ class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
             }
         }
 
-        def uniqueMatchingResourceSelectors = matchingResourceSelectors.unique()
-        def uniqueRequestSelectors = requestSelectors.unique()
+        List<String> uniqueMatchingResourceSelectors = matchingResourceSelectors.unique()
+        List<String> uniqueRequestSelectors = requestSelectors.unique()
 
-        def verifiedSelectors = uniqueRequestSelectors.intersect uniqueMatchingResourceSelectors
-        def unverifiedSelectors = uniqueRequestSelectors - verifiedSelectors
+        List<String> verifiedSelectors = uniqueRequestSelectors.intersect uniqueMatchingResourceSelectors
+        List<String> unverifiedSelectors = uniqueRequestSelectors - verifiedSelectors
 
         if (unverifiedSelectors) {
 
-            log.info("The following selectors could be abusive: ${unverifiedSelectors}")
+            log.debug("The following selectors could be abusive: ${unverifiedSelectors}")
 
-            unverifiedSelectors.each {
+            unverifiedSelectors.each { selector ->
 
-                requestStatistics << { recordRequest(slingRequest.requestURI, it) }
+                requestStatistics << { recordRequest(slingRequest.requestURI, selector) }
             }
         }
 
