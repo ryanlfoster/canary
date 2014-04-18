@@ -5,7 +5,6 @@ import com.citytechinc.canary.api.monitor.AutomaticResetMonitor
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.MonitoredServiceDefinition
 import com.citytechinc.canary.api.monitor.PollResponse
-import com.google.common.collect.Maps
 import groovy.util.logging.Slf4j
 import groovyx.gpars.agent.Agent
 import org.apache.felix.scr.ScrService
@@ -43,7 +42,7 @@ import java.util.concurrent.TimeUnit
 @MonitoredServiceDefinition(description = '', pollInterval = 1, pollIntervalUnit = TimeUnit.MINUTES, alarmThreshold = 10)
 @AutomaticResetMonitor(resetInterval = 1, resetIntervalUnit = TimeUnit.MINUTES)
 @Slf4j
-class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
+class SlingSelectorMonitor implements MonitoredService, Filter {
 
     static final SLING_SERVLET_RESOURCE_TYPES_CONFIG_KEY = 'sling.servlet.resourceTypes'
     static final SLING_SERVLET_SELECTORS_CONFIG_KEY = 'sling.servlet.selectors'
@@ -58,20 +57,23 @@ class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
 
         log.debug("Polling...")
 
-        //def statistics = requestStatistics.sendAndWait { retrieveAndClearStatistics() } as Map
-        def statistics = [:]
+        def requestURIs = (requestStatistics.val as Map).keySet() as List
+
+        log.debug("requestURIs: ${requestURIs}")
 
         def messages = []
 
-        statistics.each { requestURIs ->
+        requestURIs.each { requestURI ->
 
-            requestURIs.each { selectors ->
+            def map = requestStatistics.sendAndWait { it.remove(requestURI) } as Map
 
-                messages.add("uri: ${requestURIs.key} has had selector: ${selectors.key} requested ${selectors.value} times".toString())
+            map.each { selectorEntry ->
+
+                messages.add("uri: ${requestURI} has had selector: ${selectorEntry.key} requested ${selectorEntry.value} times".toString())
             }
         }
 
-        log.debug("messages size: ${messages.size()}")
+        log.debug("messages: ${messages}")
 
         messages ? PollResponse.WARNING().addMessages(messages) : PollResponse.SUCCESS()
     }
@@ -128,6 +130,7 @@ class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
             unverifiedSelectors.each { selector ->
 
                 requestStatistics << { recordRequest(slingRequest.requestURI, selector) }
+                requestStatistics.instantVal
             }
         }
 
@@ -157,14 +160,6 @@ class SlingSelectorSentinelMonitor implements MonitoredService, Filter {
             def requestCount = innerMap.containsKey(selector) ? innerMap.get(selector) + 1 : 1
 
             innerMap.put(selector, requestCount)
-        }
-
-        private Map<String, Map<String, Integer>> retrieveAndClearStatistics() {
-
-            def clonedMap = Maps.newHashMap(data)
-            data.clear()
-
-            clonedMap
         }
     }
 }

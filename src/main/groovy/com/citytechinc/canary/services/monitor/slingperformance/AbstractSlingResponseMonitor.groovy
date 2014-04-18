@@ -4,7 +4,6 @@ import com.citytechinc.canary.Constants
 import com.citytechinc.canary.api.monitor.MonitoredService
 import com.citytechinc.canary.api.monitor.PollResponse
 import com.google.common.base.Stopwatch
-import com.google.common.collect.Maps
 import groovyx.gpars.agent.Agent
 import org.apache.felix.scr.annotations.Activate
 import org.apache.felix.scr.annotations.Component
@@ -41,7 +40,7 @@ import java.util.concurrent.TimeUnit
         @Property(name = OsgiConstants.SERVICE_VENDOR, value = Constants.CITYTECH_SERVICE_VENDOR_NAME) ])
 abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService {
 
-    private Agent requestStatistics = new RequestStatistics()
+    protected Agent requestStatistics = new RequestStatistics()
 
     @Property(name = 'warningThreshold', label = 'Response generation time warning threshold', longValue = 10L, description = '')
     private Long warningThreshold
@@ -95,12 +94,19 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
     @Override
     PollResponse poll() {
 
-        def statistics = requestStatistics.sendAndWait { retrieveAndClearStatistics() } as Map
+        getLogger().debug("Polling...")
 
-        def messages = statistics.collect {
+        def requestURIs = (requestStatistics.val as Map).keySet() as List
 
-            "'${it.key}' rendered ${it.value.numberOfRequests} times, shortest: ${it.value.shortestDuration}ms, average: ${it.value.averageDuration}ms, longest: ${it.value.longestDuration}ms".toString()
+        getLogger().debug("requestURIs: ${requestURIs}")
+
+        def messages = requestURIs.collect { requestURI ->
+
+            def statistic = requestStatistics.sendAndWait { it.remove(requestURI) } as RequestStatistic
+            "'${requestURI}' rendered ${statistic.numberOfRequests} times, shortest: ${statistic.shortestDuration}ms, average: ${statistic.averageDuration}ms, longest: ${statistic.longestDuration}ms".toString()
         }
+
+        getLogger().debug("messages: ${messages}")
 
         messages ? PollResponse.WARNING().addMessages(messages) : PollResponse.SUCCESS()
     }
@@ -125,14 +131,6 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
 
                 data.put(requestURI, new RequestStatistic(duration, occurrence))
             }
-        }
-
-        private Map<String, RequestStatistic> retrieveAndClearStatistics() {
-
-            def clonedMap = Maps.newHashMap(data)
-            data.clear()
-
-            clonedMap
         }
     }
 
