@@ -21,6 +21,7 @@ import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.PropertyOption
+import org.apache.felix.scr.annotations.PropertyUnbounded
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
 import org.apache.sling.api.resource.ResourceResolver
@@ -62,7 +63,7 @@ class EndpointComparisonMonitor implements MonitoredService {
     @Property(name = 'rootRandomPagePath', label = 'Root Random Page Page', value = '', description = 'The root page used to produce a list of descendants and randomly select from for comparison')
     private String rootRandomPagePath
 
-    @Property(name = 'resourcePaths', label = 'Resource Paths to Hit', value = ['', ''], description = 'List of absolute resource paths to randomly select from. ex: \'/content/yoursite.html\'')
+    @Property(name = 'resourcePaths', label = 'Resource Paths to Hit', description = 'List of absolute resource paths to randomly select from. ex: \'/content/yoursite.html\'', unbounded = PropertyUnbounded.ARRAY)
     private List<String> resourcePaths
 
     @Reference

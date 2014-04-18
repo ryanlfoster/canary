@@ -13,6 +13,7 @@ import org.apache.felix.scr.annotations.ConfigurationPolicy
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Properties
 import org.apache.felix.scr.annotations.Property
+import org.apache.felix.scr.annotations.PropertyUnbounded
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
 import org.apache.sling.commons.osgi.PropertiesUtil
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 class ReplicationAgentQueueMonitor implements MonitoredService {
 
-    @Property(name = 'agentIds', label = 'Agent IDs', value = ['publish', ''], description = 'Agent IDs to examine for blocked replication queues')
+    @Property(name = 'agentIds', label = 'Agent IDs', description = 'Agent IDs to examine for blocked replication queues', unbounded = PropertyUnbounded.ARRAY)
     private List<String> agentIds
 
     @Property(name = 'queueWarningThreshold', label = 'Queue size warning threshold', intValue =  50, description = 'The threshold used to indicate a warning')

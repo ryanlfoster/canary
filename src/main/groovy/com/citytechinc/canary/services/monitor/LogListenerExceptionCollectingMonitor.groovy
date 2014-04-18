@@ -14,6 +14,7 @@ import org.apache.felix.scr.annotations.Deactivate
 import org.apache.felix.scr.annotations.Modified
 import org.apache.felix.scr.annotations.Property
 import org.apache.felix.scr.annotations.Properties
+import org.apache.felix.scr.annotations.PropertyUnbounded
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.Service
 import org.apache.sling.commons.osgi.PropertiesUtil
@@ -45,7 +46,7 @@ class LogListenerExceptionCollectingMonitor implements MonitoredService, LogList
     @Reference
     LogReaderService logReaderService
 
-    @Property(name = 'scrutinizedPackagePaths', label = 'Scrutinized Packaged Paths', value = ['', ''], description = 'Package paths that should be scrutinized and reported backed to the framework')
+    @Property(name = 'scrutinizedPackagePaths', label = 'Scrutinized Packaged Paths', description = 'Package paths that should be scrutinized and reported backed to the framework', unbounded = PropertyUnbounded.ARRAY)
     private List<String> scrutinizedPackagePaths
 
     @Property(name = 'exceptionReportingThreshold', label = 'Exception Reporting Threshold', intValue =  3, description = 'The threshold indicator used in combination with the scrutinized package paths')
