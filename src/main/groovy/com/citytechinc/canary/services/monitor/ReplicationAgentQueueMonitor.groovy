@@ -56,9 +56,10 @@ class ReplicationAgentQueueMonitor implements MonitoredService {
     @Override
     PollResponse poll() {
 
-        def response = PollResponse.SUCCESS()
-
         log.debug("Polling. Scrutinizing agent ids: ${agentIds} of ${agentManager.agents.size()} available agents...")
+
+        def blockedQueueMessages = []
+        def queueOversizeMessages = []
 
         agentManager.agents.values()
                 .findAll { it.enabled }
@@ -69,13 +70,25 @@ class ReplicationAgentQueueMonitor implements MonitoredService {
 
             if (it.queue.status.nextRetryTime > 0) {
 
-                response = PollResponse.ERROR().addMessage("The replication queue for agent: '${it.configuration.agentId}' is blocked.")
+                blockedQueueMessages << "The replication queue for agent: '${it.configuration.agentId}' is blocked.".toString()
             } else if (it.queue.entries().size() > queueWarningThreshold) {
 
-                response = PollResponse.WARNING().addMessage("The replication queue for agent: '${it.configuration.agentId}' is above threshold.")
+                queueOversizeMessages << "The replication queue for agent: '${it.configuration.agentId}' is above threshold.".toString()
+            } else {
+
+                log.debug("Agent: ${it.configuration.agentId} is functioning properly")
             }
         }
 
-        response
+        if (blockedQueueMessages) {
+
+            PollResponse.ERROR().addMessages(blockedQueueMessages).addMessages(queueOversizeMessages)
+        } else if (queueOversizeMessages) {
+
+            PollResponse.WARNING().addMessages(queueOversizeMessages)
+        } else {
+
+            PollResponse.SUCCESS()
+        }
     }
 }
