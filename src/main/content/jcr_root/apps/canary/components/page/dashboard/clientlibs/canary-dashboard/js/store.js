@@ -359,14 +359,6 @@
   }
 
 
-  /**
-   * Set the monitor data to undefined to force a refresh next time it is requested.
-   */
-  function clearMonitorData () {
-    return load('MONITOR');
-  }
-
-
 
   /**TKTKTK
    * The search request handler. Returns a promise that passes the requested list of items whose name inlcudes a search string into its resolution.
@@ -381,13 +373,14 @@
         reject('Invalid identifier.');
       } else {
 
-        var postPromise = $.post( paths[ 'resetAlarm' ] + '?identifier=' + identifier );
+        /* var postPromise = $.post( paths[ 'resetAlarm' ] + '?identifier=' + identifier ); */
+        var postPromise = $.getJSON( paths[ 'resetAlarm' ] + '?identifier=' + identifier );
 
         postPromise.then(function (outcome) {
           var payload = {result: outcome, identifier: identifier};
 
-          /** invalidate all monitor data */
-          clearMonitorData();
+          /** reload all monitor data */
+          load('MONITOR');
 
           resolve( payload );
         }, function (reason) {
