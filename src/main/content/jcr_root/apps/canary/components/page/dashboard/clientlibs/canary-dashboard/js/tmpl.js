@@ -185,22 +185,25 @@ function program5(depth0,data) {
 
   var buffer = '';
   data.buffer.push(" <button class=\"btn btn-default btn-xs\" ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "reset", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "resetAlarm", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">reset</button> ");
   return buffer;
   }
 
   data.buffer.push("<tr ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "viewRecord", "identifier", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
   data.buffer.push(" ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("isError:danger isWarning:warning isNormal:success")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push("> <td>");
+  data.buffer.push("> <td><!-- ");
   stack1 = helpers._triageMustache.call(depth0, "identifier", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td> <td>");
+  data.buffer.push(" -->");
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td> <td>");
+  stack1 = helpers._triageMustache.call(depth0, "description", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td> ");
   stack1 = helpers['if'].call(depth0, "hasRecords", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
@@ -492,32 +495,6 @@ function program18(depth0,data) {
 
 });
 
-Ember.TEMPLATES["monitorReset"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var stack1, escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-
-  var buffer = '';
-  data.buffer.push(" <p>Monitor successfully reset. <a href=\"#\" ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "refresh", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Refresh monitor view</a>.</p> ");
-  return buffer;
-  }
-
-function program3(depth0,data) {
-
-
-  data.buffer.push(" <p>Monitor reset failed.</p> ");
-  }
-
-  stack1 = helpers['if'].call(depth0, "result", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  else { data.buffer.push(''); }
-
-});
-
 Ember.TEMPLATES["monitors"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
@@ -556,7 +533,7 @@ function program4(depth0,data) {
   data.buffer.push(" ");
   stack1 = helpers['if'].call(depth0, "warnCount", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Normal Services</h2class=\"text-left\"></caption> <thead><tr><th>Identifier</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
+  data.buffer.push(" <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Normal Services</h2class=\"text-left\"></caption> <thead><tr><th>Service Name</th><th>Description</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
   stack1 = helpers._triageMustache.call(depth0, "normalCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td></tr></tfoot> <tbody> ");
@@ -568,7 +545,7 @@ function program4(depth0,data) {
 function program5(depth0,data) {
 
   var buffer = '', stack1;
-  data.buffer.push(" <table class=\"table table-striped table-hover table-responsive\"> <caption><h2 class=\"text-left\">Service Errors</h2></caption> <thead><tr><th>Identifier</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th><th>&nbsp;</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
+  data.buffer.push(" <table class=\"table table-striped table-hover table-responsive\"> <caption><h2 class=\"text-left\">Service Errors</h2></caption> <thead><tr><th>Service Name</th><th>Description</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th><th>&nbsp;</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
   stack1 = helpers._triageMustache.call(depth0, "errorCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td></tr></tfoot> <tbody> ");
@@ -589,7 +566,7 @@ function program6(depth0,data) {
 function program8(depth0,data) {
 
   var buffer = '', stack1;
-  data.buffer.push(" <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Service Warnings</h2<</caption> <thead><tr><th>ID</th><th>Service Name</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
+  data.buffer.push(" <table class=\"table table-striped table-hover\"> <caption><h2 class=\"text-left\">Service Warnings</h2<</caption> <thead><tr><th>Service Name</th><th>Description</th><th>Last Logged At</th><th>Status</th><th>Average</th><th>Response</th></tr></thead> <tfoot><tr><td colspan=\"7\" class=\"text-right\">Showing ");
   stack1 = helpers._triageMustache.call(depth0, "warnCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" monitors.</td></tr></tfoot> <tbody> ");
@@ -610,17 +587,17 @@ function program10(depth0,data) {
 
   data.buffer.push("<section class=\"row\" id=\"reports\"> <div class=\"md-col-12\"> <div class=\"btn-group pull-right\"> <button type=\"button\" ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': (":btn :btn-default showGridView:active")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push(" ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "showGridView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push("><i class=\"glyphicon glyphicon-th\"></i></button> <button type=\"button\" ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': (":btn :btn-default showGridView::active")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push(" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "showTableview", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push("><i class=\"glyphicon glyphicon-th-list\"></i></button> </div> <h1 class=\"page-header\">Monitors</h1> ");
+  data.buffer.push("><i class=\"glyphicon glyphicon-th-list\"></i></button> <button type=\"button\" ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'class': (":btn :btn-default showGridView:active")
+  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push(" ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "showGridView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push("><i class=\"glyphicon glyphicon-th\"></i></button> </div> <h1 class=\"page-header\">Monitors</h1> ");
   stack1 = helpers['if'].call(depth0, "showGridView", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(4, program4, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push(" </div> <!-- md-col-12 --> </section>");

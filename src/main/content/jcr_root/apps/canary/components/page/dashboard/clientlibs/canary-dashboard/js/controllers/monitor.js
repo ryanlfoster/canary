@@ -127,10 +127,28 @@
       toggleCard: function() {
         this.set( 'isCardExpanded', !this.get('isCardExpanded') );
       },
+      resetAlarm: function() {
+        var id = this.get('identifier'),
+          resetPromise = Canary.store.resetAlarm(id),
+          self = this,
+          now = new Date().toUTCString();
 
-      reset: function() {
-        this.set( 'status', 'normal' );
-        this.transitionToRoute('monitor', this.get('id'));
+
+        resetPromise.then(function() {
+          console.log('Monitor reset: '+id);
+
+          var updatedPromise = Canary.store.find('MONITOR', id);
+          updatedPromise.then(function(payload) {
+            console.log('reset');
+            self.set('content', payload);
+          });
+
+          self.set('alert', 'Monitor Alarm Reset Successfully ('+now+').');
+        }, function(reason) {
+          console.log('Monitor reset failed: '+id);
+          self.set('alert', 'Monitor Alarm Reset Failed. Error: "'+reason+'" ('+now+').');
+        });
+        return false;
       }
 
     }

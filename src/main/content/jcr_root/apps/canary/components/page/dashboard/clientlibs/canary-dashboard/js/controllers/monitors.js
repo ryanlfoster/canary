@@ -8,7 +8,7 @@
 
 		// Properties:
 
-    showGridView: true,
+    showGridView: false,
 
 		// Counts:
 

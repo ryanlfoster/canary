@@ -46,39 +46,15 @@
       this.render('monitor', {
         outlet: 'main'
       });
-    },
+    }/*
+,
     actions: {
-      refresh: function () {
+      resetAlarm: function () {
+        console.log('route resetting alarm.');
         this.refresh();
-      },
-      resetAlarm: function() {
-        var id = this.controllerFor('monitor').get('identifier');
-        var resetPromise = Canary.store.resetAlarm(id);
-        var route = this;
-
-        resetPromise.then(function(result) {
-          route.refresh();
-          route.controllerFor('monitor').set('alert', 'Monitor Alarm Reset Successfully');
-        }, function(reason) {
-          route.controllerFor('monitor').set('alert', 'Monitor Alarm Reset Failed. Error: "'+reason+'"');
-        });
-        return false;
       }
     }
-  });
-
-  Canary.MonitorResetRoute = Ember.Route.extend({
-    model: function () {
-      var id = this.controllerFor('monitor').get('identifier');
-      //this.controllerFor('monitor').set('model', Canary.store.find('MONITOR', id));
-      return Canary.store.resetAlarm(id);
-    },
-    renderTemplate: function() {
-      this.render('monitorReset', {
-        outlet: 'reset'
-      });
-
-    }
+*/
   });
 
   Canary.SearchRoute = Ember.Route.extend({
