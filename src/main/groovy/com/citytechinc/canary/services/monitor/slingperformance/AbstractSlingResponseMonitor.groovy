@@ -42,12 +42,16 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
 
     protected Agent requestStatistics = new RequestStatistics()
 
-    @Property(name = 'warningThreshold', label = 'Response generation time warning threshold', longValue = 10L, description = '')
+    @Property(name = 'clearStatsWhenPolled', label = 'Clear Stats When Polled', boolValue = true, description = 'Whether or not stats should be cleared when polled')
+    private Boolean clearStatsWhenPolled
+
+    @Property(name = 'warningThreshold', label = 'Warning Threshold', longValue = 10L, description = 'Response generation time warning threshold')
     private Long warningThreshold
 
     @Activate
     @Modified
     protected void activate(Map<String, Object> properties) throws Exception {
+        clearStatsWhenPolled = PropertiesUtil.toBoolean(properties.get('clearStatsWhenPolled'), true)
         warningThreshold = PropertiesUtil.toLong(properties.get('warningThreshold'), 10L)
     }
 
@@ -102,7 +106,7 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
 
         def messages = requestURIs.collect { requestURI ->
 
-            def statistic = requestStatistics.sendAndWait { it.remove(requestURI) } as RequestStatistic
+            def statistic = clearStatsWhenPolled ? requestStatistics.sendAndWait { it.remove(requestURI) } : requestStatistics.sendAndWait { it.get(requestURI) } as RequestStatistic
             "'${requestURI}' rendered ${statistic.numberOfRequests} times, shortest: ${statistic.shortestDuration}ms, average: ${statistic.averageDuration}ms, longest: ${statistic.longestDuration}ms".toString()
         }
 

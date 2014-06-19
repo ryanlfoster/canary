@@ -1,7 +1,6 @@
 package com.citytechinc.canary.api.notification
 
 import groovy.transform.EqualsAndHashCode
-import org.codehaus.jackson.annotate.JsonIgnore
 
 import java.util.concurrent.TimeUnit
 
@@ -15,7 +14,6 @@ import java.util.concurrent.TimeUnit
 @EqualsAndHashCode
 public final class NotificationAgentWrapper {
 
-    @JsonIgnore
     @Delegate
     final NotificationAgent agent
 

@@ -171,10 +171,6 @@ class MonitorRecords {
 
             alarmed = failureRate(true) > alarmThreshold
 
-        } else if (alarmCriteria == AlarmCriteria.AVERAGE_EXECUTION_TIME) {
-
-            alarmed = averagePollExecutionTime(true) > alarmThreshold
-
         } else if (alarmCriteria == AlarmCriteria.RECENT_POLLS) {
 
             if (getUnexcusedRecords().size() > alarmThreshold) {

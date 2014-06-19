@@ -93,6 +93,7 @@ class EndpointComparisonMonitor implements MonitoredService {
             resourceResolver = resourceResolverFactory.getAdministrativeResourceResolver(null)
             PageManager pageManager = resourceResolver.adaptTo(PageManager)
 
+            // SELECT A RANDOM PAGE FROM THE PAGE PATH SUPPLIED, THE PAGE MUST BE ACTIVE
             if (type == ComparisonType.RANDOM_PAGE && rootRandomPagePath) {
 
                 Page rootPage = pageManager.getPage(rootRandomPagePath)
@@ -120,6 +121,7 @@ class EndpointComparisonMonitor implements MonitoredService {
 
                 }
 
+            // SELECT A RANDOM PAGE FROM A SUPPLIED LIST
             } else if (type == ComparisonType.RANDOM_PAGE_FROM_LIST) {
 
                 if (resourcePaths) {
@@ -140,8 +142,10 @@ class EndpointComparisonMonitor implements MonitoredService {
             }
         }
 
+        // THREAD SAFE MAP TO COLLECT RESULTS
         def results = Maps.newConcurrentMap()
 
+        // COLLECT THE ACTOR REFERENCES THAT WILL GO OUT AND REQUEST AGAINST THE ENDPOINT
         def actors = endPoints.collect { endPoint ->
 
             def locallyDefinedEndpoint = endPoint
@@ -153,6 +157,7 @@ class EndpointComparisonMonitor implements MonitoredService {
 
                 log.trace("Opening connection to url: ${urlString}")
 
+                // HASH THE RESPONSE
                 def urlHash = HASH_FUNCTION.hashBytes(urlString.toURL().getBytes()).toString()
 
                 log.info("Connection response received for url: ${urlString}, hash: ${urlHash} in ${stopWatch.stop().elapsed(TimeUnit.MILLISECONDS)}ms")
@@ -161,6 +166,7 @@ class EndpointComparisonMonitor implements MonitoredService {
             }
         }
 
+        // WAIT FOR ACTORS TO ALL FINISH...
         actors*.join()
 
         if (results.isEmpty() || (results.values() as List).unique().size() == 1) {

@@ -2,7 +2,6 @@ package com.citytechinc.canary.api.responsehandler
 
 import com.citytechinc.canary.api.notification.SubscriptionStrategy
 import groovy.transform.EqualsAndHashCode
-import org.codehaus.jackson.annotate.JsonIgnore
 
 /**
  *
@@ -14,7 +13,6 @@ import org.codehaus.jackson.annotate.JsonIgnore
 @EqualsAndHashCode
 public class PollResponseHandlerWrapper {
 
-    @JsonIgnore
     @Delegate
     final PollResponseHandler handler
 

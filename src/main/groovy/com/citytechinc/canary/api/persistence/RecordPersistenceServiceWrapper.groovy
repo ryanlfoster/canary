@@ -1,7 +1,6 @@
 package com.citytechinc.canary.api.persistence
 
 import groovy.transform.EqualsAndHashCode
-import org.codehaus.jackson.annotate.JsonIgnore
 
 /**
  *
@@ -13,7 +12,6 @@ import org.codehaus.jackson.annotate.JsonIgnore
 @EqualsAndHashCode
 public final class RecordPersistenceServiceWrapper {
 
-    @JsonIgnore
     @Delegate
     final RecordPersistenceService service
 

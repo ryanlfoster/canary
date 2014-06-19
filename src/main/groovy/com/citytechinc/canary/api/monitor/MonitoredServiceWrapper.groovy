@@ -3,7 +3,6 @@ package com.citytechinc.canary.api.monitor
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
-import org.codehaus.jackson.annotate.JsonIgnore
 
 import java.util.concurrent.TimeUnit
 
@@ -18,7 +17,6 @@ import java.util.concurrent.TimeUnit
 @Slf4j
 public final class MonitoredServiceWrapper {
 
-    @JsonIgnore
     @Delegate
     final MonitoredService monitor
 

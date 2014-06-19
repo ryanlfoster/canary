@@ -58,7 +58,6 @@
             <includes>
                 <include>com.citytechinc.cq:canary</include>
                 <include>com.citytechinc.cq:cq-groovy-extension</include>
-                <include>org.codehaus.jackson</include>
                 <include>com.google.guava</include>
                 <include>org.codehaus.gpars</include>
                 <include>org.codehaus.groovy</include>
