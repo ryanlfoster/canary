@@ -292,8 +292,8 @@
                         <Bundle-Name>${project.name}</Bundle-Name>
                         <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
                         <Bundle-DocURL>${project.url}</Bundle-DocURL>
-                        <Bundle-Activator>com.citytechinc.canary.Activator</Bundle-Activator>
-                        <Export-Package>com.citytechinc.canary.api.*</Export-Package>
+                        <Bundle-Activator>com.citytechinc.aem.canary.Activator</Bundle-Activator>
+                        <Export-Package>com.citytechinc.aem.canary.api.*</Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Bundle-Category>citytech</Bundle-Category>
                         <Sling-Nodetypes>SLING-INF/nodetypes/canary.cnd</Sling-Nodetypes>
