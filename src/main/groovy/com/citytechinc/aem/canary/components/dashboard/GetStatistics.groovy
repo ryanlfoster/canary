@@ -2,9 +2,8 @@ package com.citytechinc.aem.canary.components.dashboard
 
 import com.citytechinc.aem.canary.services.manager.ServiceManager
 import com.citytechinc.aem.canary.services.manager.actors.MissionControlActor
-import com.citytechinc.aem.canary.services.manager.actors.Statistics
 import com.citytechinc.aem.canary.servlets.AbstractJSONResponseServlet
-import com.google.common.base.Optional
+import groovy.json.JsonBuilder
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.sling.SlingServlet
 import org.apache.sling.api.SlingHttpServletRequest
@@ -30,7 +29,9 @@ class GetStatistics extends AbstractJSONResponseServlet {
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) {
 
-        Optional<Statistics> statistics = serviceManager.getStatistics(request.getParameter('identifier'), MissionControlActor.GetStatistics.Type.valueOf(request.getParameter('type')))
-        writeJsonResponse(response, statistics.present ? statistics.get() : [])
+        def statistics = serviceManager.getStatistics(request.getParameter('identifier'), MissionControlActor.GetStatistics.Type.valueOf(request.getParameter('type')))
+        def jsonBuilder = new JsonBuilder(statistics.present ? statistics.get() : [])
+
+        writeJsonResponse(response, jsonBuilder)
     }
 }

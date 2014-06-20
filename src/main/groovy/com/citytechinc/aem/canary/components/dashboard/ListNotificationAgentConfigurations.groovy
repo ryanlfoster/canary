@@ -2,6 +2,7 @@ package com.citytechinc.aem.canary.components.dashboard
 
 import com.citytechinc.aem.canary.services.manager.ServiceManager
 import com.citytechinc.aem.canary.servlets.AbstractJSONResponseServlet
+import groovy.json.JsonBuilder
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.sling.SlingServlet
 import org.apache.sling.api.SlingHttpServletRequest
@@ -27,6 +28,6 @@ class ListNotificationAgentConfigurations extends AbstractJSONResponseServlet {
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) {
 
-        writeJsonResponse(response, serviceManager.notificationAgentsConfigurations)
+        writeJsonResponse(response, new JsonBuilder(serviceManager.notificationAgentsConfigurations))
     }
 }

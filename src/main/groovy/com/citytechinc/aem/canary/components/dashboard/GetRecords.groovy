@@ -1,9 +1,8 @@
 package com.citytechinc.aem.canary.components.dashboard
 
-import com.citytechinc.aem.canary.api.monitor.MonitorRecords
 import com.citytechinc.aem.canary.services.manager.ServiceManager
 import com.citytechinc.aem.canary.servlets.AbstractJSONResponseServlet
-import com.google.common.base.Optional
+import groovy.json.JsonBuilder
 import org.apache.felix.scr.annotations.Reference
 import org.apache.felix.scr.annotations.sling.SlingServlet
 import org.apache.sling.api.SlingHttpServletRequest
@@ -29,7 +28,9 @@ class GetRecords extends AbstractJSONResponseServlet {
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) {
 
-        Optional<MonitorRecords> record = serviceManager.getRecordHolder(request.getParameter('identifier'))
-        writeJsonResponse(response, record.present ? record.get() : [])
+        def record = serviceManager.getRecordHolder(request.getParameter('identifier'))
+        def jsonBuilder = new JsonBuilder(record.present ? record.get() : [])
+
+        writeJsonResponse(response, jsonBuilder)
     }
 }
