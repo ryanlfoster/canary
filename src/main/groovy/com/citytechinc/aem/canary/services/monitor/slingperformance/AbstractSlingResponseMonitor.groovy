@@ -43,10 +43,10 @@ abstract class AbstractSlingResponseMonitor implements Filter, MonitoredService 
     protected Agent requestStatistics = new RequestStatistics()
 
     @Property(name = 'clearStatsWhenPolled', label = 'Clear Stats When Polled', boolValue = true, description = 'Whether or not stats should be cleared when polled')
-    private Boolean clearStatsWhenPolled
+    protected Boolean clearStatsWhenPolled
 
     @Property(name = 'warningThreshold', label = 'Warning Threshold', longValue = 10L, description = 'Response generation time warning threshold')
-    private Long warningThreshold
+    protected Long warningThreshold
 
     @Activate
     @Modified
