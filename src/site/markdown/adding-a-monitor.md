@@ -19,17 +19,17 @@ record set sent to the [Notification Agents](adding-a-notification-agent.html) i
 
 #### Basic, minimum configuration
 
-1. It implements [`MonitoredService`](groovydoc/com/citytechinc/canary/api/monitor/MonitoredService.html) interface.
+1. It implements [`MonitoredService`](groovydoc/com/citytechinc/aem/canary/api/monitor/MonitoredService.html) interface.
  The `MonitoredService` interface defines a single, zero argument method, `poll()` which has a return type of
-  [`PollResponse`](groovydoc/com/citytechinc/canary/api/monitor/PollResponse.html)
-2. It defines or has the [MonitoredServiceDefinition](groovydoc/com/citytechinc/canary/api/monitor/MonitoredServiceDefinition.html)
+  [`PollResponse`](groovydoc/com/citytechinc/aem/canary/api/monitor/PollResponse.html)
+2. It defines or has the [MonitoredServiceDefinition](groovydoc/com/citytechinc/aem/canary/api/monitor/MonitoredServiceDefinition.html)
   annotation (with required values). The annotation is used to define all aspects of the monitor within the Canary Framework, which include...
 
     * `name` a String (required)
     * `description` a String
     * `pollInterval` an int (required)
     * [`pollIntervalUnit`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/TimeUnit.html)
-    * [`alarmCriteria`](groovydoc/com/citytechinc/canary/api/monitor/AlarmCriteria.html)
+    * [`alarmCriteria`](groovydoc/com/citytechinc/aem/canary/api/monitor/AlarmCriteria.html)
     * `alarmThreshold` an int
     * `maxNumberOfRecords` an int
     * `persistWhenAlarmed` a boolean
@@ -38,7 +38,7 @@ record set sent to the [Notification Agents](adding-a-notification-agent.html) i
 
 #### Additional configuration annotations
 
-* There is an additional annotation, [`AutomaticResetMonitor`](groovydoc/com/citytechinc/canary/api/monitor/AutomaticResetMonitor.html), which, when supplied
+* There is an additional annotation, [`AutomaticResetMonitor`](groovydoc/com/citytechinc/aem/canary/api/monitor/AutomaticResetMonitor.html), which, when supplied
  enables polling while a monitor is alarmed. The annotation takes two, required arguments...
 
     1. resetInterval
